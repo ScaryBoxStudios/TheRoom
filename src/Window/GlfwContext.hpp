@@ -28,76 +28,30 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <functional>
-#include <chrono>
-#include "System/HeartBeat.hpp"
-#include "Window/GlfwContext.hpp"
-#include "Window/Window.hpp"
+#ifndef _GLFW_CONTEXT_HPP_
+#define _GLFW_CONTEXT_HPP_
 
-int main(int argc, char* argv[])
+#include "GlfwError.hpp"
+
+///==============================================================
+/// GlfwContext
+///  * A wrapper around Glfw library context creation/destruction
+///==============================================================
+class GlfwContext
 {
-    (void) argc;
-    (void) argv;
+    public:
+        /// Initializes the Glfw library context needed for glfw to operate
+        bool Init();
 
-    {
-        // Initialize glfw library context
-        GlfwContext glfwContext;
-        glfwContext.Init();
+        /// Deinitializes the Glfw context
+        void Shutdown();
 
-        // Create the main loop algorithm strategy
-        HeartBeat hb;
-        auto exitHandler = std::bind(&HeartBeat::SetRunning, &hb, false);
+        /// Returns the state of the Glfw context initialization
+        bool IsInitialized();
 
-        // Create the window and set its properties
-        Window window;
-        window.Create(800, 600, "TheRoom", Window::Mode::Windowed);
-        window.SetShowFPS(true);
-        window.SetCloseHandler(exitHandler);
-        window.SetKeyPressedHandler(
-            [&exitHandler](Key k, KeyAction ka)
-            {
-                if(k == Key::Escape && ka == KeyAction::Release)
-                    exitHandler();
-            }
-        );
+    private:
+        static bool sInitialized;
+};
 
-        // Set the time source
-        hb.SetTimer([]
-            {
-                return static_cast<double>(
-                    std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::system_clock::now().time_since_epoch()
-                    ).count()
-                );
-            }
-        );
-
-        // Set the state update callback
-        hb.SetUpdate([&window](float dt)
-            {
-                (void) dt;
-                window.PollEvents();
-            }
-        );
-
-        // Set the render callback
-        hb.SetRender([&window](float interpolation)
-            {
-                (void) interpolation;
-                window.SwapBuffers();
-            }
-        );
-        
-        // Run the main loop
-        hb.Run();
-
-        // Destroy the created window
-        window.Destroy();
-
-        // Uninitialize the glfw library context
-        glfwContext.Shutdown();
-    }
-
-    return 0;
-}
+#endif // ! _GLFW_CONTEXT_HPP_
 

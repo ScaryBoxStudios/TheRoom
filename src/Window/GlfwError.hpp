@@ -28,76 +28,35 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <functional>
-#include <chrono>
-#include "System/HeartBeat.hpp"
-#include "Window/GlfwContext.hpp"
-#include "Window/Window.hpp"
+#ifndef _GLFW_ERROR_HPP_
+#define _GLFW_ERROR_HPP_
 
-int main(int argc, char* argv[])
+#include <string>
+
+///==============================================================
+/// GlfwError
+///  * The description of a Glfw error
+///==============================================================
+class GlfwError
 {
-    (void) argc;
-    (void) argv;
+    public:
+        GlfwError(int errorCode, std::string desc);
+        int GetErrorCode() const;
+        const std::string& GetDescription() const;
 
-    {
-        // Initialize glfw library context
-        GlfwContext glfwContext;
-        glfwContext.Init();
+    private:
+        int mErrCode;
+        std::string mDescription;
+};
 
-        // Create the main loop algorithm strategy
-        HeartBeat hb;
-        auto exitHandler = std::bind(&HeartBeat::SetRunning, &hb, false);
+/// Registers the current error handling system
+void RegisterGlfwErrorHandler();
 
-        // Create the window and set its properties
-        Window window;
-        window.Create(800, 600, "TheRoom", Window::Mode::Windowed);
-        window.SetShowFPS(true);
-        window.SetCloseHandler(exitHandler);
-        window.SetKeyPressedHandler(
-            [&exitHandler](Key k, KeyAction ka)
-            {
-                if(k == Key::Escape && ka == KeyAction::Release)
-                    exitHandler();
-            }
-        );
+/// Indicates whether the last error value is set
+bool IsGlfwErrorSet();
 
-        // Set the time source
-        hb.SetTimer([]
-            {
-                return static_cast<double>(
-                    std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::system_clock::now().time_since_epoch()
-                    ).count()
-                );
-            }
-        );
+/// Returns the last error status of all glfw actions
+GlfwError GetLastGlfwError();
 
-        // Set the state update callback
-        hb.SetUpdate([&window](float dt)
-            {
-                (void) dt;
-                window.PollEvents();
-            }
-        );
-
-        // Set the render callback
-        hb.SetRender([&window](float interpolation)
-            {
-                (void) interpolation;
-                window.SwapBuffers();
-            }
-        );
-        
-        // Run the main loop
-        hb.Run();
-
-        // Destroy the created window
-        window.Destroy();
-
-        // Uninitialize the glfw library context
-        glfwContext.Shutdown();
-    }
-
-    return 0;
-}
+#endif // ! _GLFW_ERROR_HPP_
 

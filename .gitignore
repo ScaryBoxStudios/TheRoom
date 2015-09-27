@@ -187,7 +187,8 @@ ipch/
 #=====================================
 
 # External resources
-ext/
+# TODO: Track them elsewhere
+#ext/
 
 # Doxygen generated documentation
 doc/gen/

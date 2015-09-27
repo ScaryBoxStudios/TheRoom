@@ -32,7 +32,7 @@
 #include <chrono>
 #include "System/HeartBeat.hpp"
 #include "Window/GlfwContext.hpp"
-#include "Window/Window.hpp"
+#include "Game/Game.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -40,28 +40,12 @@ int main(int argc, char* argv[])
     (void) argv;
 
     {
-        // Initialize glfw library context
         GlfwContext glfwContext;
         glfwContext.Init();
 
-        // Create the main loop algorithm strategy
         HeartBeat hb;
-        auto exitHandler = std::bind(&HeartBeat::SetRunning, &hb, false);
+        Game game;
 
-        // Create the window and set its properties
-        Window window;
-        window.Create(800, 600, "TheRoom", Window::Mode::Windowed);
-        window.SetShowFPS(true);
-        window.SetCloseHandler(exitHandler);
-        window.SetKeyPressedHandler(
-            [&exitHandler](Key k, KeyAction ka)
-            {
-                if(k == Key::Escape && ka == KeyAction::Release)
-                    exitHandler();
-            }
-        );
-
-        // Set the time source
         hb.SetTimer([]
             {
                 return static_cast<double>(
@@ -71,30 +55,14 @@ int main(int argc, char* argv[])
                 );
             }
         );
-
-        // Set the state update callback
-        hb.SetUpdate([&window](float dt)
-            {
-                (void) dt;
-                window.PollEvents();
-            }
-        );
-
-        // Set the render callback
-        hb.SetRender([&window](float interpolation)
-            {
-                (void) interpolation;
-                window.SwapBuffers();
-            }
-        );
+        hb.SetUpdate(std::bind(&Game::Update, &game, std::placeholders::_1));
+        hb.SetRender(std::bind(&Game::Render, &game, std::placeholders::_1));
+        game.SetExitHandler(std::bind(&HeartBeat::SetRunning, &hb, false));
         
-        // Run the main loop
+        game.Init();
         hb.Run();
+        game.Shutdown();
 
-        // Destroy the created window
-        window.Destroy();
-
-        // Uninitialize the glfw library context
         glfwContext.Shutdown();
     }
 

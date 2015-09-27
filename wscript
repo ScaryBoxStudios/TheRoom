@@ -36,7 +36,7 @@ INCLUDES          = ['deps/*/include']
 STLIBPATH         = ['deps/*/lib']
 
 # List of static library names to use without prefix or extension
-STLIB             = ['glfw', 'glad', 'opengl32', 'glu32', 'ole32', 'gdi32', 'advapi32', 'user32', 'shell32']
+STLIB             = ['png', 'zlib', 'glfw', 'glad', 'opengl32', 'glu32', 'ole32', 'gdi32', 'advapi32', 'user32', 'shell32']
 
 # List of common defines for all build variants
 DEFINES           = []

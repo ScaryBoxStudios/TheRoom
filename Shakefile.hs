@@ -196,6 +196,37 @@ sharedLibraryExtension =
     OSX     -> "dylib"
     Windows -> "dll"
 
+-- | File prefix for static libraries.
+staticLibPrefix :: ToolChainVariant -> String
+staticLibPrefix t =
+  case t of
+    MSVC -> ""
+    _    -> "lib"
+
+-- | File extension for static libraries.
+staticLibExtension :: ToolChainVariant -> String
+staticLibExtension t =
+    if os == Windows && t == MSVC
+        then "lib"
+        else "a"
+
+-- | Master build output name construction.
+masterOutName :: BuildResult -> ToolChainVariant -> String -> String
+masterOutName b t n = prefix ++ name <.> extension
+    where
+        prefix    = case b of
+                      Binary _ -> ""
+                      Archive  -> staticLibPrefix t
+        name      = case b of
+                      Binary _ -> n
+                      Archive  -> case t of
+                                     MSVC -> n
+                                     _    -> n
+        extension = case b of
+                         Binary Executable    -> executableExtension
+                         Binary SharedLibrary -> sharedLibraryExtension
+                         Archive -> staticLibExtension t
+
 ---------------------------------------------------------------------------
 -- Language
 ---------------------------------------------------------------------------
@@ -290,17 +321,7 @@ main = do
         let toolchain = fromMaybe defToolchain givenToolchain
 
         -- Set the main target
-        let outName = (case projType of
-                         Binary _ -> ""
-                         Archive  -> if toolchain `elem` [GCC, LLVM]
-                                        then "lib"
-                                        else "") ++ projName <.> 
-                      (case projType of
-                         Binary Executable    -> executableExtension
-                         Binary SharedLibrary -> sharedLibraryExtension
-                         Archive -> if toolchain `elem` [GCC, LLVM]
-                                       then "a"
-                                       else "lib")
+        let outName = masterOutName projType toolchain projName
 
         let mainTgt = (case projType of
                         Binary _ -> binDir

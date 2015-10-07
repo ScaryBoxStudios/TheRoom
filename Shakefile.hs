@@ -25,9 +25,9 @@ projName = "TheRoom"
 srcDir :: String
 srcDir = "src"
 
--- Intermediate directory
-intDir :: String
-intDir = "tmp"
+-- Build directory
+bldDir :: String
+bldDir = "tmp"
 
 -- Output directory for executables
 binDir :: String
@@ -303,7 +303,7 @@ additionalFlags =
 ---------------------------------------------------------------------------
 main :: IO ()
 main = do
-    let opts = shakeOptions { shakeFiles = "tmp/.shake"
+    let opts = shakeOptions { shakeFiles = bldDir </> ".shake"
                             , shakeOutput = const $ BS.putStr . BS.pack
                             }
     shakeArgsWith opts additionalFlags $ \flags targets -> return $ Just $ do
@@ -345,9 +345,9 @@ main = do
                             Just _  -> "Using toolchain: ") ++ show toolchain ++ "\n"
 
         "clean" ~> do
-            putNormal "Cleaning..."
-            removeFilesAfter "." ["tmp"]
-            putNormal "All clean."
+            putNormal "Cleaning...\n"
+            removeFilesAfter "." [bldDir]
+            putNormal "All clean.\n"
 
         mainTgt %> \out -> do
             -- Initial banner
@@ -357,7 +357,7 @@ main = do
             srcfiles <- getDirectoryFiles "" ["src//*.cpp"]
 
             -- Create the future object file list
-            let objfiles = [intDir </> sf -<.> "o" | sf <- srcfiles]
+            let objfiles = [bldDir </> sf -<.> "o" | sf <- srcfiles]
 
             -- Set the object file dependency
             need objfiles
@@ -373,7 +373,7 @@ main = do
             let params = LinkParams { ldflags = ["-static", "-static-libgcc", "-static-libstdc++"], libPaths = libpath, libraries = libs }
             quietly $ cmd $ gccLinkCommand params objfiles out
 
-        intDir </> "//*.o" %> \out -> do
+        bldDir </> "//*.o" %> \out -> do
             -- Set the source
             let c = dropDirectory1 $ out -<.> "cpp"
 

@@ -13,6 +13,10 @@ import qualified System.Info as System
 ---------------------------------------------------------------------------
 -- | Project properties
 ---------------------------------------------------------------------------
+-- Project type
+projType :: BuildResult
+projType = Binary Executable
+
 -- Project name
 projName :: String
 projName = "TheRoom"
@@ -25,9 +29,13 @@ srcDir = "src"
 intDir :: String
 intDir = "tmp"
 
--- Output directory
+-- Output directory for executables
 binDir :: String
 binDir = "bin"
+
+-- Output directory for libraries
+libDir :: String
+libDir = "lib"
 
 -- Additional include paths
 includes :: [String]
@@ -42,18 +50,19 @@ libs :: [String]
 libs = ["png", "zlib", "glfw", "glad", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
 
 ---------------------------------------------------------------------------
--- |
+-- | Project Target
 ---------------------------------------------------------------------------
 -- | Final build result type
 data BuildResult =
     Binary LinkResult -- ^ Executable or Shared Library
   | Archive           -- ^ Static library
+  deriving (Eq, Show)
 
 -- | Link result type
 data LinkResult =
     Executable      -- ^ Executable
   | SharedLibrary   -- ^ Shared (dynamically linked) library
-  deriving (Enum, Eq, Show)
+  deriving (Eq, Show)
 
 -- | Build variant type
 data BuildVariant =
@@ -267,9 +276,6 @@ main = do
                             , shakeOutput = const $ BS.putStr . BS.pack
                             }
     shakeArgsWith opts additionalFlags $ \flags targets -> return $ Just $ do
-        -- Set the main target
-        if null targets then want [binDir </> projName <.> exe] else want targets
-
         -- Extract the parameters from the flag arguments or set defaults if not given
         let defVariant = Release
         let defArch = I386
@@ -282,6 +288,25 @@ main = do
         let variant = fromMaybe defVariant givenVariant
         let arch = fromMaybe defArch givenArch
         let toolchain = fromMaybe defToolchain givenToolchain
+
+        -- Set the main target
+        let outName = (case projType of
+                         Binary _ -> ""
+                         Archive  -> if toolchain `elem` [GCC, LLVM]
+                                        then "lib"
+                                        else "") ++ projName <.> 
+                      (case projType of
+                         Binary Executable    -> executableExtension
+                         Binary SharedLibrary -> sharedLibraryExtension
+                         Archive -> if toolchain `elem` [GCC, LLVM]
+                                       then "a"
+                                       else "lib")
+
+        let mainTgt = (case projType of
+                        Binary _ -> binDir
+                        Archive  -> libDir) </> outName
+
+        if null targets then want [mainTgt] else want targets
 
         -- Shows info about the build that follows
         "banner" ~> do
@@ -303,7 +328,7 @@ main = do
             removeFilesAfter "." ["tmp"]
             putNormal "All clean."
 
-        binDir </> projName <.> exe %> \out -> do
+        mainTgt %> \out -> do
             -- Initial banner
             need ["banner"]
 

@@ -267,29 +267,36 @@ main = do
                             , shakeOutput = const $ BS.putStr . BS.pack
                             }
     shakeArgsWith opts additionalFlags $ \flags targets -> return $ Just $ do
+        -- Set the main target
         if null targets then want [binDir </> projName <.> exe] else want targets
 
+        -- Extract the parameters from the flag arguments or set defaults if not given
+        let defVariant = Release
+        let defArch = I386
+        let defToolchain = GCC
+
+        let givenVariant = listToMaybe [v | BVFlag v <- flags]
+        let givenArch = listToMaybe [v | AFlag v <- flags]
+        let givenToolchain = listToMaybe [v | TVFlag v <- flags]
+
+        let variant = fromMaybe defVariant givenVariant
+        let arch = fromMaybe defArch givenArch
+        let toolchain = fromMaybe defToolchain givenToolchain
+
+        -- Shows info about the build that follows
         "banner" ~> do
             -- Variant
-            let defVariant = Release
-            let variant = listToMaybe [v | BVFlag v <- flags]
-            case variant of
-                Nothing -> putNormal $ "No build variant given. Defaulting to " ++ show defVariant ++ "\n"
-                Just x  -> putNormal $ "Build variant: " ++ show x ++ "\n"
-
+            putNormal $ (case givenVariant of
+                            Nothing -> "No build variant given. Defaulting to: "
+                            Just _  -> "Build variant: ") ++ show variant ++ "\n"
             -- Arch
-            let defArch = I386
-            let arch = listToMaybe [v | AFlag v <- flags]
-            case arch of
-                Nothing -> putNormal $ "No target arch given. Defaulting to " ++ show defArch ++ "\n"
-                Just x  -> putNormal $ "Target arch: " ++ show x ++ "\n"
-
+            putNormal $ (case givenArch of
+                            Nothing -> "No target arch given. Defaulting to: "
+                            Just _  -> "Target arch: ") ++ show arch ++ "\n"
             -- Toolchain
-            let defToolchain = GCC
-            let toolchain = listToMaybe [v | TVFlag v <- flags]
-            case toolchain of
-                Nothing -> putNormal $ "No toolchain variant given. Defaulting to " ++ show defToolchain ++ "\n"
-                Just x  -> putNormal $ "Using toolchain: " ++ show x ++ "\n"
+            putNormal $ (case givenToolchain of
+                            Nothing -> "No toolchain variant given. Defaulting to: "
+                            Just _  -> "Using toolchain: ") ++ show toolchain ++ "\n"
 
         "clean" ~> do
             putNormal "Cleaning..."

@@ -310,10 +310,10 @@ main = do
             need objfiles
 
             -- Pretty print info about the command to be executed
-            liftIO $ setSGR [SetColor Foreground Vivid Green]
-            putNormal "[\240]"
+            liftIO $ setSGR [SetColor Foreground Dull Green]
+            putNormal "[\240] Linking "
             liftIO $ setSGR [SetColor Foreground Dull Yellow]
-            putNormal $ " Linking " ++ out ++ "\n"
+            putNormal $ out ++ "\n"
             liftIO $ setSGR [Reset]
 
             -- Schedule the link command
@@ -326,9 +326,9 @@ main = do
 
             -- Pretty print info about the command to be executed
             liftIO $ setSGR [SetColor Foreground Vivid Green]
-            putNormal "[\175]"
+            putNormal "[\175] Compiling "
             liftIO $ setSGR [SetColor Foreground Vivid Yellow]
-            putNormal $ " Compiling " ++ c ++ "\n"
+            putNormal $ c ++ "\n"
             liftIO $ setSGR [Reset]
 
             -- Schedule the compile command

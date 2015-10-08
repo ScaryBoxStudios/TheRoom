@@ -357,7 +357,7 @@ main = do
             srcfiles <- getDirectoryFiles srcDir ["//*.cpp"]
 
             -- Create the future object file list
-            let objfiles = [bldDir </> sf -<.> "o" | sf <- srcfiles]
+            let objfiles = [bldDir </> sf <.> "o" | sf <- srcfiles]
 
             -- Set the object file dependency
             need objfiles
@@ -373,9 +373,9 @@ main = do
             let params = LinkParams { ldflags = ["-static", "-static-libgcc", "-static-libstdc++"], libPaths = libpath, libraries = libs }
             quietly $ cmd $ gccLinkCommand params objfiles out
 
-        bldDir </> "//*.o" %> \out -> do
+        bldDir <//> "*.o" %> \out -> do
             -- Set the source
-            let c = dropDirectory1 $ out -<.> "cpp"
+            let c = toStandard $ srcDir </> (dropDirectory1 $ dropExtension out)
 
             -- Pretty print info about the command to be executed
             liftIO $ setSGR [SetColor Foreground Vivid Green]

@@ -1,5 +1,6 @@
 module Shakefile where
 
+import Data.Char
 import Data.Maybe
 import Development.Shake
 import Development.Shake.FilePath
@@ -221,7 +222,7 @@ masterOutName b t n = prefix ++ name <.> extension
                       Binary _ -> n
                       Archive  -> case t of
                                      MSVC -> n
-                                     _    -> n
+                                     _    -> map toLower n
         extension = case b of
                          Binary Executable    -> executableExtension
                          Binary SharedLibrary -> sharedLibraryExtension

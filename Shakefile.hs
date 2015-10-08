@@ -376,7 +376,7 @@ main = do
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source
-            let c = toStandard $ srcDir </> (dropDirectory1 $ dropExtension out)
+            let c = toStandard srcDir </> dropDirectory1 (dropExtension out)
 
             -- Pretty print info about the command to be executed
             liftIO $ setSGR [SetColor Foreground Vivid Green]

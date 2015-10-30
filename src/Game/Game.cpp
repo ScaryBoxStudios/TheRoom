@@ -9,7 +9,7 @@ WARN_GUARD_ON
 #include "../Graphics/Image/Png/Png.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <Png.hpp>
+#include <png++/png.hpp>
 WARN_GUARD_OFF
 
 ///==============================================================

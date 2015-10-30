@@ -4,7 +4,7 @@
 #include <cstdint>
 #include "../PixelTraits.hpp"
 #include "../PixelBufferTraits.hpp"
-#include <png.hpp>
+#include <png++/png.hpp>
 
 //--------------------------------------------------
 // \brief Pixel traits class specialization

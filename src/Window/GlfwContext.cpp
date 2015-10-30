@@ -1,6 +1,6 @@
 #include "GlfwContext.hpp"
 #include <string>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 ///==============================================================
 ///= GlfwContext

@@ -157,6 +157,39 @@ msvcLinkCommand params input output =
     librs = map ("/IMPLIB:" ++) (libraries params)
     
 ---------------------------------------------------------------------------
+-- | Toolchain Default flags
+---------------------------------------------------------------------------
+-- Msvc
+msvcDefaultCompilerFlags :: BuildVariant -> [String]
+msvcDefaultCompilerFlags variant =
+    ["/nologo", "/EHsc", "/W4"] ++
+    case variant of
+      Release -> ["/MT", "/O2"]
+      Debug   -> ["/MTd", "/Zi", "/Od", "/FS"]
+
+msvcDefaultLinkerFlags :: BuildVariant -> [String]
+msvcDefaultLinkerFlags variant =
+    ["/nologo", "/manifest", "/entry:mainCRTStartup"] ++
+    case variant of
+        Release -> ["/debug"]
+        Debug   -> ["/incremental:NO"]
+
+-- Gcc
+gccDefaultCompilerFlags :: BuildVariant -> [String]
+gccDefaultCompilerFlags variant =
+    ["-Wall", "-Wextra", "-std=c++11"] ++
+    case variant of
+        Release -> ["-O2"]
+        Debug   -> ["-g", "-O0"]
+
+gccDefaultLinkerFlags :: BuildVariant -> [String]
+gccDefaultLinkerFlags variant =
+    ["-static", "-static-libgcc", "-static-libstdc++"] ++
+    case variant of
+        Release -> []
+        Debug   -> []
+
+---------------------------------------------------------------------------
 -- OS
 ---------------------------------------------------------------------------
 -- | Host operating system.
@@ -395,7 +428,7 @@ main = do
             liftIO $ setSGR [Reset]
 
             -- Schedule the link command
-            let params = LinkParams { ldflags = ["-static", "-static-libgcc", "-static-libstdc++"], libPaths = libpath, libraries = libs }
+            let params = LinkParams { ldflags = gccDefaultLinkerFlags variant, libPaths = libpath, libraries = libs }
             quietly $ cmd $ gccLinkCommand params objfiles out
 
         bldDir <//> "*.o" %> \out -> do
@@ -411,7 +444,7 @@ main = do
             liftIO $ setSGR [Reset]
 
             -- Schedule the compile command
-            let params = CompileParams { cflags = ["-Wall", "-Wextra", "-std=c++11", "-O2"], defines = ["NDEBUG"], includePaths = includes }
+            let params = CompileParams { cflags = gccDefaultCompilerFlags variant, defines = ["NDEBUG"], includePaths = includes }
             () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ gccCompileCommand params c out
 
             -- Set up the dependencies upon the header files

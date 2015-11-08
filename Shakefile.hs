@@ -171,8 +171,8 @@ msvcDefaultLinkerFlags :: BuildVariant -> [String]
 msvcDefaultLinkerFlags variant =
     ["/nologo", "/manifest", "/entry:mainCRTStartup"] ++
     case variant of
-        Release -> ["/debug"]
-        Debug   -> ["/incremental:NO"]
+        Release -> ["/incremental:NO"]
+        Debug   -> ["/debug"]
 
 -- Gcc
 gccDefaultCompilerFlags :: BuildVariant -> [String]

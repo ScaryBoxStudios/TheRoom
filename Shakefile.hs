@@ -357,6 +357,45 @@ additionalFlags =
     ]
 
 ---------------------------------------------------------------------------
+-- | Command builders
+---------------------------------------------------------------------------
+-- Compile command builder
+genCompileCmd :: ToolChainVariant -> BuildVariant -> FilePath -> FilePath -> String
+genCompileCmd toolchain variant =
+    ccGen params
+  where
+    ccGen = case toolchain of
+              MSVC -> msvcCompileCommand
+              GCC  -> gccCompileCommand
+              LLVM -> gccCompileCommand
+    params = CompileParams
+             { cflags = (case toolchain of
+                           MSVC -> msvcDefaultCompilerFlags
+                           GCC  -> gccDefaultCompilerFlags
+                           LLVM -> gccDefaultCompilerFlags) variant
+             , defines = []
+             , includePaths = includes
+             }
+
+-- Link command builder
+genLinkCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> FilePath -> String
+genLinkCmd toolchain variant =
+    linkGen params
+  where
+    linkGen = case toolchain of
+                MSVC -> msvcLinkCommand
+                GCC  -> gccLinkCommand
+                LLVM -> gccLinkCommand
+    params = LinkParams
+             { ldflags = (case toolchain of
+                            MSVC -> msvcDefaultLinkerFlags
+                            GCC  -> gccDefaultLinkerFlags
+                            LLVM -> gccDefaultLinkerFlags) variant
+             , libPaths = libpath
+             , libraries = libs
+             }
+
+---------------------------------------------------------------------------
 -- | Entrypoint
 ---------------------------------------------------------------------------
 main :: IO ()
@@ -428,8 +467,7 @@ main = do
             liftIO $ setSGR [Reset]
 
             -- Schedule the link command
-            let params = LinkParams { ldflags = gccDefaultLinkerFlags variant, libPaths = libpath, libraries = libs }
-            quietly $ cmd $ gccLinkCommand params objfiles out
+            quietly $ cmd $ genLinkCmd toolchain variant objfiles out
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source
@@ -444,8 +482,7 @@ main = do
             liftIO $ setSGR [Reset]
 
             -- Schedule the compile command
-            let params = CompileParams { cflags = gccDefaultCompilerFlags variant, defines = ["NDEBUG"], includePaths = includes }
-            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ gccCompileCommand params c out
+            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ genCompileCmd toolchain variant c out
 
             -- Set up the dependencies upon the header files
             let fileName = dropExtension (takeFileName out)

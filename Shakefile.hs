@@ -154,7 +154,7 @@ msvcLinkCommand params input output =
     ld = ["link"]
     ldflgs = ldflags params
     libraryPaths = map ("/LIBPATH:" ++) (libPaths params)
-    librs = map ("/IMPLIB:" ++) (libraries params)
+    librs = map (++ ".lib") (libraries params)
     
 ---------------------------------------------------------------------------
 -- | Toolchain Default flags

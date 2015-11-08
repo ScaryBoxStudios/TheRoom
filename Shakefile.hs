@@ -140,7 +140,7 @@ gccLinkCommand params input output =
 -- | Generates Msvc compile commands
 msvcCompileCommand :: CompileAction
 msvcCompileCommand params input output =
-    unwords $ cxx ++ ["/c"] ++ ["/Fo", output] ++ defs ++ incls ++ [input]
+    unwords $ cxx ++ ["/c"] ++ ["/Fo" ++ output] ++ defs ++ incls ++ [input]
   where
     cxx = ["cl"]
     defs = map ("/D" ++) (defines params)
@@ -149,7 +149,7 @@ msvcCompileCommand params input output =
 -- | Generates Msvc link commands
 msvcLinkCommand :: LinkAction
 msvcLinkCommand params input output =
-    unwords $ ld ++ ldflgs ++ ["/OUT:", output] ++ libraryPaths ++ input ++ librs
+    unwords $ ld ++ ldflgs ++ ["/OUT:" ++ output] ++ libraryPaths ++ input ++ librs
   where
     ld = ["link"]
     ldflgs = ldflags params

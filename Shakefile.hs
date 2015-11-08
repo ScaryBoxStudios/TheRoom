@@ -1,12 +1,14 @@
 module Shakefile where
 
+import Control.Monad
 import Data.Char
+import Data.List
 import Data.Maybe
 import Development.Shake
 import Development.Shake.FilePath
-import Development.Shake.Util
 import System.Console.ANSI
 import System.Console.GetOpt
+import System.Directory
 import Text.Read
 import qualified Data.ByteString.Char8 as BS
 import qualified System.Info as System
@@ -254,16 +256,38 @@ languageOf :: FilePath -> Maybe Language
 languageOf = flip lookup defaultLanguageMap . takeExtension
 
 ---------------------------------------------------------------------------
--- | Build Process
+-- | Include parser
 ---------------------------------------------------------------------------
-{-
-    Stdout stdout <‐ cmd "cl ‐showincludes ‐c" [input] ["‐Fo" ++ output]
-    need [ dropWhile isSpace x
-    | x <‐ lines stdout
-    , Just x <‐ [stripPrefix "Note: including file:" x]]
+-- | Strips the filename from an include preprocessor command
+takeIncludePath :: String -> String
+takeIncludePath = tail . init . (!! 1) . words
 
-    usedHeaders src = [init x | x <‐ lines src, Just x <‐ [stripPrefix "#include \"" x]]
--}
+-- | Shows if given line is an include preprocessor line with double quotes
+isIncludeLine :: String -> Bool
+isIncludeLine line = all ($ line)
+    [ isPrefixOf "#include" . dropWhile isSpace
+    , (== '"') . head . (!! 1) . words
+    ]
+
+-- | Lists the include entries in the given file contents
+listIncludes :: String -> [FilePath]
+listIncludes contents = map takeIncludePath . filter isIncludeLine $ lines contents
+
+-- | Gathers a list with the headers that the given source file depends on
+gatherHeaderDeps :: [FilePath] -> FilePath -> IO [FilePath]
+gatherHeaderDeps searchDirs src = do
+    let gatherInternal sDirs chkdFiles input = do
+        filepath <- findFile searchDirs input
+        case filepath of
+          Nothing -> return []
+          Just f  -> if f `elem` chkdFiles
+                        then return []
+                        else do
+                               contents <- readFile f
+                               let incls = listIncludes contents
+                               moreIncs <- mapM (gatherInternal sDirs (f : chkdFiles)) incls
+                               return (f : concat moreIncs)
+    liftM (\l -> if null l then [] else tail l) (gatherInternal searchDirs [] src)
 
 ---------------------------------------------------------------------------
 -- | Build Parameters
@@ -377,6 +401,7 @@ main = do
         bldDir <//> "*.o" %> \out -> do
             -- Set the source
             let c = toStandard srcDir </> dropDirectory1 (dropExtension out)
+            let cdir = toStandard $ srcDir </> dropDirectory1 (takeDirectory out)
 
             -- Pretty print info about the command to be executed
             liftIO $ setSGR [SetColor Foreground Vivid Green]
@@ -387,9 +412,12 @@ main = do
 
             -- Schedule the compile command
             let params = CompileParams { cflags = ["-Wall", "-Wextra", "-std=c++11", "-O2"], defines = ["NDEBUG"], includePaths = includes }
-            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ gccCompileCommand params c out ++ " -MMD"
+            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ gccCompileCommand params c out
 
-            -- Set up the dependency upon the generated dependency file
-            let m = out -<.> "d"
-            needMakefileDependencies m
+            -- Set up the dependencies upon the header files
+            let fileName = dropExtension (takeFileName out)
+            headerDeps <- liftIO $ gatherHeaderDeps (cdir : includes) fileName
+            let prettyHeaderDeps = [normaliseEx x | x <- headerDeps]
+            --putNormal $ "DEBUG: Deps for " ++ out ++ " are: " ++ show prettyHeaderDeps ++ "\n"
+            need prettyHeaderDeps
 

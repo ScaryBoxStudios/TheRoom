@@ -40,14 +40,6 @@ binDir = "bin"
 libDir :: String
 libDir = "lib"
 
--- Additional include paths
-includes :: [String]
-includes = ["deps/" ++ l ++ "/include" | l <- ["EGL", "GL", "Glad", "Glfw", "Glm", "KHR", "Png", "Png++", "ZLib"]]
-
--- Additional library paths
-libpath :: [String]
-libpath = ["deps/" ++ l ++ "/lib/x86/Release" | l <- ["EGL", "GL", "Glad", "Glfw", "Glm", "KHR", "Png", "Png++", "ZLib"]]
-
 -- Link libraries
 libs :: [String]
 libs = ["png", "zlib", "glfw", "glad", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
@@ -214,6 +206,12 @@ data Arch =
   | X86_64
   deriving (Eq, Ord, Show, Read)
 
+showShortArch :: Arch -> String
+showShortArch arch =
+    case arch of
+        I386   -> "x86"
+        X86_64 -> "x64"
+
 ---------------------------------------------------------------------------
 -- FileUtils
 ---------------------------------------------------------------------------
@@ -360,8 +358,8 @@ additionalFlags =
 -- | Command builders
 ---------------------------------------------------------------------------
 -- Compile command builder
-genCompileCmd :: ToolChainVariant -> BuildVariant -> FilePath -> FilePath -> String
-genCompileCmd toolchain variant =
+genCompileCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> FilePath -> FilePath -> String
+genCompileCmd toolchain variant includes =
     ccGen params
   where
     ccGen = case toolchain of
@@ -378,8 +376,8 @@ genCompileCmd toolchain variant =
              }
 
 -- Link command builder
-genLinkCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> FilePath -> String
-genLinkCmd toolchain variant =
+genLinkCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> String
+genLinkCmd toolchain variant libpaths =
     linkGen params
   where
     linkGen = case toolchain of
@@ -391,7 +389,7 @@ genLinkCmd toolchain variant =
                             MSVC -> msvcDefaultLinkerFlags
                             GCC  -> gccDefaultLinkerFlags
                             LLVM -> gccDefaultLinkerFlags) variant
-             , libPaths = libpath
+             , libPaths = libpaths
              , libraries = libs
              }
 
@@ -466,8 +464,12 @@ main = do
             putNormal $ out ++ "\n"
             liftIO $ setSGR [Reset]
 
+            -- Gather additional library paths
+            deps <- Development.Shake.getDirectoryContents "deps"
+            let libpaths = ["deps" </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
+
             -- Schedule the link command
-            quietly $ cmd $ genLinkCmd toolchain variant objfiles out
+            quietly $ cmd $ genLinkCmd toolchain variant libpaths objfiles out
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source
@@ -481,8 +483,12 @@ main = do
             putNormal $ c ++ "\n"
             liftIO $ setSGR [Reset]
 
+            -- Gather additional include paths
+            deps <- Development.Shake.getDirectoryContents "deps"
+            let includes = "include" : ["deps" </> l </> "include" | l <- deps]
+
             -- Schedule the compile command
-            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ genCompileCmd toolchain variant c out
+            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ genCompileCmd toolchain variant includes c out
 
             -- Set up the dependencies upon the header files
             let fileName = dropExtension (takeFileName out)

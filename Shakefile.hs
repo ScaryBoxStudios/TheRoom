@@ -109,6 +109,13 @@ type LinkAction =
   -> FilePath          -- ^ Output link product
   -> String
 
+-- | Signature type of archive command generators
+type ArchiveAction =
+     ArchiveParams
+  -> [FilePath]        -- ^ Input object files
+  -> FilePath          -- ^ Output archive
+  -> String
+
 -- | Generates Gcc compile commands
 gccCompileCommand :: CompileAction
 gccCompileCommand params input output =
@@ -129,6 +136,15 @@ gccLinkCommand params input output =
     libraryPaths = map ("-L" ++) (libPaths params)
     librs = map ("-l" ++) (libraries params)
 
+-- | Generates Gcc archive commands
+gccArchiveCommand :: ArchiveAction
+gccArchiveCommand params input output =
+    unwords $ ar ++ arflgs ++ miscflgs ++ [output] ++ input
+  where
+    ar = ["ar"]
+    arflgs = ["rcs"]
+    miscflgs = miscArFlags params
+
 -- | Generates Msvc compile commands
 msvcCompileCommand :: CompileAction
 msvcCompileCommand params input output =
@@ -148,6 +164,15 @@ msvcLinkCommand params input output =
     libraryPaths = map ("/LIBPATH:" ++) (libPaths params)
     librs = map (++ ".lib") (libraries params)
     
+-- | Generates Msvc archive commands
+msvcArchiveCommand :: ArchiveAction
+msvcArchiveCommand params input output =
+    unwords $ ar ++ arflgs ++ miscflgs ++ ["/OUT:" ++ output] ++ input
+  where
+    ar = ["lib"]
+    arflgs = []
+    miscflgs = miscArFlags params
+
 ---------------------------------------------------------------------------
 -- | Toolchain Default flags
 ---------------------------------------------------------------------------
@@ -169,6 +194,9 @@ msvcDefaultLinkerFlags linkType variant =
         Release -> ["/incremental:NO"]
         Debug   -> ["/debug"]
 
+msvcDefaultArchiverFlags :: [String]
+msvcDefaultArchiverFlags = ["/nologo"]
+
 -- Gcc
 gccDefaultCompilerFlags :: BuildVariant -> [String]
 gccDefaultCompilerFlags variant =
@@ -186,6 +214,9 @@ gccDefaultLinkerFlags linkType variant =
     case variant of
         Release -> []
         Debug   -> []
+
+gccDefaultArchiverFlags :: [String]
+gccDefaultArchiverFlags = []
 
 ---------------------------------------------------------------------------
 -- OS
@@ -399,6 +430,18 @@ genLinkCmd linkType toolchain variant libpaths =
              , libraries = libs
              }
 
+-- Archive command builder
+genArchiveCmd :: ToolChainVariant -> [FilePath] -> FilePath -> String
+genArchiveCmd toolchain =
+    (case toolchain of
+          MSVC -> msvcArchiveCommand
+          GCC  -> gccArchiveCommand
+          LLVM -> gccArchiveCommand)
+        ArchiveParams { miscArFlags = case toolchain of
+                           MSVC -> msvcDefaultArchiverFlags
+                           GCC  -> gccDefaultArchiverFlags
+                           LLVM -> gccDefaultArchiverFlags }
+
 ---------------------------------------------------------------------------
 -- | Entrypoint
 ---------------------------------------------------------------------------
@@ -475,13 +518,14 @@ main = do
             let libpaths = ["deps" </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
 
             -- Schedule main output command
-            case projType of
-                Binary lr ->
-                    -- Schedule the link command
-                    quietly $ cmd $ genLinkCmd lr toolchain variant libpaths objfiles out
-                Archive   ->
-                    -- Schedule the archive command
-                    return () -- TODO
+            quietly $ cmd
+                (case projType of
+                    Binary lr ->
+                        -- Schedule the link command
+                        genLinkCmd lr toolchain variant libpaths objfiles out
+                    Archive   ->
+                        -- Schedule the archive command
+                        genArchiveCmd toolchain objfiles out)
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source

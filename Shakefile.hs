@@ -148,9 +148,10 @@ gccArchiveCommand params input output =
 -- | Generates Msvc compile commands
 msvcCompileCommand :: CompileAction
 msvcCompileCommand params input output =
-    unwords $ cxx ++ ["/c"] ++ ["/Fo" ++ output] ++ defs ++ incls ++ [input]
+    unwords $ cxx ++ cflgs ++ ["/c"] ++ ["/Fo" ++ output] ++ defs ++ incls ++ [input]
   where
     cxx = ["cl"]
+    cflgs = cflags params
     defs = map ("/D" ++) (defines params)
     incls = map ("/I" ++) (includePaths params)
 

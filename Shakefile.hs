@@ -159,9 +159,12 @@ msvcDefaultCompilerFlags variant =
       Release -> ["/MT", "/O2"]
       Debug   -> ["/MTd", "/Zi", "/Od", "/FS"]
 
-msvcDefaultLinkerFlags :: BuildVariant -> [String]
-msvcDefaultLinkerFlags variant =
-    ["/nologo", "/manifest", "/entry:mainCRTStartup"] ++
+msvcDefaultLinkerFlags :: LinkResult -> BuildVariant -> [String]
+msvcDefaultLinkerFlags linkType variant =
+    ["/nologo", "/manifest"] ++
+    (case linkType of
+         Executable    -> ["/entry:mainCRTStartup"]
+         SharedLibrary -> ["/DLL"]) ++
     case variant of
         Release -> ["/incremental:NO"]
         Debug   -> ["/debug"]
@@ -174,9 +177,12 @@ gccDefaultCompilerFlags variant =
         Release -> ["-O2"]
         Debug   -> ["-g", "-O0"]
 
-gccDefaultLinkerFlags :: BuildVariant -> [String]
-gccDefaultLinkerFlags variant =
+gccDefaultLinkerFlags :: LinkResult -> BuildVariant -> [String]
+gccDefaultLinkerFlags linkType variant =
     ["-static", "-static-libgcc", "-static-libstdc++"] ++
+    (case linkType of
+        Executable    -> []
+        SharedLibrary -> []) ++
     case variant of
         Release -> []
         Debug   -> []
@@ -376,8 +382,8 @@ genCompileCmd toolchain variant includes =
              }
 
 -- Link command builder
-genLinkCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> String
-genLinkCmd toolchain variant libpaths =
+genLinkCmd :: LinkResult -> ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> String
+genLinkCmd linkType toolchain variant libpaths =
     linkGen params
   where
     linkGen = case toolchain of
@@ -388,7 +394,7 @@ genLinkCmd toolchain variant libpaths =
              { ldflags = (case toolchain of
                             MSVC -> msvcDefaultLinkerFlags
                             GCC  -> gccDefaultLinkerFlags
-                            LLVM -> gccDefaultLinkerFlags) variant
+                            LLVM -> gccDefaultLinkerFlags) linkType variant
              , libPaths = libpaths
              , libraries = libs
              }
@@ -468,8 +474,14 @@ main = do
             deps <- Development.Shake.getDirectoryContents "deps"
             let libpaths = ["deps" </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
 
-            -- Schedule the link command
-            quietly $ cmd $ genLinkCmd toolchain variant libpaths objfiles out
+            -- Schedule main output command
+            case projType of
+                Binary lr ->
+                    -- Schedule the link command
+                    quietly $ cmd $ genLinkCmd lr toolchain variant libpaths objfiles out
+                Archive   ->
+                    -- Schedule the archive command
+                    return () -- TODO
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source

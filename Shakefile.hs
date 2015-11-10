@@ -522,14 +522,20 @@ main = do
             let libpaths = ["deps" </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
 
             -- Schedule main output command
-            quietly $ cmd
-                (case projType of
-                    Binary lr ->
-                        -- Schedule the link command
-                        genLinkCmd hostOs lr toolchain variant libpaths objfiles out
-                    Archive   ->
-                        -- Schedule the archive command
-                        genArchiveCmd toolchain objfiles out)
+            let outCommand =
+                 case projType of
+                   Binary lr ->
+                       -- Schedule the link command
+                       genLinkCmd hostOs lr toolchain variant libpaths objfiles out
+                   Archive   ->
+                       -- Schedule the archive command
+                       genArchiveCmd toolchain objfiles out
+
+            verbosity <- getVerbosity
+            when (verbosity >= Loud) $
+                putNormal $ "Executing command: " ++ outCommand ++ "\n"
+
+            quietly $ cmd outCommand
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source
@@ -548,7 +554,12 @@ main = do
             let includes = "include" : ["deps" </> l </> "include" | l <- deps]
 
             -- Schedule the compile command
-            () <- quietly $ cmd (EchoStdout False) (EchoStderr False) $ genCompileCmd toolchain variant includes c out
+            let compileCmd = genCompileCmd toolchain variant includes c out
+
+            verbosity <- getVerbosity
+            when (verbosity >= Loud) $
+                putNormal $ "Executing command: " ++ compileCmd ++ "\n"
+            () <- quietly $ cmd (EchoStdout False) (EchoStderr True) compileCmd
 
             -- Set up the dependencies upon the header files
             let fileName = dropExtension (takeFileName out)

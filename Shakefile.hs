@@ -206,9 +206,12 @@ gccDefaultCompilerFlags variant =
         Release -> ["-O2"]
         Debug   -> ["-g", "-O0"]
 
-gccDefaultLinkerFlags :: LinkResult -> BuildVariant -> [String]
-gccDefaultLinkerFlags linkType variant =
-    ["-static", "-static-libgcc", "-static-libstdc++"] ++
+gccDefaultLinkerFlags :: OS -> LinkResult -> BuildVariant -> [String]
+gccDefaultLinkerFlags os linkType variant =
+    (case os of
+        Windows -> ["-static", "-static-libgcc", "-static-libstdc++"]
+        Linux   -> []
+        OSX     -> []) ++
     (case linkType of
         Executable    -> []
         SharedLibrary -> []) ++
@@ -230,8 +233,8 @@ data OS =
   deriving (Eq, Ord, Show)
 
 -- | This host's operating system.
-os :: OS
-os =
+hostOs :: OS
+hostOs =
   case System.os of
     "darwin"  -> OSX
     "mingw32" -> Windows
@@ -256,14 +259,14 @@ showShortArch arch =
 -- | File extension for executables.
 executableExtension :: String
 executableExtension =
-  case os of
+  case hostOs of
     Windows -> "exe"
     _       -> ""
 
 -- | File extension for dynamic shared libraries.
 sharedLibraryExtension :: String
 sharedLibraryExtension =
-  case os of
+  case hostOs of
     Linux   -> "so"
     OSX     -> "dylib"
     Windows -> "dll"
@@ -278,7 +281,7 @@ staticLibPrefix t =
 -- | File extension for static libraries.
 staticLibExtension :: ToolChainVariant -> String
 staticLibExtension t =
-    if os == Windows && t == MSVC
+    if hostOs == Windows && t == MSVC
         then "lib"
         else "a"
 
@@ -414,8 +417,8 @@ genCompileCmd toolchain variant includes =
              }
 
 -- Link command builder
-genLinkCmd :: LinkResult -> ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> String
-genLinkCmd linkType toolchain variant libpaths =
+genLinkCmd :: OS -> LinkResult -> ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> String
+genLinkCmd os linkType toolchain variant libpaths =
     linkGen params
   where
     linkGen = case toolchain of
@@ -423,10 +426,10 @@ genLinkCmd linkType toolchain variant libpaths =
                 GCC  -> gccLinkCommand
                 LLVM -> gccLinkCommand
     params = LinkParams
-             { ldflags = (case toolchain of
-                            MSVC -> msvcDefaultLinkerFlags
-                            GCC  -> gccDefaultLinkerFlags
-                            LLVM -> gccDefaultLinkerFlags) linkType variant
+             { ldflags = case toolchain of
+                            MSVC -> msvcDefaultLinkerFlags linkType variant
+                            GCC  -> gccDefaultLinkerFlags os linkType variant
+                            LLVM -> gccDefaultLinkerFlags os linkType variant
              , libPaths = libpaths
              , libraries = libs
              }
@@ -523,7 +526,7 @@ main = do
                 (case projType of
                     Binary lr ->
                         -- Schedule the link command
-                        genLinkCmd lr toolchain variant libpaths objfiles out
+                        genLinkCmd hostOs lr toolchain variant libpaths objfiles out
                     Archive   ->
                         -- Schedule the archive command
                         genArchiveCmd toolchain objfiles out)

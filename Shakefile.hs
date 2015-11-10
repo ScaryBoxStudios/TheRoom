@@ -539,7 +539,7 @@ main = do
 
         bldDir <//> "*.o" %> \out -> do
             -- Set the source
-            let c = toStandard srcDir </> dropDirectory1 (dropExtension out)
+            let c = toStandard $ srcDir </> dropDirectory1 (dropExtension out)
             let cdir = toStandard $ srcDir </> dropDirectory1 (takeDirectory out)
 
             -- Pretty print info about the command to be executed

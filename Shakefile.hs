@@ -473,9 +473,15 @@ main = do
 
         let mainTgt = (case projType of
                         Binary _ -> binDir
-                        Archive  -> libDir) </> outName
+                        Archive  -> libDir)
+                      </> showShortArch arch
+                      </> show variant
+                      </> outName
 
         if null targets then want [mainTgt] else want targets
+
+        -- Set the build directory for the current run
+        let buildDir = bldDir </> show toolchain </> showShortArch arch </> show variant
 
         -- Shows info about the build that follows
         "banner" ~> do
@@ -505,7 +511,7 @@ main = do
             srcfiles <- getDirectoryFiles srcDir ["//*.cpp"]
 
             -- Create the future object file list
-            let objfiles = [bldDir </> sf <.> "o" | sf <- srcfiles]
+            let objfiles = [buildDir </> sf <.> "o" | sf <- srcfiles]
 
             -- Set the object file dependency
             need objfiles
@@ -537,10 +543,11 @@ main = do
 
             quietly $ cmd outCommand
 
-        bldDir <//> "*.o" %> \out -> do
+        buildDir <//> "*.o" %> \out -> do
             -- Set the source
-            let c = toStandard $ srcDir </> dropDirectory1 (dropExtension out)
-            let cdir = toStandard $ srcDir </> dropDirectory1 (takeDirectory out)
+            let dropDirectory n = foldr (.) id (replicate n dropDirectory1)
+            let c = toStandard $ srcDir </> dropDirectory 4 (dropExtension out)
+            let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
 
             -- Pretty print info about the command to be executed
             liftIO $ setSGR [SetColor Foreground Vivid Green]

@@ -1,5 +1,6 @@
 module Shakefile where
 
+import Control.Concurrent.MVar
 import Control.Monad
 import Data.Char
 import Data.List
@@ -447,8 +448,11 @@ genArchiveCmd toolchain =
 ---------------------------------------------------------------------------
 main :: IO ()
 main = do
+    -- The mutex for the status messages
+    stdoutMvar <- newMVar ()
     let opts = shakeOptions { shakeFiles = bldDir </> ".shake"
                             , shakeOutput = const $ BS.putStr . BS.pack
+                            , shakeThreads = 0
                             }
     shakeArgsWith opts additionalFlags $ \flags targets -> return $ Just $ do
         -- Extract the parameters from the flag arguments or set defaults if not given
@@ -546,11 +550,13 @@ main = do
             let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
 
             -- Pretty print info about the command to be executed
+            liftIO $ takeMVar stdoutMvar
             liftIO $ setSGR [SetColor Foreground Vivid Green]
             putNormal "[\175] Compiling "
             liftIO $ setSGR [SetColor Foreground Vivid Yellow]
             putNormal $ c ++ "\n"
             liftIO $ setSGR [Reset]
+            liftIO $ putMVar stdoutMvar ()
 
             -- Gather additional include paths
             deps <- Development.Shake.getDirectoryContents "deps"

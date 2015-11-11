@@ -41,6 +41,10 @@ libs = ["png", "glfw", "glad"] ++
             Linux   -> ["z", "GLU"]
             _       -> []
 
+-- Defines
+defines :: [String]
+defines = []
+
 ---------------------------------------------------------------------------
 -- | Project Target
 ---------------------------------------------------------------------------
@@ -78,7 +82,7 @@ data ToolChainVariant =
 -- | Holds necessary values to construct a compile command
 data CompileParams = CompileParams {
     cflags :: [String]
-  , defines :: [String]
+  , additionalDefines :: [String]
   , includePaths :: [String]
   }
 
@@ -120,7 +124,7 @@ gccCompileCommand params input output =
   where
     cxx = ["g++"]
     cflgs = cflags params
-    defs = map ("-D"++) (defines params)
+    defs = map ("-D"++) (additionalDefines params)
     incls = map ("-I" ++) (includePaths params)
 
 -- | Generates Gcc link commands
@@ -149,7 +153,7 @@ msvcCompileCommand params input output =
   where
     cxx = ["cl"]
     cflgs = cflags params
-    defs = map ("/D" ++) (defines params)
+    defs = map ("/D" ++) (additionalDefines params)
     incls = map ("/I" ++) (includePaths params)
 
 -- | Generates Msvc link commands
@@ -396,8 +400,8 @@ additionalFlags =
 -- | Command builders
 ---------------------------------------------------------------------------
 -- Compile command builder
-genCompileCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> FilePath -> FilePath -> String
-genCompileCmd toolchain variant includes =
+genCompileCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> FilePath -> String
+genCompileCmd toolchain variant includes defs =
     ccGen params
   where
     ccGen = case toolchain of
@@ -409,7 +413,7 @@ genCompileCmd toolchain variant includes =
                            MSVC -> msvcDefaultCompilerFlags
                            GCC  -> gccDefaultCompilerFlags
                            LLVM -> gccDefaultCompilerFlags) variant
-             , defines = []
+             , additionalDefines = defs
              , includePaths = includes
              }
 
@@ -563,7 +567,7 @@ main = do
             let includes = "include" : ["deps" </> l </> "include" | l <- deps]
 
             -- Schedule the compile command
-            let compileCmd = genCompileCmd toolchain variant includes c out
+            let compileCmd = genCompileCmd toolchain variant includes defines c out
 
             verbosity <- getVerbosity
             when (verbosity >= Loud) $

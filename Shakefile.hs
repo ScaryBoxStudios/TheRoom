@@ -244,15 +244,12 @@ hostOs =
 
 -- | CPU Arch type
 data Arch =
-    I386
-  | X86_64
+    X86
+  | X64
   deriving (Eq, Ord, Show, Read)
 
-showShortArch :: Arch -> String
-showShortArch arch =
-    case arch of
-        I386   -> "x86"
-        X86_64 -> "x64"
+prettyShowArch :: Arch -> String
+prettyShowArch a = map toLower (show a)
 
 ---------------------------------------------------------------------------
 -- FileUtils
@@ -461,7 +458,7 @@ main = do
     shakeArgsWith opts additionalFlags $ \flags targets -> return $ Just $ do
         -- Extract the parameters from the flag arguments or set defaults if not given
         let defVariant = Release
-        let defArch = I386
+        let defArch = X86
         let defToolchain = GCC
 
         let givenVariant = listToMaybe [v | BVFlag v <- flags]
@@ -478,14 +475,14 @@ main = do
         let mainTgt = (case projType of
                         Binary _ -> "bin"
                         Archive  -> "lib")
-                      </> showShortArch arch
+                      </> prettyShowArch arch
                       </> show variant
                       </> outName
 
         if null targets then want [mainTgt] else want targets
 
         -- Set the build directory for the current run
-        let buildDir = bldDir </> show toolchain </> showShortArch arch </> show variant
+        let buildDir = bldDir </> show toolchain </> prettyShowArch arch </> show variant
 
         -- Shows info about the build that follows
         "banner" ~> do
@@ -533,7 +530,7 @@ main = do
             libpaths <- if depsFolderExists
                           then do
                             deps <- Development.Shake.getDirectoryContents depsFolder
-                            return [depsFolder </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
+                            return [depsFolder </> l </> "lib" </> prettyShowArch arch </> show variant | l <- deps]
                           else
                             return []
 

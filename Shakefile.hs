@@ -528,8 +528,14 @@ main = do
             liftIO $ setSGR [Reset]
 
             -- Gather additional library paths
-            deps <- Development.Shake.getDirectoryContents "deps"
-            let libpaths = ["deps" </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
+            let depsFolder = "deps"
+            depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
+            libpaths <- if depsFolderExists
+                          then do
+                            deps <- Development.Shake.getDirectoryContents depsFolder
+                            return [depsFolder </> l </> "lib" </> showShortArch arch </> show variant | l <- deps]
+                          else
+                            return []
 
             -- Schedule main output command
             let outCommand =

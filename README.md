@@ -10,13 +10,9 @@ Building
  1. Clone the project and cd to the directory of the sample you want to build.
  2. Run:  
     ```
-    python waf distclean configure --check-c-compiler=<CC> --check-cxx-compiler=<CXX>
+    runhaskell Shakefile.hs --toolchain=<TOOLCHAIN> --variant=<VARIANT>
     ```
-    where CC and CXX combination can either be {msvc,msvc} | {gcc, g++} | {clang, clang++} and after that run:  
-    ```
-    python waf clean build install --variant=<VARIANT> --arch=<ARCH>
-    ```
-    where VARIANT can be either Release|Debug and ARCH can be either x86|x64.
+    where <VARIANT> can be either Release|Debug and <TOOLCHAIN> can be either MSVC|GCC|LLVM.
  3. Built binaries will reside in the `bin\<ARCH>\<VARIANT>` directory.
 
 ChangeLog

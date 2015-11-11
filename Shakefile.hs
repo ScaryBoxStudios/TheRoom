@@ -32,14 +32,6 @@ srcDir = "src"
 bldDir :: String
 bldDir = "tmp"
 
--- Output directory for executables
-binDir :: String
-binDir = "bin"
-
--- Output directory for libraries
-libDir :: String
-libDir = "lib"
-
 -- Link libraries
 libs :: [String]
 libs = ["png", "zlib", "glfw", "glad", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
@@ -472,8 +464,8 @@ main = do
         let outName = masterOutName projType toolchain projName
 
         let mainTgt = (case projType of
-                        Binary _ -> binDir
-                        Archive  -> libDir)
+                        Binary _ -> "bin"
+                        Archive  -> "lib")
                       </> showShortArch arch
                       </> show variant
                       </> outName

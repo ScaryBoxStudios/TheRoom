@@ -34,7 +34,11 @@ bldDir = "tmp"
 
 -- Link libraries
 libs :: [String]
-libs = ["png", "zlib", "glfw", "glad", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
+libs = ["png", "glfw", "glad"] ++
+        case hostOs of
+            Windows -> ["zlib", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
+            Linux   -> ["z", "GLU"]
+            _       -> []
 
 ---------------------------------------------------------------------------
 -- | Project Target

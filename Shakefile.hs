@@ -14,6 +14,11 @@ import Text.Read
 import qualified Data.ByteString.Char8 as BS
 import qualified System.Info as System
 
+--
+-- Precompile for better performance with:
+--   ghc --make Shakefile -main-is Shakefile -threaded -rtsopts -with-rtsopts="-I0 -qg -qb" -o sbuild
+--
+
 ---------------------------------------------------------------------------
 -- | Project properties
 ---------------------------------------------------------------------------

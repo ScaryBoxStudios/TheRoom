@@ -428,7 +428,7 @@ namespace MemTrack
             size_t size = pBlockHeader->GetRequestedSize();
             char const *fileName = pBlockHeader->GetFilename();
             int lineNum = pBlockHeader->GetLineNum();
-            printf("*** #%-6d %5d bytes %-50s\n", i, size, typeName);
+            printf("*** #%-6zd %5zd bytes %-50s\n", i, size, typeName);
             printf("... %s:%d\n", fileName, lineNum);
         }
 
@@ -556,7 +556,7 @@ namespace MemTrack
             double totalSizePct = 100.0 * totalSize / grandTotalSize;
 
             printf(
-                "%-50s %5d %5.1f%% %7d %5.1f%%\n",
+                "%-50s %5zd %5.1f%% %7zd %5.1f%%\n",
                 pMD->typeName,
                 blockCount,
                 blockCountPct,
@@ -565,7 +565,7 @@ namespace MemTrack
             );
         }
         printf("%-50s %5s %5s  %7s %s \n", "--------", "-----", "", "-------", "");
-        printf("%-50s %5d %5s  %7d %s \n", "[totals]", grandTotalNumBlocks, "", grandTotalSize, "");
+        printf("%-50s %5zd %5s  %7zd %s \n", "[totals]", grandTotalNumBlocks, "", grandTotalSize, "");
 
         // Clean up.
         free(ppBlockHeader);

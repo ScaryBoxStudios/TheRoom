@@ -151,7 +151,6 @@
     DO_PRAGMA(GCC diagnostic ignored "-Wpadded")                        \
     DO_PRAGMA(GCC diagnostic ignored "-Wparentheses")                   \
     DO_PRAGMA(GCC diagnostic ignored "-Wpedantic")                      \
-    DO_PRAGMA(GCC diagnostic ignored "-Wpedantic-ms-format")            \
     DO_PRAGMA(GCC diagnostic ignored "-Wpmf-conversions")               \
     DO_PRAGMA(GCC diagnostic ignored "-Wpointer-arith")                 \
     DO_PRAGMA(GCC diagnostic ignored "-Wpointer-sign")                  \

@@ -4,6 +4,7 @@ import Control.Concurrent.MVar
 import Control.Monad
 import Data.Char
 import Data.List
+import Data.List.Split
 import Data.Maybe
 import Development.Shake
 import Development.Shake.FilePath
@@ -49,6 +50,14 @@ libs = ["png", "glfw", "glad"] ++
 -- Defines
 defines :: [String]
 defines = []
+
+-- Default build variant if not specified
+defVariant :: BuildVariant
+defVariant = Release
+
+-- Default toolchain if not specified
+defToolchain :: ToolChainVariant
+defToolchain = GCC
 
 ---------------------------------------------------------------------------
 -- | Project Target
@@ -377,13 +386,6 @@ parseBuildVariantFlag s =
         Nothing -> Left "Could not parse given build variant."
         Just x  -> Right (BVFlag x)
 
--- Used by ReqArg to parse Arch Flag
-parseArchFlag :: String -> Either String AdditionalFlag
-parseArchFlag s =
-    case readMaybe s :: Maybe Arch of
-        Nothing -> Left "Could not parse given architecture."
-        Just x  -> Right (AFlag x)
-
 -- Used by ReqArg to parse ToolChain Variant Flag
 parseTVFlag :: String -> Either String AdditionalFlag
 parseTVFlag s =
@@ -394,7 +396,6 @@ parseTVFlag s =
 additionalFlags :: [OptDescr (Either String AdditionalFlag)]
 additionalFlags =
     [ Option [] ["variant"]   (ReqArg parseBuildVariantFlag "VARIANT") "The build variant to make (Release/Debug)"
-    , Option [] ["arch"]      (ReqArg parseArchFlag "ARCH")            "The target architecture to build for (i386/x86_64)"
     , Option [] ["toolchain"] (ReqArg parseTVFlag "TOOLCHAIN")         "The toolchain to use for building the target"
     ]
 
@@ -450,6 +451,46 @@ genArchiveCmd toolchain =
                            LLVM -> gccDefaultArchiverFlags }
 
 ---------------------------------------------------------------------------
+-- | Enviroment Probers
+---------------------------------------------------------------------------
+-- Converts the triplet gained by a command such as 'gcc -dumpmachine'
+-- to an target Arch datatype
+gccTripletToArch :: String -> Maybe Arch
+gccTripletToArch out =
+    case machine of
+        "i386"   -> Just X86
+        "i486"   -> Just X86
+        "i586"   -> Just X86
+        "i686"   -> Just X86
+        "x86_64" -> Just X64
+        _        -> Nothing
+  where
+      machine = head $ splitOn "-" $ head $ lines out
+
+-- Converts the info gained by the 'cl' command to an Arch datatype
+msvcClInfoToArch :: String -> Maybe Arch
+msvcClInfoToArch out =
+    case machine of
+        "x86" -> Just X86
+        "x64" -> Just X64
+        _     -> Nothing
+  where
+      machine = last $ words $ head $ lines out
+
+gatherArchFromToolchain :: ToolChainVariant -> IO (Maybe Arch)
+gatherArchFromToolchain toolchain = do
+    let infoCmd =
+          case toolchain of
+            MSVC -> "cl"
+            GCC  -> "gcc -dumpmachine"
+            LLVM -> "clang -dumpmachine"
+    (Stdout out, Stderr err) <- cmd (EchoStdout False) (EchoStderr False) infoCmd
+    return $ case toolchain of
+               MSVC -> msvcClInfoToArch err
+               GCC  -> gccTripletToArch out
+               LLVM -> gccTripletToArch out
+
+---------------------------------------------------------------------------
 -- | Entrypoint
 ---------------------------------------------------------------------------
 main :: IO ()
@@ -460,30 +501,27 @@ main = do
                             , shakeOutput = const $ BS.putStr . BS.pack
                             , shakeThreads = 0
                             }
-    shakeArgsWith opts additionalFlags $ \flags targets -> return $ Just $ do
-        -- Extract the parameters from the flag arguments or set defaults if not given
-        let defVariant = Release
-        let defArch = X86
-        let defToolchain = GCC
+    shakeArgsWith opts additionalFlags $ \flags targets -> do
+      -- Extract the parameters from the flag arguments or set defaults if not given
+      let givenVariant = listToMaybe [v | BVFlag v <- flags]
+      let givenToolchain = listToMaybe [v | TVFlag v <- flags]
 
-        let givenVariant = listToMaybe [v | BVFlag v <- flags]
-        let givenArch = listToMaybe [v | AFlag v <- flags]
-        let givenToolchain = listToMaybe [v | TVFlag v <- flags]
+      let variant = fromMaybe defVariant givenVariant
+      let toolchain = fromMaybe defToolchain givenToolchain
 
-        let variant = fromMaybe defVariant givenVariant
-        let arch = fromMaybe defArch givenArch
-        let toolchain = fromMaybe defToolchain givenToolchain
+      -- Gather the target architecture from the used compiler
+      foundArch <- gatherArchFromToolchain toolchain
+      let arch = fromMaybe X86 foundArch
 
+      return $ Just $ do
         -- Set the main target
         let outName = masterOutName projType toolchain projName
-
         let mainTgt = (case projType of
                         Binary _ -> "bin"
                         Archive  -> "lib")
                       </> prettyShowArch arch
                       </> show variant
                       </> outName
-
         if null targets then want [mainTgt] else want targets
 
         -- Set the build directory for the current run
@@ -491,14 +529,14 @@ main = do
 
         -- Shows info about the build that follows
         "banner" ~> do
+            -- Arch
+            putNormal $ (case foundArch of
+                            Nothing -> "Could not detect target Architecture. Defaulting to: "
+                            Just _  -> "Target Arch: ") ++ prettyShowArch arch ++ "\n"
             -- Variant
             putNormal $ (case givenVariant of
                             Nothing -> "No build variant given. Defaulting to: "
                             Just _  -> "Build variant: ") ++ show variant ++ "\n"
-            -- Arch
-            putNormal $ (case givenArch of
-                            Nothing -> "No target arch given. Defaulting to: "
-                            Just _  -> "Target arch: ") ++ show arch ++ "\n"
             -- Toolchain
             putNormal $ (case givenToolchain of
                             Nothing -> "No toolchain variant given. Defaulting to: "

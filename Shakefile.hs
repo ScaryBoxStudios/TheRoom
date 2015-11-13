@@ -560,13 +560,6 @@ main = do
             -- Set the object file dependency
             need objfiles
 
-            -- Pretty print info about the command to be executed
-            liftIO $ setSGR [SetColor Foreground Dull Green]
-            putNormal "[\240] Linking "
-            liftIO $ setSGR [SetColor Foreground Dull Yellow]
-            putNormal $ out ++ "\n"
-            liftIO $ setSGR [Reset]
-
             -- Gather additional library paths
             let depsFolder = "deps"
             depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
@@ -577,20 +570,29 @@ main = do
                           else
                             return []
 
-            -- Schedule main output command
+            -- Construct the main output command
             let outCommand =
                  case projType of
                    Binary lr ->
-                       -- Schedule the link command
+                       -- Link command
                        genLinkCmd hostOs lr toolchain variant libpaths objfiles out
                    Archive   ->
-                       -- Schedule the archive command
+                       -- Archive command
                        genArchiveCmd toolchain objfiles out
 
+            -- Pretty print info about the command to be executed
+            liftIO $ setSGR [SetColor Foreground Dull Green]
+            putNormal "[\240] Linking "
+            liftIO $ setSGR [SetColor Foreground Dull Yellow]
+            putNormal $ out ++ "\n"
+            liftIO $ setSGR [Reset]
+
+            -- Print additional info on verbose builds
             verbosity <- getVerbosity
             when (verbosity >= Loud) $
                 putNormal $ "Executing command: " ++ outCommand ++ "\n"
 
+            -- Execute main output command
             quietly $ cmd outCommand
 
         buildDir <//> "*.o" %> \out -> do
@@ -599,25 +601,27 @@ main = do
             let c = toStandard $ srcDir </> dropDirectory 4 (dropExtension out)
             let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
 
+            -- Gather additional include paths
+            deps <- Development.Shake.getDirectoryContents "deps"
+            let includes = "include" : ["deps" </> l </> "include" | l <- deps]
+
+            -- Construct the command to be executed
+            let compileCmd = genCompileCmd toolchain variant includes defines c out
+
             -- Pretty print info about the command to be executed
+            verbosity <- getVerbosity
+
             liftIO $ takeMVar stdoutMvar
             liftIO $ setSGR [SetColor Foreground Vivid Green]
             putNormal "[\175] Compiling "
             liftIO $ setSGR [SetColor Foreground Vivid Yellow]
             putNormal $ c ++ "\n"
             liftIO $ setSGR [Reset]
-            liftIO $ putMVar stdoutMvar ()
-
-            -- Gather additional include paths
-            deps <- Development.Shake.getDirectoryContents "deps"
-            let includes = "include" : ["deps" </> l </> "include" | l <- deps]
-
-            -- Schedule the compile command
-            let compileCmd = genCompileCmd toolchain variant includes defines c out
-
-            verbosity <- getVerbosity
             when (verbosity >= Loud) $
                 putNormal $ "Executing command: " ++ compileCmd ++ "\n"
+            liftIO $ putMVar stdoutMvar ()
+
+            -- Execute the command
             () <- quietly $ cmd (EchoStdout False) (EchoStderr True) compileCmd
 
             -- Set up the dependencies upon the header files

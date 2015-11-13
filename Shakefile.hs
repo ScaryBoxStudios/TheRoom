@@ -189,6 +189,20 @@ msvcArchiveCommand params input output =
     arflgs = []
     miscflgs = miscArFlags params
 
+-- | Generates Clang compile commands
+clangCompileCommand :: CompileAction
+clangCompileCommand params input output =
+    unwords $ (["clang++"] ++ ) . tail . words $ gccCompileCommand params input output
+
+-- | Generates Clang link commands
+clangLinkCommand :: LinkAction
+clangLinkCommand params input output =
+    unwords $ (["clang++"] ++ ) . tail . words $ gccLinkCommand params input output
+
+-- | Generates Clang archive commands
+clangArchiveCommand :: ArchiveAction
+clangArchiveCommand = gccArchiveCommand
+
 ---------------------------------------------------------------------------
 -- | Toolchain Default flags
 ---------------------------------------------------------------------------
@@ -236,6 +250,16 @@ gccDefaultLinkerFlags os linkType variant =
 
 gccDefaultArchiverFlags :: [String]
 gccDefaultArchiverFlags = []
+
+-- Clang
+clangDefaultCompilerFlags :: BuildVariant -> [String]
+clangDefaultCompilerFlags = gccDefaultCompilerFlags
+
+clangDefaultLinkerFlags :: OS -> LinkResult -> BuildVariant -> [String]
+clangDefaultLinkerFlags = gccDefaultLinkerFlags
+
+clangDefaultArchiverFlags :: [String]
+clangDefaultArchiverFlags = gccDefaultArchiverFlags
 
 ---------------------------------------------------------------------------
 -- OS
@@ -410,12 +434,12 @@ genCompileCmd toolchain variant includes defs =
     ccGen = case toolchain of
               MSVC -> msvcCompileCommand
               GCC  -> gccCompileCommand
-              LLVM -> gccCompileCommand
+              LLVM -> clangCompileCommand
     params = CompileParams
              { cflags = (case toolchain of
                            MSVC -> msvcDefaultCompilerFlags
                            GCC  -> gccDefaultCompilerFlags
-                           LLVM -> gccDefaultCompilerFlags) variant
+                           LLVM -> clangDefaultCompilerFlags) variant
              , additionalDefines = defs
              , includePaths = includes
              }
@@ -428,12 +452,12 @@ genLinkCmd os linkType toolchain variant libpaths =
     linkGen = case toolchain of
                 MSVC -> msvcLinkCommand
                 GCC  -> gccLinkCommand
-                LLVM -> gccLinkCommand
+                LLVM -> clangLinkCommand
     params = LinkParams
              { ldflags = case toolchain of
                             MSVC -> msvcDefaultLinkerFlags linkType variant
                             GCC  -> gccDefaultLinkerFlags os linkType variant
-                            LLVM -> gccDefaultLinkerFlags os linkType variant
+                            LLVM -> clangDefaultLinkerFlags os linkType variant
              , libPaths = libpaths
              , libraries = libs
              }
@@ -444,11 +468,11 @@ genArchiveCmd toolchain =
     (case toolchain of
           MSVC -> msvcArchiveCommand
           GCC  -> gccArchiveCommand
-          LLVM -> gccArchiveCommand)
+          LLVM -> clangArchiveCommand)
         ArchiveParams { miscArFlags = case toolchain of
                            MSVC -> msvcDefaultArchiverFlags
                            GCC  -> gccDefaultArchiverFlags
-                           LLVM -> gccDefaultArchiverFlags }
+                           LLVM -> clangDefaultArchiverFlags }
 
 ---------------------------------------------------------------------------
 -- | Enviroment Probers
@@ -477,6 +501,9 @@ msvcClInfoToArch out =
   where
       machine = last $ words $ head $ lines out
 
+clangTripletToArch :: String -> Maybe Arch
+clangTripletToArch = gccTripletToArch
+
 gatherArchFromToolchain :: ToolChainVariant -> IO (Maybe Arch)
 gatherArchFromToolchain toolchain = do
     let infoCmd =
@@ -488,7 +515,7 @@ gatherArchFromToolchain toolchain = do
     return $ case toolchain of
                MSVC -> msvcClInfoToArch err
                GCC  -> gccTripletToArch out
-               LLVM -> gccTripletToArch out
+               LLVM -> clangTripletToArch out
 
 ---------------------------------------------------------------------------
 -- | Entrypoint

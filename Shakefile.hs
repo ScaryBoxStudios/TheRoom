@@ -446,8 +446,8 @@ genCompileCmd toolchain variant includes defs =
              }
 
 -- Link command builder
-genLinkCmd :: OS -> LinkResult -> ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> String
-genLinkCmd os linkType toolchain variant libpaths =
+genLinkCmd :: OS -> LinkResult -> ToolChainVariant -> BuildVariant -> [FilePath] -> [String] -> [FilePath] -> FilePath -> String
+genLinkCmd os linkType toolchain variant libpaths libs =
     linkGen params
   where
     linkGen = case toolchain of
@@ -603,7 +603,7 @@ main = do
                  case projType of
                    Binary lr ->
                        -- Link command
-                       genLinkCmd hostOs lr toolchain variant libpaths objfiles out
+                       genLinkCmd hostOs lr toolchain variant libpaths libs objfiles out
                    Archive   ->
                        -- Archive command
                        genArchiveCmd toolchain objfiles out

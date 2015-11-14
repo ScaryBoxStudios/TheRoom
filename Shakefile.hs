@@ -1,17 +1,22 @@
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Shakefile where
 
+import GHC.Generics
 import Control.Concurrent.MVar
 import Control.Monad
 import Data.Char
 import Data.List
 import Data.List.Split
 import Data.Maybe
+import Data.Yaml
 import Development.Shake
 import Development.Shake.FilePath
 import System.Console.ANSI
 import System.Console.GetOpt
 import System.Directory
 import Text.Read
+import qualified Data.Map as M
 import qualified Data.ByteString.Char8 as BS
 import qualified System.Info as System
 
@@ -21,16 +26,8 @@ import qualified System.Info as System
 --
 
 ---------------------------------------------------------------------------
--- | Project properties
+-- | Build system Preferences
 ---------------------------------------------------------------------------
--- Project type
-projType :: BuildResult
-projType = Binary Executable
-
--- Project name
-projName :: String
-projName = "TheRoom"
-
 -- Source directory
 srcDir :: String
 srcDir = "src"
@@ -38,18 +35,6 @@ srcDir = "src"
 -- Build directory
 bldDir :: String
 bldDir = "tmp"
-
--- Link libraries
-libs :: [String]
-libs = ["png", "glfw", "glad"] ++
-        case hostOs of
-            Windows -> ["zlib", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
-            Linux   -> ["z", "GLU"]
-            _       -> []
-
--- Defines
-defines :: [String]
-defines = []
 
 -- Default build variant if not specified
 defVariant :: BuildVariant
@@ -270,7 +255,7 @@ data OS =
     Linux
   | OSX
   | Windows
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic)
 
 -- | This host's operating system.
 hostOs :: OS
@@ -508,10 +493,10 @@ clangTripletToArch = gccTripletToArch
 gatherArchFromToolchain :: ToolChainVariant -> IO (Maybe Arch)
 gatherArchFromToolchain toolchain = do
     let infoCmd =
-          case toolchain of
-            MSVC -> "cl"
-            GCC  -> "gcc -dumpmachine"
-            LLVM -> "clang -dumpmachine"
+          (case toolchain of
+              MSVC -> "cl"
+              GCC  -> "gcc -dumpmachine"
+              LLVM -> "clang -dumpmachine") :: String
     (Stdout out, Stderr err) <- cmd (EchoStdout False) (EchoStderr False) infoCmd
     return $ case toolchain of
                MSVC -> msvcClInfoToArch err
@@ -519,155 +504,240 @@ gatherArchFromToolchain toolchain = do
                LLVM -> clangTripletToArch out
 
 ---------------------------------------------------------------------------
+-- | Configuration
+---------------------------------------------------------------------------
+-- Project configuration file
+cfgFile :: String
+cfgFile = "shake.yml"
+
+-- The configuration file datatype
+data Config = Config
+  { projectName :: String
+  , projectType :: BuildResult
+  , userDefines :: [String]
+  , commonLibs :: [String]
+  , osLibs :: OSLibMap
+  } deriving Show
+
+--
+instance FromJSON BuildResult where
+    parseJSON (Data.Yaml.String s) = return $
+        case s of
+            "Executable" -> Binary Executable
+            "SharedLib"  -> Binary SharedLibrary
+            "StaticLib"  -> Archive
+            _            -> error "Err."
+    parseJSON _ = error "Config parse error."
+
+--
+instance FromJSON OS
+
+-- Wrapper around a map of Operating Systems and their dedicated library lists
+newtype OSLibMap = OSLibMap { getOsLibMap :: M.Map OS [String] } deriving (Show, Generic)
+
+--
+instance FromJSON OSLibMap where
+    parseJSON (Object o) = do
+        winLibs <- o .: "Windows"
+        linLibs <- o .: "Linux"
+        osxLibs <- o .:? "OSX" .!= []
+        return $ OSLibMap $ M.fromList
+                              [ (Windows, winLibs)
+                              , (Linux, linLibs)
+                              , (OSX, osxLibs)
+                              ]
+    parseJSON _ = error "Config parse error."
+
+--
+instance FromJSON Config where
+    parseJSON (Object m) = Config <$>
+        m .: "ProjectName" <*>
+        m .: "ProjectType" <*>
+        m .: "Defines" <*>
+        m .:? "Libraries" .!= [] <*>
+        m .:? "OSLibraries" .!= OSLibMap mempty
+    parseJSON _ = error "Config parse error."
+
+---------------------------------------------------------------------------
 -- | Entrypoint
 ---------------------------------------------------------------------------
+findProjectFile :: IO (Maybe Config)
+findProjectFile = do
+    -- Check n' load the config file
+    cfgExists <- System.Directory.doesFileExist cfgFile
+    if not cfgExists
+        then do
+            putStrLn "Error: Could not find project configuration file."
+            return Nothing
+        else do
+            config <- Data.Yaml.decodeFileEither cfgFile :: IO (Either ParseException Config)
+            case config of
+                Left _   -> return Nothing
+                Right cfg -> return $ Just cfg
+
 main :: IO ()
 main = do
-    -- The mutex for the status messages
-    stdoutMvar <- newMVar ()
-    let opts = shakeOptions { shakeFiles = bldDir </> ".shake"
-                            , shakeOutput = const $ BS.putStr . BS.pack
-                            , shakeThreads = 0
-                            }
-    shakeArgsWith opts additionalFlags $ \flags targets -> do
-      -- Extract the parameters from the flag arguments or set defaults if not given
-      let givenVariant = listToMaybe [v | BVFlag v <- flags]
-      let givenToolchain = listToMaybe [v | TVFlag v <- flags]
+    -- Flips the second and third arguments of a function
+    let flip23 f a b c = f a c b
+    -- Gather the project configuration file
+    mCfg <- findProjectFile
+    -- If found continue
+    flip23 maybe (return ()) mCfg $ \cfg -> do
+        -- Project type
+        let projType = projectType cfg
+        -- Project name
+        let projName = projectName cfg
+        -- Link libraries
+        let libs = commonLibs cfg ++ fromMaybe [] (M.lookup hostOs (getOsLibMap (osLibs cfg)))
+        -- Defines
+        let defines = userDefines cfg
 
-      let variant = fromMaybe defVariant givenVariant
-      let toolchain = fromMaybe defToolchain givenToolchain
 
-      -- Gather the target architecture from the used compiler
-      foundArch <- gatherArchFromToolchain toolchain
-      let arch = fromMaybe X86 foundArch
+        -- The mutex for the status messages
+        stdoutMvar <- newMVar ()
+        let opts = shakeOptions { shakeFiles = bldDir </> ".shake"
+                                , shakeOutput = const $ BS.putStr . BS.pack
+                                , shakeThreads = 0
+                                }
+        shakeArgsWith opts additionalFlags $ \flags targets -> do
+          -- Extract the parameters from the flag arguments or set defaults if not given
+          let givenVariant = listToMaybe [v | BVFlag v <- flags]
+          let givenToolchain = listToMaybe [v | TVFlag v <- flags]
 
-      return $ Just $ do
-        -- Set the main target
-        let outName = masterOutName projType toolchain projName
-        let mainTgt = (case projType of
-                        Binary _ -> "bin"
-                        Archive  -> "lib")
-                      </> prettyShowArch arch
-                      </> show variant
-                      </> outName
-        if null targets then want [mainTgt] else want targets
+          let variant = fromMaybe defVariant givenVariant
+          let toolchain = fromMaybe defToolchain givenToolchain
 
-        -- Set the build directory for the current run
-        let buildDir = bldDir </> show toolchain </> prettyShowArch arch </> show variant
+          -- Gather the target architecture from the used compiler
+          foundArch <- gatherArchFromToolchain toolchain
+          let arch = fromMaybe X86 foundArch
 
-        -- Shows info about the build that follows
-        "banner" ~> do
-            -- Arch
-            putNormal $ (case foundArch of
-                            Nothing -> "Could not detect target Architecture. Defaulting to: "
-                            Just _  -> "Target Arch: ") ++ prettyShowArch arch ++ "\n"
-            -- Variant
-            putNormal $ (case givenVariant of
-                            Nothing -> "No build variant given. Defaulting to: "
-                            Just _  -> "Build variant: ") ++ show variant ++ "\n"
-            -- Toolchain
-            putNormal $ (case givenToolchain of
-                            Nothing -> "No toolchain variant given. Defaulting to: "
-                            Just _  -> "Using toolchain: ") ++ show toolchain ++ "\n"
+          return $ Just $ do
+            -- Set the main target
+            let outName = masterOutName projType toolchain projName
+            let mainTgt = (case projType of
+                            Binary _ -> "bin"
+                            Archive  -> "lib")
+                          </> prettyShowArch arch
+                          </> show variant
+                          </> outName
+            if null targets then want [mainTgt] else want targets
 
-        "clean" ~> do
-            putNormal "Cleaning...\n"
-            removeFilesAfter "." [bldDir]
-            putNormal "All clean.\n"
+            -- Set the build directory for the current run
+            let buildDir = bldDir </> show toolchain </> prettyShowArch arch </> show variant
 
-        mainTgt %> \out -> do
-            -- Initial banner
-            need ["banner"]
+            -- Shows info about the build that follows
+            "banner" ~> do
+                -- Arch
+                putNormal $ (case foundArch of
+                                Nothing -> "Could not detect target Architecture. Defaulting to: "
+                                Just _  -> "Target Arch: ") ++ prettyShowArch arch ++ "\n"
+                -- Variant
+                putNormal $ (case givenVariant of
+                                Nothing -> "No build variant given. Defaulting to: "
+                                Just _  -> "Build variant: ") ++ show variant ++ "\n"
+                -- Toolchain
+                putNormal $ (case givenToolchain of
+                                Nothing -> "No toolchain variant given. Defaulting to: "
+                                Just _  -> "Using toolchain: ") ++ show toolchain ++ "\n"
 
-            -- Gather the source files
-            srcfiles <- getDirectoryFiles srcDir ["//*.cpp", "//*.cc", "//*.c"]
+            "clean" ~> do
+                putNormal "Cleaning...\n"
+                removeFilesAfter "." [bldDir]
+                putNormal "All clean.\n"
 
-            -- Create the future object file list
-            let objfiles = [buildDir </> sf <.> "o" | sf <- srcfiles]
+            mainTgt %> \out -> do
+                -- Initial banner
+                need ["banner"]
 
-            -- Set the object file dependency
-            need objfiles
+                -- Gather the source files
+                srcfiles <- getDirectoryFiles srcDir ["//*.cpp", "//*.cc", "//*.c"]
 
-            -- Gather additional library paths
-            let depsFolder = "deps"
-            depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
-            libpaths <- if depsFolderExists
-                          then do
-                            deps <- Development.Shake.getDirectoryContents depsFolder
-                            return [depsFolder </> l </> "lib" </> prettyShowArch arch </> show variant | l <- deps]
-                          else
-                            return []
+                -- Create the future object file list
+                let objfiles = [buildDir </> sf <.> "o" | sf <- srcfiles]
 
-            -- Construct the main output command
-            let outCommand =
-                 case projType of
-                   Binary lr ->
-                       -- Link command
-                       genLinkCmd hostOs lr toolchain variant libpaths libs objfiles out
-                   Archive   ->
-                       -- Archive command
-                       genArchiveCmd toolchain objfiles out
+                -- Set the object file dependency
+                need objfiles
 
-            -- Pretty print info about the command to be executed
-            liftIO $ setSGR [SetColor Foreground Dull Green]
-            putNormal "[\240] Linking "
-            liftIO $ setSGR [SetColor Foreground Dull Yellow]
-            putNormal $ out ++ "\n"
-            liftIO $ setSGR [Reset]
+                -- Gather additional library paths
+                let depsFolder = "deps"
+                depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
+                libpaths <- if depsFolderExists
+                              then do
+                                deps <- Development.Shake.getDirectoryContents depsFolder
+                                return [depsFolder </> l </> "lib" </> prettyShowArch arch </> show variant | l <- deps]
+                              else
+                                return []
 
-            -- Print additional info on verbose builds
-            verbosity <- getVerbosity
-            when (verbosity >= Loud) $
-                putNormal $ "Executing command: " ++ outCommand ++ "\n"
+                -- Construct the main output command
+                let outCommand =
+                     case projType of
+                       Binary lr ->
+                           -- Link command
+                           genLinkCmd hostOs lr toolchain variant libpaths libs objfiles out
+                       Archive   ->
+                           -- Archive command
+                           genArchiveCmd toolchain objfiles out
 
-            -- Execute main output command
-            quietly $ cmd outCommand :: Action ()
+                -- Pretty print info about the command to be executed
+                liftIO $ setSGR [SetColor Foreground Dull Green]
+                putNormal "[\240] Linking "
+                liftIO $ setSGR [SetColor Foreground Dull Yellow]
+                putNormal $ out ++ "\n"
+                liftIO $ setSGR [Reset]
 
-            -- Copy pdb on MSVC debug builds
-            pdb <- liftM head $ getDirectoryFiles buildDir ["*.pdb"]
-            when (toolchain == MSVC && variant == Debug) $
-                copyFile' (buildDir </> pdb) (takeDirectory mainTgt </> pdb)
+                -- Print additional info on verbose builds
+                verbosity <- getVerbosity
+                when (verbosity >= Loud) $
+                    putNormal $ "Executing command: " ++ outCommand ++ "\n"
 
-        buildDir <//> "*.o" %> \out -> do
-            -- Set the source
-            let dropDirectory n = foldr (.) id (replicate n dropDirectory1)
-            let c = toStandard $ srcDir </> dropDirectory 4 (dropExtension out)
-            let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
+                -- Execute main output command
+                quietly $ cmd outCommand :: Action ()
 
-            -- Gather additional include paths
-            let depsFolder = "deps"
-            depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
-            includes <- liftM (["include"] ++) $
-                              if depsFolderExists
-                                then do
-                                    deps <- Development.Shake.getDirectoryContents depsFolder
-                                    return [depsFolder </> l </> "include" | l <- deps]
-                                else
-                                    return []
+                -- Copy pdb on MSVC debug builds
+                pdb <- liftM head $ getDirectoryFiles buildDir ["*.pdb"]
+                when (toolchain == MSVC && variant == Debug) $
+                    copyFile' (buildDir </> pdb) (takeDirectory mainTgt </> pdb)
 
-            -- Construct the command to be executed
-            let compileCmd = genCompileCmd toolchain variant includes defines c out
+            buildDir <//> "*.o" %> \out -> do
+                -- Set the source
+                let dropDirectory n = foldr (.) id (replicate n dropDirectory1)
+                let c = toStandard $ srcDir </> dropDirectory 4 (dropExtension out)
+                let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
 
-            -- Pretty print info about the command to be executed
-            verbosity <- getVerbosity
+                -- Gather additional include paths
+                let depsFolder = "deps"
+                depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
+                includes <- liftM (["include"] ++) $
+                                  if depsFolderExists
+                                    then do
+                                        deps <- Development.Shake.getDirectoryContents depsFolder
+                                        return [depsFolder </> l </> "include" | l <- deps]
+                                    else
+                                        return []
 
-            liftIO $ takeMVar stdoutMvar
-            liftIO $ setSGR [SetColor Foreground Vivid Green]
-            putNormal "[\175] Compiling "
-            liftIO $ setSGR [SetColor Foreground Vivid Yellow]
-            putNormal $ c ++ "\n"
-            liftIO $ setSGR [Reset]
-            when (verbosity >= Loud) $
-                putNormal $ "Executing command: " ++ compileCmd ++ "\n"
-            liftIO $ putMVar stdoutMvar ()
+                -- Construct the command to be executed
+                let compileCmd = genCompileCmd toolchain variant includes defines c out
 
-            -- Execute the command
-            () <- quietly $ cmd (EchoStdout False) (EchoStderr True) compileCmd
+                -- Pretty print info about the command to be executed
+                verbosity <- getVerbosity
 
-            -- Set up the dependencies upon the header files
-            let fileName = dropExtension (takeFileName out)
-            headerDeps <- liftIO $ gatherHeaderDeps (cdir : includes) fileName
-            let prettyHeaderDeps = [normaliseEx x | x <- headerDeps]
-            --putNormal $ "DEBUG: Deps for " ++ out ++ " are: " ++ show prettyHeaderDeps ++ "\n"
-            need prettyHeaderDeps
+                liftIO $ takeMVar stdoutMvar
+                liftIO $ setSGR [SetColor Foreground Vivid Green]
+                putNormal "[\175] Compiling "
+                liftIO $ setSGR [SetColor Foreground Vivid Yellow]
+                putNormal $ c ++ "\n"
+                liftIO $ setSGR [Reset]
+                when (verbosity >= Loud) $
+                    putNormal $ "Executing command: " ++ compileCmd ++ "\n"
+                liftIO $ putMVar stdoutMvar ()
+
+                -- Execute the command
+                () <- quietly $ cmd (EchoStdout False) (EchoStderr True) compileCmd
+
+                -- Set up the dependencies upon the header files
+                let fileName = dropExtension (takeFileName out)
+                headerDeps <- liftIO $ gatherHeaderDeps (cdir : includes) fileName
+                let prettyHeaderDeps = [normaliseEx x | x <- headerDeps]
+                --putNormal $ "DEBUG: Deps for " ++ out ++ " are: " ++ show prettyHeaderDeps ++ "\n"
+                need prettyHeaderDeps
 

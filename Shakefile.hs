@@ -121,7 +121,9 @@ gccCompileCommand :: CompileAction
 gccCompileCommand params input output =
     unwords $ cxx ++ cflgs ++ ["-c"] ++ ["-o", output] ++ defs ++ incls ++ [input]
   where
-    cxx = ["g++"]
+    cxx = case languageOf input of
+              Just C -> ["gcc"]
+              _      -> ["g++"]
     cflgs = cflags params
     defs = map ("-D"++) (additionalDefines params)
     incls = map ("-I" ++) (includePaths params)
@@ -178,7 +180,11 @@ msvcArchiveCommand params input output =
 -- | Generates Clang compile commands
 clangCompileCommand :: CompileAction
 clangCompileCommand params input output =
-    unwords $ (["clang++"] ++ ) . tail . words $ gccCompileCommand params input output
+    unwords $ (cxx ++ ) . tail . words $ gccCompileCommand params input output
+  where
+    cxx = case languageOf input of
+              Just C -> ["clang"]
+              _      -> ["clang++"]
 
 -- | Generates Clang link commands
 clangLinkCommand :: LinkAction
@@ -193,12 +199,15 @@ clangArchiveCommand = gccArchiveCommand
 -- | Toolchain Default flags
 ---------------------------------------------------------------------------
 -- Msvc
-msvcDefaultCompilerFlags :: BuildVariant -> [String]
-msvcDefaultCompilerFlags variant =
+msvcDefaultCompilerFlags :: BuildVariant -> Language -> [String]
+msvcDefaultCompilerFlags variant language =
     ["/nologo", "/EHsc", "/W4"] ++
-    case variant of
-      Release -> ["/MT", "/O2"]
-      Debug   -> ["/MTd", "/Zi", "/Od", "/FS"]
+    (case variant of
+         Release -> ["/MT", "/O2"]
+         Debug   -> ["/MTd", "/Zi", "/Od", "/FS"]) ++
+    case language of
+        C -> ["/TC"]
+        _ -> []
 
 msvcDefaultLinkerFlags :: LinkResult -> BuildVariant -> [String]
 msvcDefaultLinkerFlags linkType variant =
@@ -214,12 +223,15 @@ msvcDefaultArchiverFlags :: [String]
 msvcDefaultArchiverFlags = ["/nologo"]
 
 -- Gcc
-gccDefaultCompilerFlags :: BuildVariant -> [String]
-gccDefaultCompilerFlags variant =
-    ["-Wall", "-Wextra", "-std=c++11"] ++
-    case variant of
-        Release -> ["-O2"]
-        Debug   -> ["-g", "-O0"]
+gccDefaultCompilerFlags :: BuildVariant -> Language -> [String]
+gccDefaultCompilerFlags variant language =
+    ["-Wall", "-Wextra"] ++
+    (case variant of
+         Release -> ["-O2"]
+         Debug   -> ["-g", "-O0"]) ++
+    case language of
+        Cpp -> ["-std=c++11"]
+        _   -> []
 
 gccDefaultLinkerFlags :: OS -> LinkResult -> BuildVariant -> [String]
 gccDefaultLinkerFlags os linkType variant =
@@ -238,7 +250,7 @@ gccDefaultArchiverFlags :: [String]
 gccDefaultArchiverFlags = []
 
 -- Clang
-clangDefaultCompilerFlags :: BuildVariant -> [String]
+clangDefaultCompilerFlags :: BuildVariant -> Language -> [String]
 clangDefaultCompilerFlags = gccDefaultCompilerFlags
 
 clangDefaultLinkerFlags :: OS -> LinkResult -> BuildVariant -> [String]
@@ -414,8 +426,8 @@ additionalFlags =
 ---------------------------------------------------------------------------
 -- Compile command builder
 genCompileCmd :: ToolChainVariant -> BuildVariant -> [FilePath] -> [FilePath] -> FilePath -> FilePath -> String
-genCompileCmd toolchain variant includes defs =
-    ccGen params
+genCompileCmd toolchain variant includes defs input output =
+    ccGen params input output
   where
     ccGen = case toolchain of
               MSVC -> msvcCompileCommand
@@ -425,7 +437,7 @@ genCompileCmd toolchain variant includes defs =
              { cflags = (case toolchain of
                            MSVC -> msvcDefaultCompilerFlags
                            GCC  -> gccDefaultCompilerFlags
-                           LLVM -> clangDefaultCompilerFlags) variant
+                           LLVM -> clangDefaultCompilerFlags) variant (fromMaybe Cpp (languageOf input))
              , additionalDefines = defs
              , includePaths = includes
              }

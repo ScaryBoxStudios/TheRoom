@@ -164,6 +164,7 @@ gccArchiveCommand params input output =
 msvcCompileCommand :: CompileAction
 msvcCompileCommand params input output =
     unwords $ cxx ++ cflgs ++ ["/c"] ++ ["/Fo" ++ output] ++ defs ++ incls ++ [input]
+                  ++ ["/Fd" ++ foldr1 (</>) (take 4 (splitDirectories output)) ++ "/" ]
   where
     cxx = ["cl"]
     cflgs = cflags params
@@ -620,7 +621,12 @@ main = do
                 putNormal $ "Executing command: " ++ outCommand ++ "\n"
 
             -- Execute main output command
-            quietly $ cmd outCommand
+            quietly $ cmd outCommand :: Action ()
+
+            -- Copy pdb on MSVC debug builds
+            pdb <- liftM head $ getDirectoryFiles buildDir ["*.pdb"]
+            when (toolchain == MSVC && variant == Debug) $
+                copyFile' (buildDir </> pdb) (takeDirectory mainTgt </> pdb)
 
         buildDir <//> "*.o" %> \out -> do
             -- Set the source

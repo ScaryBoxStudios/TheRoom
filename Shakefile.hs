@@ -580,7 +580,7 @@ main = do
             need ["banner"]
 
             -- Gather the source files
-            srcfiles <- getDirectoryFiles srcDir ["//*.cpp"]
+            srcfiles <- getDirectoryFiles srcDir ["//*.cpp", "//*.cc", "//*.c"]
 
             -- Create the future object file list
             let objfiles = [buildDir </> sf <.> "o" | sf <- srcfiles]

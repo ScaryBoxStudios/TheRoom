@@ -574,7 +574,9 @@ findProjectFile = do
         else do
             config <- Data.Yaml.decodeFileEither cfgFile :: IO (Either ParseException Config)
             case config of
-                Left _   -> return Nothing
+                Left pe   -> do
+                    print pe
+                    return Nothing
                 Right cfg -> return $ Just cfg
 
 main :: IO ()

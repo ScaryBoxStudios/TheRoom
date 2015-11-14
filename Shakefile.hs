@@ -515,6 +515,7 @@ data Config = Config
   { projectName :: String
   , projectType :: BuildResult
   , userDefines :: [String]
+  , addIncludes :: [String]
   , commonLibs :: [String]
   , osLibs :: OSLibMap
   } deriving Show
@@ -554,6 +555,7 @@ instance FromJSON Config where
         m .: "ProjectName" <*>
         m .: "ProjectType" <*>
         m .: "Defines" <*>
+        m .:? "AdditionalIncludes" .!= [] <*>
         m .:? "Libraries" .!= [] <*>
         m .:? "OSLibraries" .!= OSLibMap mempty
     parseJSON _ = error "Config parse error."
@@ -587,11 +589,12 @@ main = do
         let projType = projectType cfg
         -- Project name
         let projName = projectName cfg
+        -- Additional includes
+        let addIncl = addIncludes cfg
         -- Link libraries
         let libs = commonLibs cfg ++ fromMaybe [] (M.lookup hostOs (getOsLibMap (osLibs cfg)))
         -- Defines
         let defines = userDefines cfg
-
 
         -- The mutex for the status messages
         stdoutMvar <- newMVar ()
@@ -707,7 +710,7 @@ main = do
                 -- Gather additional include paths
                 let depsFolder = "deps"
                 depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
-                includes <- liftM (["include"] ++) $
+                includes <- liftM (("include" : addIncl) ++) $
                                   if depsFolderExists
                                     then do
                                         deps <- Development.Shake.getDirectoryContents depsFolder

@@ -737,7 +737,7 @@ main = do
                 liftIO $ putMVar stdoutMvar ()
 
                 -- Execute the command
-                () <- quietly $ cmd (EchoStdout False) (EchoStderr True) compileCmd
+                () <- quietly $ cmd (EchoStdout True) (EchoStderr True) compileCmd
 
                 -- Set up the dependencies upon the header files
                 let fileName = dropExtension (takeFileName out)

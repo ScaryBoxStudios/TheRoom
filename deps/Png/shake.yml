@@ -1,0 +1,3 @@
+ProjectName: Png
+ProjectType: StaticLib
+AdditionalIncludes: ["../ZLib/include"]

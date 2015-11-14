@@ -635,8 +635,15 @@ main = do
             let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
 
             -- Gather additional include paths
-            deps <- Development.Shake.getDirectoryContents "deps"
-            let includes = "include" : ["deps" </> l </> "include" | l <- deps]
+            let depsFolder = "deps"
+            depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
+            includes <- liftM (["include"] ++) $
+                              if depsFolderExists
+                                then do
+                                    deps <- Development.Shake.getDirectoryContents depsFolder
+                                    return [depsFolder </> l </> "include" | l <- deps]
+                                else
+                                    return []
 
             -- Construct the command to be executed
             let compileCmd = genCompileCmd toolchain variant includes defines c out

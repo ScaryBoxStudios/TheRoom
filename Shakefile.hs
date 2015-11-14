@@ -554,7 +554,7 @@ instance FromJSON Config where
     parseJSON (Object m) = Config <$>
         m .: "ProjectName" <*>
         m .: "ProjectType" <*>
-        m .: "Defines" <*>
+        m .:? "Defines" .!= [] <*>
         m .:? "AdditionalIncludes" .!= [] <*>
         m .:? "Libraries" .!= [] <*>
         m .:? "OSLibraries" .!= OSLibMap mempty

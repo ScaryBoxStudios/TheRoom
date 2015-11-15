@@ -1,0 +1,28 @@
+ProjectName: Glfw
+ProjectType: StaticLib
+Sources:
+  - "context.c"
+  - "init.c"
+  - "input.c"
+  - "monitor.c"
+  - "window.c"
+OSSources:
+  Windows:
+    - "win32_init.c"
+    - "win32_monitor.c"
+    - "win32_time.c"
+    - "win32_tls.c"
+    - "win32_window.c"
+    - "winmm_joystick.c"
+    - "wgl_context.c"
+  Linux:
+    - "x11_init.c"
+    - "x11_monitor.c"
+    - "x11_window.c"
+    - "xkb_unicode.c"
+    - "linux_joystick.c"
+    - "posix_time.c"
+    - "posix_tls.c"
+    - "glx_context.c"
+Defines: ["_GLFW_WIN32", "_GLFW_WGL", "_GLFW_USE_OPENGL"]
+AdditionalIncludes: ["../GL/include", "../EGL/include"]

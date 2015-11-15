@@ -529,7 +529,7 @@ data Config = Config
   , userDefines :: [String]
   , addIncludes :: [String]
   , commonLibs :: [String]
-  , osLibs :: OSLibMap
+  , osLibs :: OSMap
   } deriving Show
 
 --
@@ -545,16 +545,16 @@ instance FromJSON BuildResult where
 --
 instance FromJSON OS
 
--- Wrapper around a map of Operating Systems and their dedicated library lists
-newtype OSLibMap = OSLibMap { getOsLibMap :: M.Map OS [String] } deriving (Show, Generic)
+-- Wrapper around a map of Operating Systems and some String lists
+newtype OSMap = OSMap { getOsMap :: M.Map OS [String] } deriving (Show, Generic)
 
 --
-instance FromJSON OSLibMap where
+instance FromJSON OSMap where
     parseJSON (Object o) = do
         winLibs <- o .:? "Windows" .!= []
         linLibs <- o .:? "Linux" .!= []
         osxLibs <- o .:? "OSX" .!= []
-        return $ OSLibMap $ M.fromList
+        return $ OSMap $ M.fromList
                               [ (Windows, winLibs)
                               , (Linux, linLibs)
                               , (OSX, osxLibs)
@@ -569,7 +569,7 @@ instance FromJSON Config where
         m .:? "Defines" .!= [] <*>
         m .:? "AdditionalIncludes" .!= [] <*>
         m .:? "Libraries" .!= [] <*>
-        m .:? "OSLibraries" .!= OSLibMap mempty
+        m .:? "OSLibraries" .!= OSMap mempty
     parseJSON _ = error "Config parse error."
 
 ---------------------------------------------------------------------------
@@ -606,7 +606,7 @@ main = do
         -- Additional includes
         let addIncl = addIncludes cfg
         -- Link libraries
-        let libs = commonLibs cfg ++ fromMaybe [] (M.lookup hostOs (getOsLibMap (osLibs cfg)))
+        let libs = commonLibs cfg ++ fromMaybe [] (M.lookup hostOs (getOsMap (osLibs cfg)))
         -- Defines
         let defines = userDefines cfg
 

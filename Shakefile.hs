@@ -551,8 +551,8 @@ newtype OSLibMap = OSLibMap { getOsLibMap :: M.Map OS [String] } deriving (Show,
 --
 instance FromJSON OSLibMap where
     parseJSON (Object o) = do
-        winLibs <- o .: "Windows"
-        linLibs <- o .: "Linux"
+        winLibs <- o .:? "Windows" .!= []
+        linLibs <- o .:? "Linux" .!= []
         osxLibs <- o .:? "OSX" .!= []
         return $ OSLibMap $ M.fromList
                               [ (Windows, winLibs)

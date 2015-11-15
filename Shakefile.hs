@@ -526,6 +526,8 @@ cfgFile = "shake.yml"
 data Config = Config
   { projectName :: String
   , projectType :: BuildResult
+  , commonSources :: [String]
+  , osSources :: OSMap
   , userDefines :: [String]
   , addIncludes :: [String]
   , commonLibs :: [String]
@@ -566,6 +568,8 @@ instance FromJSON Config where
     parseJSON (Object m) = Config <$>
         m .: "ProjectName" <*>
         m .: "ProjectType" <*>
+        m .:? "Sources" .!= [] <*>
+        m .:? "OSSources" .!= OSMap mempty <*>
         m .:? "Defines" .!= [] <*>
         m .:? "AdditionalIncludes" .!= [] <*>
         m .:? "Libraries" .!= [] <*>
@@ -603,6 +607,8 @@ main = do
         let projType = projectType cfg
         -- Project name
         let projName = projectName cfg
+        -- Sources
+        let sources = fromMaybe ["//*.cpp", "//*.cc", "//*.c"] (M.lookup hostOs (getOsMap (osSources cfg)))
         -- Additional includes
         let addIncl = addIncludes cfg
         -- Link libraries
@@ -667,7 +673,7 @@ main = do
                 need ["banner"]
 
                 -- Gather the source files
-                srcfiles <- getDirectoryFiles srcDir ["//*.cpp", "//*.cc", "//*.c"]
+                srcfiles <- getDirectoryFiles srcDir sources
 
                 -- Create the future object file list
                 let objfiles = [buildDir </> sf <.> "o" | sf <- srcfiles]

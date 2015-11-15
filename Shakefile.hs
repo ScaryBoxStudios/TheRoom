@@ -608,7 +608,7 @@ main = do
         -- Project name
         let projName = projectName cfg
         -- Sources
-        let sources = fromMaybe ["//*.cpp", "//*.cc", "//*.c"] (M.lookup hostOs (getOsMap (osSources cfg)))
+        let sources = maybe ["//*.cpp", "//*.cc", "//*.c"] (commonSources cfg ++ ) (M.lookup hostOs (getOsMap (osSources cfg)))
         -- Additional includes
         let addIncl = addIncludes cfg
         -- Link libraries

@@ -727,6 +727,9 @@ main = do
                 let c = toStandard $ srcDir </> dropDirectory 4 (dropExtension out)
                 let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
 
+                -- Need on the object source
+                need [c]
+
                 -- Gather additional include paths
                 let depsFolder = "deps"
                 depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder

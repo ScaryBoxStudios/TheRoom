@@ -130,6 +130,12 @@ class Window
         /// Retrieves the key press callback handler
         KeyPressedCb GetKeyPressedHandler() const;
 
+        /// Enables or Disables mouse grab
+        void SetMouseGrabEnabled(bool on);
+
+        /// Retrieves the value of the mouse grab option
+        bool MouseGrabEnabled() const;
+
         /// Enables debug option that appends current window fps to the window title
         void SetShowFPS(bool show);
 

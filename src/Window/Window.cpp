@@ -232,6 +232,19 @@ Window::KeyPressedCb Window::GetKeyPressedHandler() const
     return mKeyPressCb;
 }
 
+void Window::SetMouseGrabEnabled(bool on)
+{
+    if (on)
+        glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    else
+        glfwSetInputMode(mWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+bool Window::MouseGrabEnabled() const
+{
+    return glfwGetInputMode(mWindow, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+}
+
 void Window::UpdateTitleFPS()
 {
     double elapsedMs = (glfwGetTime() * 1000) - mPrevTimeTicks;

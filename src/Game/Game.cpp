@@ -250,11 +250,20 @@ void Game::Init()
     mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
     mWindow.SetShowFPS(true);
     mWindow.SetCloseHandler(mExitHandler);
+    mWindow.SetMouseButtonPressHandler(
+        [this](MouseButton mb, ButtonAction ba)
+        {
+            if (mb == MouseButton::Left && ba == ButtonAction::Press)
+                mWindow.SetMouseGrabEnabled(true);
+        }
+    );
     mWindow.SetKeyPressedHandler(
         [this](Key k, KeyAction ka)
         {
             if(k == Key::Escape && ka == KeyAction::Release)
                 mExitHandler();
+            if(k == Key::RightControl && ka == KeyAction::Release)
+                mWindow.SetMouseGrabEnabled(false);
         }
     );
     mRenderData.degrees = 0.1f;

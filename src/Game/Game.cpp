@@ -8,6 +8,7 @@
 WARN_GUARD_ON
 #include "../Graphics/Image/Png/Png.hpp"
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <png++/png.hpp>
 WARN_GUARD_OFF
@@ -384,7 +385,7 @@ void Game::Render(float interpolation)
 
     glm::mat4 MVP = projection * view * model;
 
-    glUniformMatrix4fv(mGLData.matrixId, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(mGLData.matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
     glBindVertexArray(0);

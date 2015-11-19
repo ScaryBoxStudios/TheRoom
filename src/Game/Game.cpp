@@ -265,15 +265,6 @@ void Game::Init()
             // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
                 mWindow.SetMouseGrabEnabled(false);
-            // Camera movement
-            if(k == Key::W)
-                mCamKeys[0] = ka != KeyAction::Release;
-            if(k == Key::A)
-                mCamKeys[1] = ka != KeyAction::Release;
-            if(k == Key::S)
-                mCamKeys[2] = ka != KeyAction::Release;
-            if(k == Key::D)
-                mCamKeys[3] = ka != KeyAction::Release;
         }
     );
     mWindow.SetCursorPositionChangedHandler(
@@ -298,8 +289,6 @@ void Game::Init()
     mCamera.pitch = -20.0f;
     mCamera.xOffset = 0.0f;
     mCamera.yOffset = 0.0f;
-
-    std::fill(mCamKeys, mCamKeys + sizeof(mCamKeys) / sizeof(bool), 0);
 
     mRenderData.degrees = 0.1f;
     mRenderData.degreesInc = 0.05f;
@@ -429,13 +418,13 @@ void Game::Update(float dt)
     mCamera.front = calcCamFront(yaw, pitch);
 
     // Update camera position
-    if(mCamKeys[0]) // W
+    if(mWindow.IsKeyPressed(Key::W))
         mCamera.pos += mCamera.speed * mCamera.front;
-    if(mCamKeys[1]) // A
+    if(mWindow.IsKeyPressed(Key::A))
         mCamera.pos -= glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed;
-    if(mCamKeys[2]) // S
+    if(mWindow.IsKeyPressed(Key::S))
         mCamera.pos -= mCamera.speed * mCamera.front;
-    if(mCamKeys[3]) // D
+    if(mWindow.IsKeyPressed(Key::D))
         mCamera.pos += glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed;
 
     // Update state
@@ -454,13 +443,13 @@ void Game::Render(float interpolation)
     glm::vec3 cameraPos = mCamera.pos;
     glm::vec3 cameraFront = mCamera.front;
         // Interpolate camera positioning
-        if(mCamKeys[0]) // W
+        if(mWindow.IsKeyPressed(Key::W))
             cameraPos += mCamera.speed * mCamera.front * interpolation;
-        if(mCamKeys[1]) // A
+        if(mWindow.IsKeyPressed(Key::A))
             cameraPos -= glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed * interpolation;
-        if(mCamKeys[2]) // S
+        if(mWindow.IsKeyPressed(Key::S))
             cameraPos -= mCamera.speed * mCamera.front * interpolation;
-        if(mCamKeys[3]) // D
+        if(mWindow.IsKeyPressed(Key::D))
             cameraPos += glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed * interpolation;
         // TODO: Interpolate look around
 

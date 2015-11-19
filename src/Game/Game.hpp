@@ -84,9 +84,6 @@ class Game
             GLfloat yOffset;
         };
         Camera mCamera;
-
-        // The state of the keyboard keys for the camera
-        bool mCamKeys[4];
 };
 
 #endif // ! _GAME_HPP_

@@ -6,7 +6,12 @@
 #endif
 
 #include <functional>
+#include "../Util/WarnGuard.hpp"
 #include "../Window/Window.hpp"
+
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+WARN_GUARD_OFF
 
 class Game
 {
@@ -61,6 +66,27 @@ class Game
             float degreesInc;
         };
         RenderData mRenderData;
+
+        // The state of the camera view
+        struct Camera
+        {
+            glm::vec3 pos;
+            glm::vec3 front;
+            glm::vec3 up;
+            float speed;
+            float sensitivity;
+            float yaw;
+            float pitch;
+
+            double lastX;
+            double lastY;
+            GLfloat xOffset;
+            GLfloat yOffset;
+        };
+        Camera mCamera;
+
+        // The state of the keyboard keys for the camera
+        bool mCamKeys[4];
 };
 
 #endif // ! _GAME_HPP_

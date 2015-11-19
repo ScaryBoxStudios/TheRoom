@@ -2,12 +2,10 @@
 #include <sstream>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "../Util/WarnGuard.hpp"
 #include "../Graphics/Image/PixelTraits.hpp"
 #include "../Graphics/Image/PixelBufferTraits.hpp"
 WARN_GUARD_ON
 #include "../Graphics/Image/Png/Png.hpp"
-#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <png++/png.hpp>
@@ -261,14 +259,51 @@ void Game::Init()
     mWindow.SetKeyPressedHandler(
         [this](Key k, KeyAction ka)
         {
+            // Exit
             if(k == Key::Escape && ka == KeyAction::Release)
                 mExitHandler();
+            // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
                 mWindow.SetMouseGrabEnabled(false);
+            // Camera movement
+            if(k == Key::W)
+                mCamKeys[0] = ka != KeyAction::Release;
+            if(k == Key::A)
+                mCamKeys[1] = ka != KeyAction::Release;
+            if(k == Key::S)
+                mCamKeys[2] = ka != KeyAction::Release;
+            if(k == Key::D)
+                mCamKeys[3] = ka != KeyAction::Release;
         }
     );
+    mWindow.SetCursorPositionChangedHandler(
+        [this](double x, double y)
+        {
+            if (mWindow.MouseGrabEnabled())
+            {
+                mCamera.xOffset = x - mCamera.lastX;
+                mCamera.yOffset = mCamera.lastY - y;
+                mCamera.lastX = x;
+                mCamera.lastY = y;
+            }
+        }
+    );
+
+    mCamera.up = glm::vec3(0, 1, 0);
+    mCamera.front = glm::vec3(0, 0, -1);
+    mCamera.pos = glm::vec3(0, 3, 8);
+    mCamera.speed = 0.3f;
+    mCamera.sensitivity = 0.05;
+    mCamera.yaw = -90.0f;
+    mCamera.pitch = -20.0f;
+    mCamera.xOffset = 0.0f;
+    mCamera.yOffset = 0.0f;
+
+    std::fill(mCamKeys, mCamKeys + sizeof(mCamKeys) / sizeof(bool), 0);
+
     mRenderData.degrees = 0.1f;
     mRenderData.degreesInc = 0.05f;
+
     GLInit();
 }
 
@@ -357,12 +392,51 @@ void Game::GLInit()
     CheckGLError();
 }
 
+glm::vec3 calcCamFront(float yaw, float pitch)
+{
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    return glm::normalize(front);
+}
+
 void Game::Update(float dt)
 {
     (void) dt;
 
     // Poll window events
     mWindow.PollEvents();
+
+    // Update camera euler angles
+    auto& xOffset = mCamera.xOffset;
+    auto& yOffset = mCamera.yOffset;
+    auto& yaw = mCamera.yaw;
+    auto& pitch = mCamera.pitch;
+
+    xOffset *= mCamera.sensitivity;
+    yOffset *= mCamera.sensitivity;
+
+    yaw += xOffset;
+    pitch += yOffset;
+
+    GLfloat pitchLim = 30.0f; // Normal: 89.0f
+    if(pitch > pitchLim)
+        pitch = pitchLim;
+    if(pitch < -pitchLim)
+        pitch = -pitchLim;
+
+    mCamera.front = calcCamFront(yaw, pitch);
+
+    // Update camera position
+    if(mCamKeys[0]) // W
+        mCamera.pos += mCamera.speed * mCamera.front;
+    if(mCamKeys[1]) // A
+        mCamera.pos -= glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed;
+    if(mCamKeys[2]) // S
+        mCamera.pos -= mCamera.speed * mCamera.front;
+    if(mCamKeys[3]) // D
+        mCamera.pos += glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed;
 
     // Update state
     mRenderData.degrees += mRenderData.degreesInc;
@@ -375,11 +449,24 @@ void Game::Render(float interpolation)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-    glm::mat4 view = glm::lookAt(
-            glm::vec3(6, 4, 8),
-            glm::vec3(0, 0, 0),
-            glm::vec3(0, 1, 0)
-    );
+
+    // View calculation with camera
+    glm::vec3 cameraPos = mCamera.pos;
+    glm::vec3 cameraFront = mCamera.front;
+        // Interpolate camera positioning
+        if(mCamKeys[0]) // W
+            cameraPos += mCamera.speed * mCamera.front * interpolation;
+        if(mCamKeys[1]) // A
+            cameraPos -= glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed * interpolation;
+        if(mCamKeys[2]) // S
+            cameraPos -= mCamera.speed * mCamera.front * interpolation;
+        if(mCamKeys[3]) // D
+            cameraPos += glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed * interpolation;
+        // TODO: Interpolate look around
+
+    glm::vec3 cameraUp = mCamera.up;
+    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
 

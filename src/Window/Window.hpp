@@ -130,6 +130,9 @@ class Window
         /// Retrieves the key press callback handler
         KeyPressedCb GetKeyPressedHandler() const;
 
+        /// Returns true if in the frame that the function was called, the given Key was pressed
+        bool IsKeyPressed(Key k) const;
+
         /// Enables or Disables mouse grab
         void SetMouseGrabEnabled(bool on);
 

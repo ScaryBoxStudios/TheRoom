@@ -232,6 +232,11 @@ Window::KeyPressedCb Window::GetKeyPressedHandler() const
     return mKeyPressCb;
 }
 
+bool Window::IsKeyPressed(Key k) const
+{
+    return glfwGetKey(mWindow, static_cast<int>(k)) == GLFW_PRESS;
+}
+
 void Window::SetMouseGrabEnabled(bool on)
 {
     if (on)

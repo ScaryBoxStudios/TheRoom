@@ -217,8 +217,8 @@ template <typename PixelBuffer>
 void SetTextureData(PixelBuffer pb)
 {
     GLint format = PixelTraits<typename PixelBufferTraits<PixelBuffer>::Pixel>::GetChannels() == 4 ? GL_RGBA : GL_RGB;
-    size_t width = PixelBufferTraits<PixelBuffer>::Width(pb);
-    size_t height = PixelBufferTraits<PixelBuffer>::Height(pb);
+    uint32_t width = PixelBufferTraits<PixelBuffer>::Width(pb);
+    uint32_t height = PixelBufferTraits<PixelBuffer>::Height(pb);
     const GLvoid* data = PixelBufferTraits<PixelBuffer>::GetData(pb);
 
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);

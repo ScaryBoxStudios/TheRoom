@@ -36,12 +36,12 @@ struct PixelBufferTraits<SolidBuffer<PixelType>>
 {
     using Pixel = PixelType;
 
-    static std::size_t Width(SolidBuffer<PixelType>& pb)
+    static std::uint32_t Width(SolidBuffer<PixelType>& pb)
     {
         return pb.get_width();
     }
 
-    static std::size_t Height(SolidBuffer<PixelType>& pb)
+    static std::uint32_t Height(SolidBuffer<PixelType>& pb)
     {
         return pb.get_height();
     }

@@ -61,10 +61,10 @@ std::vector<uint8_t> PngLoader::Load(std::vector<uint8_t>&& fileData)
     rawData.resize(width * height * bitDepth * channels / 8);
 
     //const unsigned int stride = width * bitDepth * channels / 8;
-    const unsigned int stride = png_get_rowbytes(png.get(), info.get());
+    const size_t stride = png_get_rowbytes(png.get(), info.get());
     for (size_t i = 0; i < height; ++i)
     {
-        uint32_t q = (height - i - 1) * stride;
+        size_t q = (height - i - 1) * stride;
         rowPtrs[i] = rawData.data()  + q;
     }
     png_read_image(png.get(), rowPtrs.data());

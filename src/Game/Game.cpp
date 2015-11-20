@@ -272,10 +272,10 @@ void Game::Init()
         {
             if (mWindow.MouseGrabEnabled())
             {
-                mCamera.xOffset = x - mCamera.lastX;
-                mCamera.yOffset = mCamera.lastY - y;
-                mCamera.lastX = x;
-                mCamera.lastY = y;
+                mCamera.xOffset = static_cast<float>(x) - mCamera.lastX;
+                mCamera.yOffset = mCamera.lastY - static_cast<float>(y);
+                mCamera.lastX = static_cast<float>(x);
+                mCamera.lastY = static_cast<float>(y);
             }
         }
     );
@@ -284,7 +284,7 @@ void Game::Init()
     mCamera.front = glm::vec3(0, 0, -1);
     mCamera.pos = glm::vec3(0, 3, 8);
     mCamera.speed = 0.3f;
-    mCamera.sensitivity = 0.05;
+    mCamera.sensitivity = 0.05f;
     mCamera.yaw = -90.0f;
     mCamera.pitch = -20.0f;
     mCamera.xOffset = 0.0f;

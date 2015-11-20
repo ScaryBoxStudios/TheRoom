@@ -78,10 +78,10 @@ class Game
             float yaw;
             float pitch;
 
-            double lastX;
-            double lastY;
-            GLfloat xOffset;
-            GLfloat yOffset;
+            float lastX;
+            float lastY;
+            float xOffset;
+            float yOffset;
         };
         Camera mCamera;
 };

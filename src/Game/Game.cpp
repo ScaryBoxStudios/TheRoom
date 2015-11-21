@@ -265,6 +265,16 @@ void Game::Init()
             // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
                 mWindow.SetMouseGrabEnabled(false);
+            // Toggle polygon mode
+            if(k == Key::P && ka == KeyAction::Release)
+            {
+                if (mGLData.drawMode == GL_FILL)
+                    mGLData.drawMode = GL_POINT;
+                else if (mGLData.drawMode == GL_POINT)
+                    mGLData.drawMode = GL_LINE;
+                else if (mGLData.drawMode == GL_LINE)
+                    mGLData.drawMode = GL_FILL;
+            }
         }
     );
     mWindow.SetCursorPositionChangedHandler(
@@ -294,6 +304,7 @@ void Game::Init()
     mRenderData.degreesInc = 0.05f;
 
     GLInit();
+    mGLData.drawMode = GL_FILL;
 }
 
 void Game::GLInit()
@@ -462,7 +473,7 @@ void Game::Render(float interpolation)
     glm::mat4 MVP = projection * view * model;
 
     glUniformMatrix4fv(mGLData.matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, mGLData.drawMode);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
     glBindVertexArray(0);
     CheckGLError();

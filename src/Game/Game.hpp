@@ -56,6 +56,7 @@ class Game
             GLuint vBuf, colBuf, idxBuf, texCoordBuf;
             GLuint tex;
             GLuint matrixId;
+            GLenum drawMode;
         };
         GLData mGLData;
 

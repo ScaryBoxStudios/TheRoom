@@ -139,6 +139,9 @@ class Window
         /// Retrieves the value of the mouse grab option
         bool MouseGrabEnabled() const;
 
+        /// Retrieves the relative movement difference of the cursor from the last frame
+        std::tuple<double, double> GetCursorDiff() const;
+
         /// Enables debug option that appends current window fps to the window title
         void SetShowFPS(bool show);
 
@@ -146,7 +149,8 @@ class Window
         void SwapBuffers();
 
         /// Peeks for the events of the current window and feeds them to the registered callbacks
-        void PollEvents();
+        /// Updates also the cursor state variables for making the Cursor Diff functions usable
+        void Update();
 
     private:
         // Main window properties
@@ -165,6 +169,9 @@ class Window
         
         // Appends current FPS to the window title if mShowFPS is true
         void UpdateTitleFPS();
+
+        // Stores the cursor position from the last two frames
+        double mCursorX, mCursorY, mPrevCursorX, mPrevCursorY;
 
         // State variables used by the window title FPS debugging feature
         bool mShowFPS;

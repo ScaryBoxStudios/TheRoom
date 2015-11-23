@@ -78,11 +78,6 @@ class Game
             float sensitivity;
             float yaw;
             float pitch;
-
-            float lastX;
-            float lastY;
-            float xOffset;
-            float yOffset;
         };
         Camera mCamera;
 };

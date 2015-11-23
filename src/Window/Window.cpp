@@ -8,6 +8,10 @@
 Window::Window() :
     mWindow(0),
     mTitle(""),
+    mCursorX(0),
+    mCursorY(0),
+    mPrevCursorX(0),
+    mPrevCursorY(0),
     mShowFPS(false),
     mPrevTimeTicks(0)
 {
@@ -250,6 +254,11 @@ bool Window::MouseGrabEnabled() const
     return glfwGetInputMode(mWindow, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
 }
 
+std::tuple<double, double> Window::GetCursorDiff() const
+{
+    return std::make_tuple<double, double>(mCursorX - mPrevCursorX, mCursorY - mPrevCursorY);
+}
+
 void Window::UpdateTitleFPS()
 {
     double elapsedMs = (glfwGetTime() * 1000) - mPrevTimeTicks;
@@ -278,8 +287,14 @@ void Window::SwapBuffers()
     glfwSwapBuffers(mWindow);
 }
 
-void Window::PollEvents()
+void Window::Update()
 {
+    // Poll events from the event queue and call their callback handlers
     glfwPollEvents();
+
+    // Update the cursor position state
+    mPrevCursorX = mCursorX;
+    mPrevCursorY = mCursorY;
+    glfwGetCursorPos(mWindow, &mCursorX, &mCursorY);
 }
 

@@ -277,18 +277,6 @@ void Game::Init()
             }
         }
     );
-    mWindow.SetCursorPositionChangedHandler(
-        [this](double x, double y)
-        {
-            if (mWindow.MouseGrabEnabled())
-            {
-                mCamera.xOffset = static_cast<float>(x) - mCamera.lastX;
-                mCamera.yOffset = mCamera.lastY - static_cast<float>(y);
-                mCamera.lastX = static_cast<float>(x);
-                mCamera.lastY = static_cast<float>(y);
-            }
-        }
-    );
 
     mCamera.up = glm::vec3(0, 1, 0);
     mCamera.front = glm::vec3(0, 0, -1);
@@ -297,8 +285,6 @@ void Game::Init()
     mCamera.sensitivity = 0.05f;
     mCamera.yaw = -90.0f;
     mCamera.pitch = -20.0f;
-    mCamera.xOffset = 0.0f;
-    mCamera.yOffset = 0.0f;
 
     mRenderData.degrees = 0.1f;
     mRenderData.degreesInc = 0.05f;
@@ -406,27 +392,31 @@ void Game::Update(float dt)
     (void) dt;
 
     // Poll window events
-    mWindow.PollEvents();
+    mWindow.Update();
 
     // Update camera euler angles
-    auto& xOffset = mCamera.xOffset;
-    auto& yOffset = mCamera.yOffset;
-    auto& yaw = mCamera.yaw;
-    auto& pitch = mCamera.pitch;
+    if (mWindow.MouseGrabEnabled())
+    {
+        std::tuple<double, double> curDiff = mWindow.GetCursorDiff();
+        double xOffset = std::get<0>(curDiff);
+        double yOffset = std::get<1>(curDiff);
+        auto& yaw = mCamera.yaw;
+        auto& pitch = mCamera.pitch;
 
-    xOffset *= mCamera.sensitivity;
-    yOffset *= mCamera.sensitivity;
+        xOffset *= mCamera.sensitivity;
+        yOffset *= mCamera.sensitivity;
 
-    yaw += xOffset;
-    pitch += yOffset;
+        yaw += xOffset;
+        pitch += yOffset;
 
-    GLfloat pitchLim = 30.0f; // Normal: 89.0f
-    if(pitch > pitchLim)
-        pitch = pitchLim;
-    if(pitch < -pitchLim)
-        pitch = -pitchLim;
+        GLfloat pitchLim = 30.0f; // Normal: 89.0f
+        if(pitch > pitchLim)
+            pitch = pitchLim;
+        if(pitch < -pitchLim)
+            pitch = -pitchLim;
 
-    mCamera.front = calcCamFront(yaw, pitch);
+        mCamera.front = calcCamFront(yaw, pitch);
+    }
 
     // Update camera position
     if(mWindow.IsKeyPressed(Key::W))

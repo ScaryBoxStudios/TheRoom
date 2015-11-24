@@ -10,128 +10,7 @@ WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>
 #include <png++/png.hpp>
 WARN_GUARD_OFF
-
-///==============================================================
-///= Const Data
-///==============================================================
-const GLfloat vertexBufferData[] = {
-     // Front
-    -1.0, -1.0,  1.0, 1,
-     1.0, -1.0,  1.0, 1,
-     1.0,  1.0,  1.0, 1,
-    -1.0,  1.0,  1.0, 1,
-     // Top
-    -1.0,  1.0,  1.0, 1,
-     1.0,  1.0,  1.0, 1,
-     1.0,  1.0, -1.0, 1,
-    -1.0,  1.0, -1.0, 1,
-     // Back
-     1.0, -1.0, -1.0, 1,
-    -1.0, -1.0, -1.0, 1,
-    -1.0,  1.0, -1.0, 1,
-     1.0,  1.0, -1.0, 1,
-     // Bottom
-    -1.0, -1.0, -1.0, 1,
-     1.0, -1.0, -1.0, 1,
-     1.0, -1.0,  1.0, 1,
-    -1.0, -1.0,  1.0, 1,
-     // Left
-    -1.0, -1.0, -1.0, 1,
-    -1.0, -1.0,  1.0, 1,
-    -1.0,  1.0,  1.0, 1,
-    -1.0,  1.0, -1.0, 1,
-     // Right
-     1.0, -1.0,  1.0, 1,
-     1.0, -1.0, -1.0, 1,
-     1.0,  1.0, -1.0, 1,
-     1.0,  1.0,  1.0, 1
-};
-
-const GLfloat colorBufferData[] = {
-    0, 0, 1,
-    0, 1, 0,
-    0, 1, 1,
-    1, 0, 0,
-    1, 0, 1,
-    1, 1, 0,
-    0, 0, 1,
-    0, 1, 0,
-    0, 1, 1,
-    1, 0, 0,
-    1, 0, 1,
-    1, 1, 0,
-    0, 0, 1,
-    0, 1, 0,
-    0, 1, 1,
-    1, 0, 0,
-    1, 0, 1,
-    1, 1, 0,
-    0, 0, 1,
-    0, 1, 0,
-    0, 1, 1,
-    1, 0, 0,
-    1, 0, 1,
-    1, 1, 0
-};
-
-const GLubyte indices[] = {
-    // Front
-    0, 1, 2,
-    2, 3, 0,
-    // Top
-    4, 5, 6,
-    6, 7, 4,
-    // Back
-    8, 9, 10,
-    10, 11, 8,
-    // Bottom
-    12, 13, 14,
-    14, 15, 12,
-    // Left
-    16, 17, 18,
-    18, 19, 16,
-    // Right
-    20, 21, 22,
-    22, 23, 20
-};
-
-const GLfloat textureCoords[] = {
-    // Front
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-
-    // Top
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-
-    // Back
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-
-    // Bottom
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-
-    // Left
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-
-    // Right
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f
-};
+#include "Cube.hpp"
 
 const GLchar* vertexShader = R"rsd(
 
@@ -317,21 +196,21 @@ void Game::GLInit()
 
     // Create VBOs
     glBindBuffer(GL_ARRAY_BUFFER, mGLData.vBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexBufferData), vertexBufferData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertexes), cubeVertexes, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*) 0);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Color buffer
     glBindBuffer(GL_ARRAY_BUFFER, mGLData.colBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colorBufferData), colorBufferData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeColorData), cubeColorData, GL_STATIC_DRAW);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Create index buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLData.idxBuf);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Compile and Link shaders
@@ -353,7 +232,7 @@ void Game::GLInit()
 
     // Create texture coordinate buffer
     glBindBuffer(GL_ARRAY_BUFFER, mGLData.texCoordBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoords), textureCoords, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeTextureUVMappings), cubeTextureUVMappings, GL_STATIC_DRAW);
     GLint texAttrib = glGetAttribLocation(mGLData.programId, "in_texCoords");
     glEnableVertexAttribArray(texAttrib);
     glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);

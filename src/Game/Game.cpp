@@ -157,16 +157,10 @@ void Game::Init()
         }
     );
 
-    mCamera.up = glm::vec3(0, 1, 0);
-    mCamera.front = glm::vec3(0, 0, -1);
-    mCamera.pos = glm::vec3(0, 3, 8);
-    mCamera.speed = 0.3f;
-    mCamera.sensitivity = 0.05f;
-    mCamera.yaw = -90.0f;
-    mCamera.pitch = -20.0f;
-
     mRenderData.degrees = 0.1f;
     mRenderData.degreesInc = 0.05f;
+
+    mCamera.SetPos(glm::vec3(0, 0, 8));
 
     GLInit();
     mGLData.drawMode = GL_FILL;
@@ -257,13 +251,27 @@ void Game::GLInit()
     CheckGLError();
 }
 
-glm::vec3 calcCamFront(float yaw, float pitch)
+std::vector<Camera::MoveDirection> Game::CameraMoveDirections()
 {
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    return glm::normalize(front);
+    std::vector<Camera::MoveDirection> mds;
+    if(mWindow.IsKeyPressed(Key::W))
+        mds.push_back(Camera::MoveDirection::Forward);
+    if(mWindow.IsKeyPressed(Key::A))
+        mds.push_back(Camera::MoveDirection::Left);
+    if(mWindow.IsKeyPressed(Key::S))
+        mds.push_back(Camera::MoveDirection::BackWard);
+    if(mWindow.IsKeyPressed(Key::D))
+        mds.push_back(Camera::MoveDirection::Right);
+    return mds;
+}
+
+std::tuple<float, float> Game::CameraLookOffset()
+{
+    std::tuple<double, double> curDiff = mWindow.GetCursorDiff();
+    return std::make_tuple(
+        static_cast<float>(std::get<0>(curDiff)),
+        static_cast<float>(std::get<1>(curDiff))
+    );
 }
 
 void Game::Update(float dt)
@@ -275,37 +283,9 @@ void Game::Update(float dt)
 
     // Update camera euler angles
     if (mWindow.MouseGrabEnabled())
-    {
-        std::tuple<double, double> curDiff = mWindow.GetCursorDiff();
-        float xOffset = static_cast<float>(std::get<0>(curDiff));
-        float yOffset = static_cast<float>(std::get<1>(curDiff));
-        auto& yaw = mCamera.yaw;
-        auto& pitch = mCamera.pitch;
+        mCamera.Look(CameraLookOffset());
 
-        xOffset *= mCamera.sensitivity;
-        yOffset *= mCamera.sensitivity;
-
-        yaw += xOffset;
-        pitch += yOffset;
-
-        GLfloat pitchLim = 30.0f; // Normal: 89.0f
-        if(pitch > pitchLim)
-            pitch = pitchLim;
-        if(pitch < -pitchLim)
-            pitch = -pitchLim;
-
-        mCamera.front = calcCamFront(yaw, pitch);
-    }
-
-    // Update camera position
-    if(mWindow.IsKeyPressed(Key::W))
-        mCamera.pos += mCamera.speed * mCamera.front;
-    if(mWindow.IsKeyPressed(Key::A))
-        mCamera.pos -= glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed;
-    if(mWindow.IsKeyPressed(Key::S))
-        mCamera.pos -= mCamera.speed * mCamera.front;
-    if(mWindow.IsKeyPressed(Key::D))
-        mCamera.pos += glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed;
+    mCamera.Move(CameraMoveDirections());
 
     // Update state
     mRenderData.degrees += mRenderData.degreesInc;
@@ -320,42 +300,12 @@ void Game::Render(float interpolation)
     glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 
     // View calculation with camera
-    glm::vec3 cameraPos = mCamera.pos;
-    glm::vec3 cameraFront = mCamera.front;
-        // Interpolate camera positioning
-        if(mWindow.IsKeyPressed(Key::W))
-            cameraPos += mCamera.speed * mCamera.front * interpolation;
-        if(mWindow.IsKeyPressed(Key::A))
-            cameraPos -= glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed * interpolation;
-        if(mWindow.IsKeyPressed(Key::S))
-            cameraPos -= mCamera.speed * mCamera.front * interpolation;
-        if(mWindow.IsKeyPressed(Key::D))
-            cameraPos += glm::normalize(glm::cross(mCamera.front, mCamera.up)) * mCamera.speed * interpolation;
-        // Intepolate camera euler angles
-        if (mWindow.MouseGrabEnabled())
-        {
-            std::tuple<double, double> curDiff = mWindow.GetCursorDiff();
-            float xOffset = static_cast<float>(std::get<0>(curDiff)) * interpolation;
-            float yOffset = static_cast<float>(std::get<1>(curDiff)) * interpolation;
-            auto yaw = mCamera.yaw;
-            auto pitch = mCamera.pitch;
+    auto lookOffset = mWindow.MouseGrabEnabled() ? CameraLookOffset() : std::make_tuple(0.0f, 0.0f);
+    auto iCamState = mCamera.Interpolate(CameraMoveDirections(), lookOffset, interpolation);
+    glm::vec3& cameraPos = iCamState.position;
+    glm::vec3& cameraFront = iCamState.front;
+    glm::vec3& cameraUp = iCamState.up;
 
-            xOffset *= mCamera.sensitivity;
-            yOffset *= mCamera.sensitivity;
-
-            yaw += xOffset;
-            pitch += yOffset;
-
-            GLfloat pitchLim = 30.0f; // Normal: 89.0f
-            if(pitch > pitchLim)
-                pitch = pitchLim;
-            if(pitch < -pitchLim)
-                pitch = -pitchLim;
-
-            cameraFront = calcCamFront(yaw, pitch);
-        }
-
-    glm::vec3 cameraUp = mCamera.up;
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
     glm::mat4 model = glm::mat4(1.0f);

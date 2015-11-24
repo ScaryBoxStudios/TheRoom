@@ -6,8 +6,10 @@
 #endif
 
 #include <functional>
+#include <vector>
 #include "../Util/WarnGuard.hpp"
 #include "../Window/Window.hpp"
+#include "../Graphics/Util/Camera.hpp"
 
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -68,17 +70,9 @@ class Game
         };
         RenderData mRenderData;
 
-        // The state of the camera view
-        struct Camera
-        {
-            glm::vec3 pos;
-            glm::vec3 front;
-            glm::vec3 up;
-            float speed;
-            float sensitivity;
-            float yaw;
-            float pitch;
-        };
+        // The camera view
+        std::vector<Camera::MoveDirection> CameraMoveDirections();
+        std::tuple<float, float> CameraLookOffset();
         Camera mCamera;
 };
 

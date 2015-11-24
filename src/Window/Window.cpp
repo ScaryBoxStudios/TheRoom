@@ -96,14 +96,14 @@ void Window::SetTitle(const std::string& title)
     glfwSetWindowTitle(mWindow, mTitle.c_str());
 }
 
-const std::string& Window::GetTitle() const 
+const std::string& Window::GetTitle() const
 {
     return mTitle;
 }
 
 void Window::SetPositionChangedHandler(PositionChangedCb cb)
 {
-    mPosCb = cb; 
+    mPosCb = cb;
     GLFWwindowposfun f = [](GLFWwindow* w, int x, int y)
     {
         Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
@@ -117,7 +117,7 @@ Window::PositionChangedCb Window::GetPositionChangedHandler() const
     return mPosCb;
 }
 
-void Window::SetResizeHandler(ResizeCb cb) 
+void Window::SetResizeHandler(ResizeCb cb)
 {
     mResizeCb = cb;
     GLFWwindowsizefun f = [](GLFWwindow* w, int width, int height)
@@ -128,14 +128,14 @@ void Window::SetResizeHandler(ResizeCb cb)
     glfwSetWindowSizeCallback(mWindow, f);
 }
 
-Window::ResizeCb Window::GetResizeHandler() const 
+Window::ResizeCb Window::GetResizeHandler() const
 {
     return mResizeCb;
 }
 
 void Window::SetCloseHandler(CloseCb cb)
-{ 
-    mCloseCb = cb; 
+{
+    mCloseCb = cb;
     GLFWwindowclosefun f = [](GLFWwindow* w)
     {
         Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
@@ -184,7 +184,7 @@ Window::MouseButtonPressedCb Window::GetMouseButtonPressHandler() const
     return mMouseBtnPressCb;
 }
 
-void Window::SetCursorPositionChangedHandler(CursorPositionChangedCb cb) 
+void Window::SetCursorPositionChangedHandler(CursorPositionChangedCb cb)
 {
     mCursorPosCb = cb;
     GLFWcursorposfun f = [](GLFWwindow* w, double xpos, double ypos)
@@ -201,8 +201,8 @@ Window::CursorPositionChangedCb Window::GetCursorPositionChangedHandler() const
 }
 
 void Window::SetMouseScrollHandler(MouseScrollCb cb)
-{ 
-    mMouseScrollCb = cb; 
+{
+    mMouseScrollCb = cb;
     GLFWscrollfun f = [](GLFWwindow* w, double xoffset, double yoffset)
     {
         Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));

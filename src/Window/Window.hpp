@@ -90,7 +90,7 @@ class Window
 
         /// Sets the window resize callback handler
         void SetResizeHandler(ResizeCb cb);
-        
+
         /// Retrieves the window resize callback handler
         ResizeCb GetResizeHandler() const;
 
@@ -166,7 +166,7 @@ class Window
         CursorPositionChangedCb mCursorPosCb;
         MouseScrollCb mMouseScrollCb;
         KeyPressedCb mKeyPressCb;
-        
+
         // Appends current FPS to the window title if mShowFPS is true
         void UpdateTitleFPS();
 

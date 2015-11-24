@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         hb.SetUpdate(std::bind(&Game::Update, &game, std::placeholders::_1));
         hb.SetRender(std::bind(&Game::Render, &game, std::placeholders::_1));
         game.SetExitHandler(std::bind(&HeartBeat::SetRunning, &hb, false));
-        
+
         game.Init();
         hb.Run();
         game.Shutdown();

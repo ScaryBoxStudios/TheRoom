@@ -310,7 +310,7 @@ void Game::GLInit()
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
     glDepthFunc(GL_LESS);
-    
+
     // Create VAO
     glGenVertexArrays(1, &mGLData.vaoId);
     glBindVertexArray(mGLData.vaoId);
@@ -348,7 +348,7 @@ void Game::GLInit()
     LinkProgram(mGLData.programId);
     glDeleteShader(vShader);
     glDeleteShader(fShader);
-    
+
     glUseProgram(mGLData.programId);
 
     // Create texture coordinate buffer
@@ -489,7 +489,7 @@ void Game::Render(float interpolation)
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
     glBindVertexArray(0);
     CheckGLError();
-   
+
     // Show it
     mWindow.SwapBuffers();
 }

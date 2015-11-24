@@ -16,7 +16,7 @@ WARN_GUARD_OFF
 class Game
 {
     public:
-    	/*! Constructor */
+        /*! Constructor */
         Game();
 
         /*! Initializes all the low level modules of the game */

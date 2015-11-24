@@ -6,7 +6,7 @@
 //
 // Provides a common way to access information and
 // data in different types of pixel buffers.
-// 
+//
 // Not implemented -- see specializations.
 //--------------------------------------------------
 template <typename PixelBuffer> struct PixelBufferTraits;

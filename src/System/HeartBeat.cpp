@@ -1,4 +1,4 @@
-#include "HeartBeat.hpp" 
+#include "HeartBeat.hpp"
 
 void HeartBeat::SetRunning(bool running){ mRunning = running; }
 void HeartBeat::SetUpdate(UpdateCb uFn){ mUpdate = uFn; }
@@ -12,7 +12,7 @@ void HeartBeat::Run()
     const int TICKS_PER_SECOND = 25;
     const int MAX_FRAMESKIP = 5;
     const float SKIP_TICKS = 1000 / TICKS_PER_SECOND;
-    
+
     int loops;
     float interpolation;
 

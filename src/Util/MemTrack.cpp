@@ -66,7 +66,7 @@ namespace MemTrack
     {
         private:    // static member variables
             static BlockHeader *ourFirstNode;
-    
+
         private:    // member variables
             BlockHeader *myPrevNode;
             BlockHeader *myNextNode;
@@ -78,14 +78,14 @@ namespace MemTrack
         public:     // members
             BlockHeader(size_t requestedSize);
             ~BlockHeader();
-        
+
             size_t GetRequestedSize() const { return myRequestedSize; }
             char const *GetFilename() const { return myFilename; }
             int GetLineNum() const { return myLineNum; }
             char const *GetTypeName() const { return myTypeName; }
-        
+
             void Stamp(char const *filename, int lineNum, char const *typeName);
-        
+
             static void AddNode(BlockHeader *node);
             static void RemoveNode(BlockHeader *node);
             static size_t CountBlocks();
@@ -114,7 +114,7 @@ namespace MemTrack
     BlockHeader::~BlockHeader()
     {
     }
-        
+
     /* ---------------------------------------- BlockHeader Stamp */
 
     void BlockHeader::Stamp(char const *filename, int lineNum, char const *typeName)
@@ -132,7 +132,7 @@ namespace MemTrack
         assert(node->myPrevNode == NULL);
         assert(node->myNextNode == NULL);
 
-        // If we have at least one node in the list ...        
+        // If we have at least one node in the list ...
         if (ourFirstNode != NULL)
         {
             // ... make the new node the first node's predecessor.
@@ -161,13 +161,13 @@ namespace MemTrack
             assert(ourFirstNode->myPrevNode == NULL);
             ourFirstNode = node->myNextNode;
         }
-        
+
         // Link target node's predecessor, if any, to its successor.
         if (node->myPrevNode != NULL)
         {
             node->myPrevNode->myNextNode = node->myNextNode;
         }
-        
+
         // Link target node's successor, if any, to its predecessor.
         if (node->myNextNode != NULL)
         {
@@ -222,15 +222,15 @@ namespace MemTrack
         private:    // constants
             static const unsigned int SIGNATURE1 = 0xCAFEBABE;
             static const unsigned int SIGNATURE2 = 0xFACEFACE;
-        
+
         private:    // member variables
             unsigned int mySignature1;
             unsigned int mySignature2;
-            
+
         public:        // construction/destruction
             Signature() : mySignature1(SIGNATURE1), mySignature2(SIGNATURE2) {};
             ~Signature() { mySignature1 = 0; mySignature2 = 0; }
-            
+
         public:        // static member functions
             static bool IsValidSignature(const Signature *pProspectiveSignature)
             {
@@ -263,14 +263,14 @@ namespace MemTrack
     /* If "value" (a memory size or offset) falls on an alignment boundary,
      * then just return it.  Otherwise return the smallest number larger
      * than "value" that falls on an alignment boundary.
-     */    
+     */
 
     #define PAD_TO_ALIGNMENT_BOUNDARY(value) \
         ((value) + ((ALIGNMENT - ((value) % ALIGNMENT)) % ALIGNMENT))
 
     /* ---------------------------------------- chunk structs */
-    
-    /* We declare incomplete structures for each chunk, just to 
+
+    /* We declare incomplete structures for each chunk, just to
      * provide type safety.
      */
 
@@ -285,7 +285,7 @@ namespace MemTrack
     const size_t OFFSET_BlockHeader = 0;
     const size_t OFFSET_Signature = OFFSET_BlockHeader + SIZE_BlockHeader;
     const size_t OFFSET_UserChunk = OFFSET_Signature + SIZE_Signature;
-    
+
     const size_t SIZE_PrologChunk = OFFSET_UserChunk;
 
     /* ---------------------------------------- GetUserAddress */
@@ -333,47 +333,47 @@ namespace MemTrack
     /* ------------------------------------------------------------ */
 
     /* ---------------------------------------- TrackMalloc */
-    
+
     void *TrackMalloc(size_t size)
     {
         // Allocate the memory, including space for the prolog.
         PrologChunk *pProlog = (PrologChunk *)malloc(SIZE_PrologChunk + size);
-        
+
         // If the allocation failed, then return NULL.
         if (pProlog == NULL) return NULL;
-        
+
         // Use placement new to construct the block header in place.
         BlockHeader *pBlockHeader = new (pProlog) BlockHeader(size);
-        
+
         // Link the block header into the list of extant block headers.
         BlockHeader::AddNode(pBlockHeader);
-        
+
         // Use placement new to construct the signature in place.
         Signature *pSignature = new (GetSignatureAddress(pProlog)) Signature;
         (void) pSignature;
-        
+
         // Get the offset to the user chunk and return it.
         UserChunk *pUser = GetUserAddress(pProlog);
         (void) pUser;
-        
+
         return pUser;
     }
 
     /* ---------------------------------------- TrackFree */
-    
+
     void TrackFree(void *p)
     {
         // It's perfectly valid for "p" to be null; return if it is.
         if (p == NULL) return;
-    
+
         // Get the prolog address for this memory block.
-        UserChunk *pUser = reinterpret_cast<UserChunk *>(p);    
+        UserChunk *pUser = reinterpret_cast<UserChunk *>(p);
         PrologChunk *pProlog = GetPrologAddress(pUser);
-       
+
         // Check the signature, and if it's invalid, return immediately.
         Signature *pSignature = GetSignatureAddress(pProlog);
         if (!Signature::IsValidSignature(pSignature)) return;
-        
+
         // Destroy the signature.
         pSignature->~Signature();
         pSignature = NULL;
@@ -384,7 +384,7 @@ namespace MemTrack
         pBlockHeader->~BlockHeader();
         pBlockHeader = NULL;
 
-        // Free the memory block.    
+        // Free the memory block.
         free(pProlog);
     }
 

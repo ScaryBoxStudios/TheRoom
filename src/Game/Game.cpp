@@ -16,19 +16,20 @@ const GLchar* vertexShader = R"rsd(
 
 #version 330
 
-in vec2 in_texCoords;
-layout(location=0) in vec3 in_Pos;
-layout(location=1) in vec3 in_Col;
+layout(location=0) in vec3 position;
+layout(location=1) in vec3 color;
+layout(location=2) in vec2 texUV;
+
 out vec3 vertexColor;
-out vec2 out_texCoords;
+out vec2 texCoords;
 
 uniform mat4 MVP;
 
 void main(void)
 {
-    out_texCoords = in_texCoords;
-    gl_Position = MVP * vec4(in_Pos, 1.0f);
-    vertexColor = in_Col;
+    texCoords = texUV;
+    vertexColor = color;
+    gl_Position = MVP * vec4(position, 1.0f);
 }
 
 )rsd";
@@ -38,7 +39,7 @@ const GLchar* fragmentShader = R"rsd(
 #version 330
 
 in vec3 vertexColor;
-in vec2 out_texCoords;
+in vec2 texCoords;
 
 out vec4 color;
 
@@ -46,7 +47,7 @@ uniform sampler2D tex;
 
 void main(void)
 {
-    color = texture(tex, out_texCoords) * vec4(vertexColor, 1);
+    color = texture(tex, texCoords) * vec4(vertexColor, 1);
 }
 
 )rsd";
@@ -117,6 +118,93 @@ static void CheckGLError()
 }
 
 ///==============================================================
+///= Model
+///==============================================================
+Game::Model::Model()
+{
+    glGenVertexArrays(1, &mVao);
+    glGenBuffers(1, &mVbo);
+    glGenBuffers(1, &mColBuf);
+    glGenBuffers(1, &mTexBuf);
+    glGenBuffers(1, &mEbo);
+}
+
+Game::Model::~Model()
+{
+    glDeleteBuffers(1, &mEbo);
+    glDeleteBuffers(1, &mTexBuf);
+    glDeleteBuffers(1, &mColBuf);
+    glDeleteBuffers(1, &mVbo);
+    glDeleteVertexArrays(1, &mVao);
+}
+
+void Game::Model::Load(const Game::ModelData& data)
+{
+    glBindVertexArray(mVao);
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, mVbo);
+        {
+            glBufferData(GL_ARRAY_BUFFER,
+                data.vertices.size() * sizeof(GLfloat),
+                data.vertices.data(),
+                GL_STATIC_DRAW
+            );
+            GLuint index = 0;
+            glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+            glEnableVertexAttribArray(index);
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mColBuf);
+        {
+            glBufferData(GL_ARRAY_BUFFER,
+                data.colors.size() * sizeof(GLfloat),
+                data.colors.data(),
+                GL_STATIC_DRAW
+            );
+            GLuint index = 1;
+            glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+            glEnableVertexAttribArray(index);
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mTexBuf);
+        {
+            glBufferData(GL_ARRAY_BUFFER,
+                data.texCoords.size() * sizeof(GLfloat),
+                data.texCoords.data(),
+                GL_STATIC_DRAW
+            );
+            GLuint index = 2;
+            glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+            glEnableVertexAttribArray(index);
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
+        {
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                data.indices.size() * sizeof(GLuint),
+                data.indices.data(),
+                GL_STATIC_DRAW
+            );
+        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+    glBindVertexArray(0);
+}
+
+GLuint Game::Model::VaoId() const
+{
+    return mVao;
+}
+
+GLuint Game::Model::EboId() const
+{
+    return mEbo;
+}
+
+///==============================================================
 ///= Game
 ///==============================================================
 Game::Game()
@@ -162,6 +250,35 @@ void Game::Init()
 
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
+    // Load the Cube
+    ModelData cubeData;
+    cubeData.vertices.assign(std::begin(cubeVertexes), std::end(cubeVertexes));
+    cubeData.indices.assign(std::begin(cubeIndices), std::end(cubeIndices));
+    cubeData.colors.assign(std::begin(cubeColorData), std::end(cubeColorData));
+    cubeData.texCoords.assign(std::begin(cubeTextureUVMappings), std::end(cubeTextureUVMappings));
+
+    std::unique_ptr<Model> cube = std::make_unique<Model>();
+    Model* cubePtr = cube.get();
+    cube->Load(cubeData);
+    mModelStore["cube"] = std::move(cube);
+
+    // Create various Cube instances in the world
+    std::vector<glm::vec3> cubePositions = {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(4.0f, 10.0f, -20.0f),
+        glm::vec3(-3.0f, -4.4f, -5.0f),
+        glm::vec3(-7.6f, -4.0f, -14.0f),
+        glm::vec3(4.4f, -3.5f, -4.0f),
+        glm::vec3(-3.4f, 6.0f, -15.0f),
+        glm::vec3(2.6f, -4.0f, -17.0f),
+        glm::vec3(4.0f, 3.0f, -5.0f),
+        glm::vec3(3.0f, 0.4f, -12.0f),
+        glm::vec3(-3.5f, 2.0f, -3.0f)
+    };
+    for (const auto& pos : cubePositions)
+        mWorld.push_back({pos, cubePtr});
+
+    CheckGLError();
     GLInit();
     mGLData.drawMode = GL_FILL;
 }
@@ -169,10 +286,6 @@ void Game::Init()
 void Game::GLInit()
 {
     // Generate the various resources
-    glGenBuffers(1, &mGLData.vBuf);
-    glGenBuffers(1, &mGLData.colBuf);
-    glGenBuffers(1, &mGLData.idxBuf);
-    glGenBuffers(1, &mGLData.texCoordBuf);
     glGenTextures(1, &mGLData.tex);
     mGLData.programId = glCreateProgram();
 
@@ -183,29 +296,6 @@ void Game::GLInit()
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
     glDepthFunc(GL_LESS);
-
-    // Create VAO
-    glGenVertexArrays(1, &mGLData.vaoId);
-    glBindVertexArray(mGLData.vaoId);
-
-    // Create VBOs
-    glBindBuffer(GL_ARRAY_BUFFER, mGLData.vBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertexes), cubeVertexes, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Color buffer
-    glBindBuffer(GL_ARRAY_BUFFER, mGLData.colBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeColorData), cubeColorData, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Create index buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mGLData.idxBuf);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cubeIndices), cubeIndices, GL_STATIC_DRAW);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Compile and Link shaders
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
@@ -224,14 +314,6 @@ void Game::GLInit()
 
     glUseProgram(mGLData.programId);
 
-    // Create texture coordinate buffer
-    glBindBuffer(GL_ARRAY_BUFFER, mGLData.texCoordBuf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeTextureUVMappings), cubeTextureUVMappings, GL_STATIC_DRAW);
-    GLint texAttrib = glGetAttribLocation(mGLData.programId, "in_texCoords");
-    glEnableVertexAttribArray(texAttrib);
-    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     // Load the sample texture
     glActiveTexture(GL_TEXTURE0);
     png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
@@ -247,7 +329,6 @@ void Game::GLInit()
     glUniform1i(samplerId, 0);
 
     mGLData.matrixId = glGetUniformLocation(mGLData.programId, "MVP");
-    glBindVertexArray(0);
     CheckGLError();
 }
 
@@ -293,10 +374,13 @@ void Game::Update(float dt)
 
 void Game::Render(float interpolation)
 {
-    // Render stuff
-    glBindVertexArray(mGLData.vaoId);
+    // Clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Set the polygon mode
+    glPolygonMode(GL_FRONT_AND_BACK, mGLData.drawMode);
+
+    // Create the projection matrix
     glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 
     // View calculation with camera
@@ -306,17 +390,33 @@ void Game::Render(float interpolation)
     glm::vec3& cameraFront = iCamState.front;
     glm::vec3& cameraUp = iCamState.up;
 
+    // Create the view matrix
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
+    for (std::size_t i = 0; i < mWorld.size(); ++i)
+    {
+        const auto& gObj = mWorld[i];
 
-    glm::mat4 MVP = projection * view * model;
+        // Calculate the model matrix
+        glm::mat4 model;
+        model = glm::translate(model, gObj.position);
+        model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
+        model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
 
-    glUniformMatrix4fv(mGLData.matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
-    glPolygonMode(GL_FRONT_AND_BACK, mGLData.drawMode);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, 0);
-    glBindVertexArray(0);
+        // Combine the projection, view and model matrices
+        glm::mat4 MVP = projection * view * model;
+        // Upload the combined matrix as a uniform
+        glUniformMatrix4fv(mGLData.matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
+
+        // Draw the object
+        glBindVertexArray(gObj.model->VaoId());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gObj.model->EboId());
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+
+    // Check for errors
     CheckGLError();
 
     // Show it
@@ -328,20 +428,8 @@ void Game::Shutdown()
     // OpenGL
     glUseProgram(0);
 
-    // Disable attribute arrays
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-
-    glDeleteBuffers(1, &mGLData.vBuf);
-    glDeleteBuffers(1, &mGLData.colBuf);
-    glDeleteBuffers(1, &mGLData.idxBuf);
-    glDeleteBuffers(1, &mGLData.texCoordBuf);
     glDeleteTextures(1, &mGLData.tex);
     glDeleteProgram(mGLData.programId);
-
-    // Delete VAO
-    glBindVertexArray(0);
-    glDeleteVertexArrays(1, &mGLData.vaoId);
 
     // Window
     mWindow.Destroy();

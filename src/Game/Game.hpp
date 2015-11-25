@@ -7,6 +7,8 @@
 
 #include <functional>
 #include <vector>
+#include <unordered_map>
+#include <memory>
 #include "../Util/WarnGuard.hpp"
 #include "../Window/Window.hpp"
 #include "../Graphics/Util/Camera.hpp"
@@ -53,14 +55,56 @@ class Game
         // The OpenGL data
         struct GLData
         {
-            GLuint vaoId;
             GLuint programId;
-            GLuint vBuf, colBuf, idxBuf, texCoordBuf;
             GLuint tex;
             GLuint matrixId;
             GLenum drawMode;
         };
         GLData mGLData;
+
+        // ModelData
+        struct ModelData
+        {
+            std::vector<GLfloat> vertices;
+            std::vector<GLfloat> normals;
+            std::vector<GLfloat> colors;
+            std::vector<GLfloat> texCoords;
+            std::vector<GLuint> indices;
+        };
+
+        // Model
+        class Model
+        {
+            public:
+                // Constructor
+                Model();
+
+                // Destructor
+                ~Model();
+
+                // Loads given data into the GPU
+                void Load(const ModelData& data);
+
+                // Retrieves the internal vao id value
+                GLuint VaoId() const;
+
+                // Retrieves the internal ebo id value
+                GLuint EboId() const;
+
+            private:
+                GLuint mVao, mVbo, mColBuf, mTexBuf, mEbo;
+        };
+
+        // Stores the models loaded in the gpu
+        std::unordered_map<std::string, std::unique_ptr<Model>> mModelStore;
+
+        // GameObject
+        struct GameObject
+        {
+            glm::vec3 position;
+            Model* model;
+        };
+        std::vector<GameObject> mWorld;
 
         // The data needed for rendering
         struct RenderData

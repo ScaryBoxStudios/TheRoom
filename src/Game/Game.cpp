@@ -1,5 +1,6 @@
 #include "Game.hpp"
 #include <sstream>
+#include <iterator>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "../Graphics/Image/PixelTraits.hpp"
@@ -51,6 +52,38 @@ void main(void)
 }
 
 )rsd";
+
+///==============================================================
+///= FileSystem Helpers
+///==============================================================
+template <typename Buffer>
+std::unique_ptr<Buffer> FileLoad(const std::string& file)
+{
+    // Open file
+    std::ifstream ifs(file, std::ios::binary);
+    if (!ifs.good())
+        return std::unique_ptr<Buffer>(nullptr);
+
+    // Stop the istream_iterator from eating newlines
+    ifs.unsetf(std::ios::skipws);
+
+    // Calculate total filesize
+    std::streampos sz;
+    ifs.seekg(0, std::ios::end);
+    sz = ifs.tellg();
+
+    // Rewind file pointer
+    ifs.seekg(0, std::ios::beg);
+
+    // Create buffer with preallocated size
+    Buffer buf(static_cast<std::size_t>(sz));
+
+    // Read the data into the buffer
+    buf.assign(std::istream_iterator<typename Buffer::value_type>(ifs),
+               std::istream_iterator<typename Buffer::value_type>());
+
+    return std::make_unique<Buffer>(std::move(buf));
+}
 
 ///==============================================================
 ///= GL Helpers

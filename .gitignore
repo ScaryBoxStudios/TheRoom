@@ -186,12 +186,16 @@ ipch/
 # General untracked files and folders
 #=====================================
 
-# External resources
-# TODO: Track them elsewhere
-#ext/
-
 # Doxygen generated documentation
 doc/gen/
 
 # Temporary folder
 tmp/
+
+#=====================================
+# Whitelist
+#=====================================
+
+# Allow obj model files
+!ext/*.obj
+

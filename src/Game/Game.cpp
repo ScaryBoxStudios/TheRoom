@@ -5,11 +5,13 @@
 #include <GL/glu.h>
 #include "../Graphics/Image/PixelTraits.hpp"
 #include "../Graphics/Image/PixelBufferTraits.hpp"
+#include "../Graphics/Image/RawImageTraits.hpp"
 WARN_GUARD_ON
+#include "../Graphics/Image/Jpeg/JpegLoader.hpp"
 #include "../Graphics/Image/Png/Png.hpp"
+#include <png++/png.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <png++/png.hpp>
 WARN_GUARD_OFF
 #include "Cube.hpp"
 
@@ -349,8 +351,18 @@ void Game::GLInit()
 
     // Load the sample texture
     glActiveTexture(GL_TEXTURE0);
-    png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
-    auto pb = img.get_pixbuf();
+
+    //png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
+    //auto pb = img.get_pixbuf();
+
+    // Load the file contents into memory buffer
+    using BufferType = std::vector<std::uint8_t>;
+    std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
+    // Parse them using the JpegLoader
+    JpegLoader jL;
+    RawImage<> pb = jL.Load(*imgData);
+
+    // Upload
     glBindTexture(GL_TEXTURE_2D, mGLData.tex);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

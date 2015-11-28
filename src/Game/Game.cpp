@@ -226,7 +226,6 @@ void Game::GLInit()
     GLuint samplerId = glGetUniformLocation(mGLData.programId, "tex");
     glUniform1i(samplerId, 0);
 
-    mGLData.matrixId = glGetUniformLocation(mGLData.programId, "MVP");
     CheckGLError();
 }
 
@@ -304,7 +303,8 @@ void Game::Render(float interpolation)
         // Combine the projection, view and model matrices
         glm::mat4 MVP = projection * view * model;
         // Upload the combined matrix as a uniform
-        glUniformMatrix4fv(mGLData.matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
+        auto matrixId = glGetUniformLocation(mGLData.programId, "MVP");
+        glUniformMatrix4fv(matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
 
         // Draw the object
         glBindVertexArray(gObj.model->VaoId());

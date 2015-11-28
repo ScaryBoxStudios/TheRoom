@@ -58,7 +58,6 @@ class Game
         {
             GLuint programId;
             GLuint tex;
-            GLuint matrixId;
             GLenum drawMode;
         };
         GLData mGLData;

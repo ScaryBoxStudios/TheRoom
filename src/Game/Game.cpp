@@ -283,6 +283,10 @@ void Game::Shutdown()
 {
     glDeleteTextures(1, &mGLData.tex);
 
+    // Explicitly deallocate GPU data
+    mModelStore.clear();
+    mShaderProgramStore.clear();
+
     // Window
     mWindow.Destroy();
 }

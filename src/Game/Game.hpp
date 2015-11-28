@@ -12,6 +12,7 @@
 #include "../Util/WarnGuard.hpp"
 #include "../Window/Window.hpp"
 #include "../Graphics/Util/Camera.hpp"
+#include "../Graphics/Model/Model.hpp"
 
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -61,39 +62,6 @@ class Game
             GLenum drawMode;
         };
         GLData mGLData;
-
-        // ModelData
-        struct ModelData
-        {
-            std::vector<GLfloat> vertices;
-            std::vector<GLfloat> normals;
-            std::vector<GLfloat> colors;
-            std::vector<GLfloat> texCoords;
-            std::vector<GLuint> indices;
-        };
-
-        // Model
-        class Model
-        {
-            public:
-                // Constructor
-                Model();
-
-                // Destructor
-                ~Model();
-
-                // Loads given data into the GPU
-                void Load(const ModelData& data);
-
-                // Retrieves the internal vao id value
-                GLuint VaoId() const;
-
-                // Retrieves the internal ebo id value
-                GLuint EboId() const;
-
-            private:
-                GLuint mVao, mVbo, mColBuf, mTexBuf, mEbo;
-        };
 
         // Stores the models loaded in the gpu
         std::unordered_map<std::string, std::unique_ptr<Model>> mModelStore;

@@ -286,7 +286,6 @@ void Game::Render(float interpolation)
 
 void Game::Shutdown()
 {
-    glUseProgram(0);
     glDeleteTextures(1, &mGLData.tex);
 
     // Window

@@ -2,9 +2,6 @@
 #include <sstream>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "../Graphics/Image/PixelTraits.hpp"
-#include "../Graphics/Image/PixelBufferTraits.hpp"
-#include "../Graphics/Image/RawImageTraits.hpp"
 WARN_GUARD_ON
 #include "../Graphics/Image/Jpeg/JpegLoader.hpp"
 #include "../Graphics/Image/Png/Png.hpp"
@@ -18,17 +15,6 @@ WARN_GUARD_OFF
 ///==============================================================
 ///= GL Helpers
 ///==============================================================
-template <typename PixelBuffer>
-void SetTextureData(PixelBuffer pb)
-{
-    GLint format = PixelTraits<typename PixelBufferTraits<PixelBuffer>::Pixel>::GetChannels() == 4 ? GL_RGBA : GL_RGB;
-    uint32_t width = PixelBufferTraits<PixelBuffer>::Width(pb);
-    uint32_t height = PixelBufferTraits<PixelBuffer>::Height(pb);
-    const GLvoid* data = PixelBufferTraits<PixelBuffer>::GetData(pb);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-}
-
 static void CheckGLError()
 {
     GLenum errVal = glGetError();
@@ -116,16 +102,12 @@ void Game::Init()
     for (const auto& pos : cubePositions)
         mWorld.push_back({pos, cubePtr});
 
-    CheckGLError();
     GLInit();
     mGLData.drawMode = GL_FILL;
 }
 
 void Game::GLInit()
 {
-    // Generate the various resources
-    glGenTextures(1, &mGLData.tex);
-
     // Set the clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -166,12 +148,10 @@ void Game::GLInit()
     //png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
     //auto pb = img.get_pixbuf();
 
-    // Upload
-    glBindTexture(GL_TEXTURE_2D, mGLData.tex);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    SetTextureData(pb);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    // Store the texture in the store
+    std::unique_ptr<Texture> tex = std::make_unique<Texture>();
+    tex->SetData(pb);
+    mTextureStore["mahogany_wood"] = std::move(tex);
 
     CheckGLError();
 }
@@ -252,8 +232,9 @@ void Game::Render(float interpolation)
         glUseProgram(p->Id());
 
         // Bind the texture
+        auto& tex = mTextureStore["mahogany_wood"];
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mGLData.tex);
+        glBindTexture(GL_TEXTURE_2D, tex->Id());
         GLuint samplerId = glGetUniformLocation(p->Id(), "tex");
         glUniform1i(samplerId, 0);
 
@@ -281,9 +262,8 @@ void Game::Render(float interpolation)
 
 void Game::Shutdown()
 {
-    glDeleteTextures(1, &mGLData.tex);
-
     // Explicitly deallocate GPU data
+    mTextureStore.clear();
     mModelStore.clear();
     mShaderProgramStore.clear();
 

@@ -15,6 +15,7 @@
 #include "../Graphics/Model/Model.hpp"
 #include "../Graphics/Shader/Shader.hpp"
 #include "../Graphics/Shader/ShaderProgram.hpp"
+#include "../Graphics/Texture/Texture.hpp"
 
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -58,7 +59,6 @@ class Game
         // The OpenGL data
         struct GLData
         {
-            GLuint tex;
             GLenum drawMode;
         };
         GLData mGLData;
@@ -68,6 +68,9 @@ class Game
 
         // Stores the shader programs loaded in the gpu
         std::unordered_map<std::string, std::unique_ptr<ShaderProgram>> mShaderProgramStore;
+
+        // Stores the textures loaded in the gpu
+        std::unordered_map<std::string, std::unique_ptr<Texture>> mTextureStore;
 
         // GameObject
         struct GameObject

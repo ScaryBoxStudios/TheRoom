@@ -156,21 +156,15 @@ void Game::GLInit()
     prog->Link(vert.Id(), frag.Id());
     mShaderProgramStore["cube"] = std::move(prog);
 
-    // Use the program
-    auto& p = mShaderProgramStore["cube"];
-    glUseProgram(p->Id());
-
-    // Load the sample texture
-    glActiveTexture(GL_TEXTURE0);
-
-    //png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
-    //auto pb = img.get_pixbuf();
-
     // Load the file contents into memory buffer
     std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
     // Parse them using the JpegLoader
     JpegLoader jL;
     RawImage<> pb = jL.Load(*imgData);
+
+    // Parse them using the PngLoader
+    //png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
+    //auto pb = img.get_pixbuf();
 
     // Upload
     glBindTexture(GL_TEXTURE_2D, mGLData.tex);
@@ -178,11 +172,6 @@ void Game::GLInit()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     SetTextureData(pb);
     glGenerateMipmap(GL_TEXTURE_2D);
-
-    // Pass it to OpenGL
-    GLuint samplerId = glGetUniformLocation(p->Id(), "tex");
-    glUniform1i(samplerId, 0);
-    glUseProgram(0);
 
     CheckGLError();
 }
@@ -261,6 +250,12 @@ void Game::Render(float interpolation)
         // Use the appropriate program
         auto& p = mShaderProgramStore["cube"];
         glUseProgram(p->Id());
+
+        // Bind the texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, mGLData.tex);
+        GLuint samplerId = glGetUniformLocation(p->Id(), "tex");
+        glUniform1i(samplerId, 0);
 
         // Combine the projection, view and model matrices
         glm::mat4 MVP = projection * view * model;

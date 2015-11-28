@@ -10,6 +10,12 @@ auto JpegLoader::Load(BufferType fileData) -> RawImage<BufferType>
 
     // Create decompress struct
     jpeg_decompress_struct cinfo;
+
+    // Set the error mechanism
+    jpeg_error_mgr errMgr;
+    cinfo.err = jpeg_std_error(&errMgr);
+
+    // Initialize decompression object
     jpeg_create_decompress(&cinfo);
 
     // Set memory buffer as source
@@ -35,7 +41,6 @@ auto JpegLoader::Load(BufferType fileData) -> RawImage<BufferType>
     // Ptr to the start of the output buffer
     uint8_t* bufP = rawData.data();
 
-    /*
     // Read by lines
     int nSamples;
     while (cinfo.output_scanline < cinfo.output_height)
@@ -43,10 +48,6 @@ auto JpegLoader::Load(BufferType fileData) -> RawImage<BufferType>
         nSamples = jpeg_read_scanlines(&cinfo, (JSAMPARRAY) &bufP, 1);
         bufP += nSamples * cinfo.image_width * cinfo.num_components;
     }
-     */
-
-    // Read whole file at once
-    jpeg_read_raw_data(&cinfo, (JSAMPIMAGE) &bufP, height);
 
     // Release all internal buffers used by jpeg_start_decompress
     jpeg_finish_decompress(&cinfo);

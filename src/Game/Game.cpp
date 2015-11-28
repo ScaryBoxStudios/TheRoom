@@ -18,44 +18,6 @@ WARN_GUARD_OFF
 ///==============================================================
 ///= GL Helpers
 ///==============================================================
-static void CompileShader(GLuint shaderId)
-{
-    glCompileShader(shaderId);
-
-    GLint compileStatus;
-    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileStatus);
-    if (compileStatus == GL_FALSE)
-    {
-        GLint logLength;
-        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength != 0)
-        {
-            std::vector<GLchar> buf(logLength, 0);
-            glGetShaderInfoLog(shaderId, logLength, 0, buf.data());
-            //Error("Shader Compilation Error!", buf.data());
-        }
-    }
-}
-
-static void LinkProgram(GLuint programId)
-{
-    glLinkProgram(programId);
-
-    GLint linkStatus;
-    glGetProgramiv(programId, GL_LINK_STATUS, &linkStatus);
-    if (linkStatus == GL_FALSE)
-    {
-        GLint logLength;
-        glGetShaderiv(programId, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength != 0)
-        {
-            std::vector<GLchar> buf(logLength, 0);
-            glGetShaderInfoLog(programId, logLength, 0, buf.data());
-            //Error("GL Program Link Error!", buf.data());
-        }
-    }
-}
-
 template <typename PixelBuffer>
 void SetTextureData(PixelBuffer pb)
 {
@@ -163,7 +125,6 @@ void Game::GLInit()
 {
     // Generate the various resources
     glGenTextures(1, &mGLData.tex);
-    mGLData.programId = glCreateProgram();
 
     // Set the clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -181,27 +142,23 @@ void Game::GLInit()
     auto fragFile = FileLoad<BufferType>("res/cube_frag.glsl");
 
     // Convert them to std::string containers and get the raw pointer to their start
-    std::string vertexShader((*vertFile).begin(), (*vertFile).end());
-    std::string fragmentShader((*fragFile).begin(), (*fragFile).end());
-    const GLchar* vShaderSrcP = vertexShader.c_str();
-    const GLchar* fShaderSrcP = fragmentShader.c_str();
+    std::string vShaderSrc((*vertFile).begin(), (*vertFile).end());
+    std::string fShaderSrc((*fragFile).begin(), (*fragFile).end());
 
-    // Compile and Link shaders
-    GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vShader, 1, &vShaderSrcP, 0);
-    CompileShader(vShader);
+    // Compile shaders
+    Shader vert(Shader::Type::Vertex);
+    vert.Source(vShaderSrc);
+    Shader frag(Shader::Type::Fragment);
+    frag.Source(fShaderSrc);
 
-    GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShader, 1, &fShaderSrcP, 0);
-    CompileShader(fShader);
+    // Link them into a shader program
+    std::unique_ptr<ShaderProgram> prog = std::make_unique<ShaderProgram>();
+    prog->Link(vert.Id(), frag.Id());
+    mShaderProgramStore["cube"] = std::move(prog);
 
-    glAttachShader(mGLData.programId, vShader);
-    glAttachShader(mGLData.programId, fShader);
-    LinkProgram(mGLData.programId);
-    glDeleteShader(vShader);
-    glDeleteShader(fShader);
-
-    glUseProgram(mGLData.programId);
+    // Use the program
+    auto& p = mShaderProgramStore["cube"];
+    glUseProgram(p->Id());
 
     // Load the sample texture
     glActiveTexture(GL_TEXTURE0);
@@ -223,8 +180,9 @@ void Game::GLInit()
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // Pass it to OpenGL
-    GLuint samplerId = glGetUniformLocation(mGLData.programId, "tex");
+    GLuint samplerId = glGetUniformLocation(p->Id(), "tex");
     glUniform1i(samplerId, 0);
+    glUseProgram(0);
 
     CheckGLError();
 }
@@ -300,10 +258,14 @@ void Game::Render(float interpolation)
         model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
         model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
 
+        // Use the appropriate program
+        auto& p = mShaderProgramStore["cube"];
+        glUseProgram(p->Id());
+
         // Combine the projection, view and model matrices
         glm::mat4 MVP = projection * view * model;
         // Upload the combined matrix as a uniform
-        auto matrixId = glGetUniformLocation(mGLData.programId, "MVP");
+        auto matrixId = glGetUniformLocation(p->Id(), "MVP");
         glUniformMatrix4fv(matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
 
         // Draw the object
@@ -312,6 +274,7 @@ void Game::Render(float interpolation)
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+        glUseProgram(0);
     }
 
     // Check for errors
@@ -323,11 +286,8 @@ void Game::Render(float interpolation)
 
 void Game::Shutdown()
 {
-    // OpenGL
     glUseProgram(0);
-
     glDeleteTextures(1, &mGLData.tex);
-    glDeleteProgram(mGLData.programId);
 
     // Window
     mWindow.Destroy();

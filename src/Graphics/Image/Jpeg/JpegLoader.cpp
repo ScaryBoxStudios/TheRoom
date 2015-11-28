@@ -3,24 +3,21 @@
 #include <memory>
 #include "jpeglib.h"
 
-std::vector<uint8_t> JpegLoader::Load(std::vector<uint8_t>&& fileData)
+auto JpegLoader::Load(BufferType fileData) -> RawImage<BufferType>
 {
-    // Make a holder for our file data
-    std::vector<uint8_t> imgData = fileData;
-
     // The data that will be returned
-    std::vector<uint8_t> rawData;
+    BufferType rawData;
 
     // Create decompress struct
     jpeg_decompress_struct cinfo;
     jpeg_create_decompress(&cinfo);
 
     // Set memory buffer as source
-    jpeg_mem_src(&cinfo, imgData.data(), imgData.size());
+    jpeg_mem_src(&cinfo, fileData.data(), static_cast<unsigned long>(fileData.size()));
     if (!jpeg_read_header(&cinfo, TRUE))
     {
         mLastError = "Incorrect jpeg header";
-        return rawData;
+        return RawImage<>(std::move(rawData), {0,0,0});
     }
 
     // Populate the decompress structure
@@ -57,5 +54,12 @@ std::vector<uint8_t> JpegLoader::Load(std::vector<uint8_t>&& fileData)
     // Destroy decompress struct
     jpeg_destroy_decompress(&cinfo);
 
-    return rawData;
+    // Create the ImageProperties structure for the RawImage returned
+    ImageProperties imProps;
+    imProps.width = width;
+    imProps.height = height;
+    imProps.channels = 3;
+
+    // Return the RawImage structure
+    return RawImage<>(std::move(rawData), imProps);
 }

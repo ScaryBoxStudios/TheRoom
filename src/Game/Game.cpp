@@ -15,46 +15,6 @@ WARN_GUARD_ON
 WARN_GUARD_OFF
 #include "Cube.hpp"
 
-const GLchar* vertexShader = R"rsd(
-
-#version 330
-
-layout(location=0) in vec3 position;
-layout(location=1) in vec3 color;
-layout(location=2) in vec2 texUV;
-
-out vec3 vertexColor;
-out vec2 texCoords;
-
-uniform mat4 MVP;
-
-void main(void)
-{
-    texCoords = texUV;
-    vertexColor = color;
-    gl_Position = MVP * vec4(position, 1.0f);
-}
-
-)rsd";
-
-const GLchar* fragmentShader = R"rsd(
-
-#version 330
-
-in vec3 vertexColor;
-in vec2 texCoords;
-
-out vec4 color;
-
-uniform sampler2D tex;
-
-void main(void)
-{
-    color = texture(tex, texCoords) * vec4(vertexColor, 1);
-}
-
-)rsd";
-
 ///==============================================================
 ///= FileSystem Helpers
 ///==============================================================
@@ -332,13 +292,26 @@ void Game::GLInit()
     //glEnable(GL_TEXTURE_2D);
     glDepthFunc(GL_LESS);
 
+    // BufferType for the files loaded
+    using BufferType = std::vector<std::uint8_t>;
+
+    // Load shader files
+    auto vertFile = FileLoad<BufferType>("res/cube_vert.glsl");
+    auto fragFile = FileLoad<BufferType>("res/cube_frag.glsl");
+
+    // Convert them to std::string containers and get the raw pointer to their start
+    std::string vertexShader((*vertFile).begin(), (*vertFile).end());
+    std::string fragmentShader((*fragFile).begin(), (*fragFile).end());
+    const GLchar* vShaderSrcP = vertexShader.c_str();
+    const GLchar* fShaderSrcP = fragmentShader.c_str();
+
     // Compile and Link shaders
     GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vShader, 1, &vertexShader, 0);
+    glShaderSource(vShader, 1, &vShaderSrcP, 0);
     CompileShader(vShader);
 
     GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShader, 1, &fragmentShader, 0);
+    glShaderSource(fShader, 1, &fShaderSrcP, 0);
     CompileShader(fShader);
 
     glAttachShader(mGLData.programId, vShader);
@@ -356,7 +329,6 @@ void Game::GLInit()
     //auto pb = img.get_pixbuf();
 
     // Load the file contents into memory buffer
-    using BufferType = std::vector<std::uint8_t>;
     std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
     // Parse them using the JpegLoader
     JpegLoader jL;

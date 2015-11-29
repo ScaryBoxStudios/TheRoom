@@ -10,6 +10,26 @@ Shader::~Shader()
     glDeleteShader(mId);
 }
 
+Shader::Shader(Shader&& other) :
+    mId(other.mId),
+    mLastCompileError(other.mLastCompileError)
+{
+    other.mId = 0;
+    other.mLastCompileError = "";
+}
+
+Shader& Shader::operator=(Shader&& other)
+{
+    if (this != &other)
+    {
+        mId = other.mId;
+        mLastCompileError = other.mLastCompileError;
+        other.mId = 0;
+        other.mLastCompileError = "";
+    }
+    return *this;
+}
+
 bool Shader::Source(const std::string& src)
 {
     const GLchar* s = src.c_str();

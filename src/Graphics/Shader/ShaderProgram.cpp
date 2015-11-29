@@ -10,6 +10,26 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(mId);
 }
 
+ShaderProgram::ShaderProgram(ShaderProgram&& other) :
+    mId(other.mId),
+    mLastLinkError(other.mLastLinkError)
+{
+    other.mId = 0;
+    other.mLastLinkError = "";
+}
+
+ShaderProgram& ShaderProgram::operator=(ShaderProgram&& other)
+{
+    if (this != &other)
+    {
+        mId = other.mId;
+        mLastLinkError = other.mLastLinkError;
+        other.mId = 0;
+        other.mLastLinkError = "";
+    }
+    return *this;
+}
+
 bool ShaderProgram::Link(const GLuint& vert, const GLuint& frag)
 {
     glAttachShader(mId, vert);

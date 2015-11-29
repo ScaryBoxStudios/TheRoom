@@ -18,6 +18,39 @@ Model::~Model()
     glDeleteVertexArrays(1, &mVao);
 }
 
+Model::Model(Model&& other) :
+    mVao(other.mVao),
+    mVbo(other.mVbo),
+    mColBuf(other.mColBuf),
+    mTexBuf(other.mTexBuf),
+    mEbo(other.mEbo)
+{
+    other.mVao = 0;
+    other.mVbo = 0;
+    other.mColBuf = 0;
+    other.mTexBuf = 0;
+    other.mEbo = 0;
+}
+
+Model& Model::operator=(Model&& other)
+{
+    if (this != &other)
+    {
+        mVao = other.mVao;
+        mVbo = other.mVbo;
+        mColBuf = other.mColBuf;
+        mTexBuf = other.mTexBuf;
+        mEbo = other.mEbo;
+
+        other.mVao = 0;
+        other.mVbo = 0;
+        other.mColBuf = 0;
+        other.mTexBuf = 0;
+        other.mEbo = 0;
+    }
+    return *this;
+}
+
 void Model::Load(const ModelData& data)
 {
     glBindVertexArray(mVao);

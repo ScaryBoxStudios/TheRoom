@@ -50,8 +50,8 @@ class ShaderProgram
         ShaderProgram& operator=(const ShaderProgram& other) = delete;
 
         // Enable move construction
-        ShaderProgram(ShaderProgram&& other) = default;
-        ShaderProgram& operator=(ShaderProgram&& other) = default;
+        ShaderProgram(ShaderProgram&& other);
+        ShaderProgram& operator=(ShaderProgram&& other);
 
         // Links the given shaders in
         bool Link(const GLuint& vert, const GLuint& frag);

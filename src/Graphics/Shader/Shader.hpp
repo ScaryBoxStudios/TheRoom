@@ -56,8 +56,8 @@ class Shader
         Shader& operator=(const Shader& other) = delete;
 
         // Enable move construction
-        Shader(Shader&& other) = default;
-        Shader& operator=(Shader&& other) = default;
+        Shader(Shader&& other);
+        Shader& operator=(Shader&& other);
 
         // Uploads new source to the shader object and compiles it
         bool Source(const std::string& src);

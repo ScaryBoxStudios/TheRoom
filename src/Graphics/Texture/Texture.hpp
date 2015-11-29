@@ -51,8 +51,8 @@ class Texture
         Texture& operator=(const Texture& other) = delete;
 
         // Enable move construction
-        Texture(Texture&& other) = default;
-        Texture& operator=(Texture&& other) = default;
+        Texture(Texture&& other);
+        Texture& operator=(Texture&& other);
 
         // Retrieves the internal opengl handle
         GLuint Id() const;

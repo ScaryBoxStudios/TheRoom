@@ -99,7 +99,10 @@ void Game::Init()
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
     for (const auto& pos : cubePositions)
-        mWorld.push_back({pos, "cube"});
+        mWorld.push_back({pos, "cube", "cube"});
+
+    // Add cube lights
+    mWorld.push_back({glm::vec3(4.0f, 0.0f, 0.0f), "cube", "light"});
 
     GLInit();
     mGLData.drawMode = GL_FILL;
@@ -121,21 +124,32 @@ void Game::GLInit()
     // Load shader files
     auto vertFile = FileLoad<BufferType>("res/cube_vert.glsl");
     auto fragFile = FileLoad<BufferType>("res/cube_frag.glsl");
+    auto lightVertFile = FileLoad<BufferType>("res/light_vert.glsl");
+    auto lightFragFile = FileLoad<BufferType>("res/light_frag.glsl");
 
     // Convert them to std::string containers and get the raw pointer to their start
     std::string vShaderSrc((*vertFile).begin(), (*vertFile).end());
     std::string fShaderSrc((*fragFile).begin(), (*fragFile).end());
+    std::string vLightShSrc((*lightVertFile).begin(), (*lightVertFile).end());
+    std::string fLightShSrc((*lightFragFile).begin(), (*lightFragFile).end());
 
     // Compile shaders
     Shader vert(Shader::Type::Vertex);
     vert.Source(vShaderSrc);
     Shader frag(Shader::Type::Fragment);
     frag.Source(fShaderSrc);
+    Shader lightVert(Shader::Type::Vertex);
+    lightVert.Source(vLightShSrc);
+    Shader lightFrag(Shader::Type::Fragment);
+    lightFrag.Source(fLightShSrc);
 
     // Link them into a shader program
     ShaderProgram prog;
     prog.Link(vert.Id(), frag.Id());
     mShaderProgramStore["cube"] = std::move(prog);
+    ShaderProgram lightProg;
+    lightProg.Link(lightVert.Id(), lightFrag.Id());
+    mShaderProgramStore["light"] = std::move(lightProg);
 
     // Load the file contents into memory buffer
     std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
@@ -218,24 +232,35 @@ void Game::Render(float interpolation)
 
     for (std::size_t i = 0; i < mWorld.size(); ++i)
     {
+        // Convinience reference
         const auto& gObj = mWorld[i];
+
+        // Use the appropriate program
+        auto& p = mShaderProgramStore[gObj.type];
+        glUseProgram(p.Id());
 
         // Calculate the model matrix
         glm::mat4 model;
         model = glm::translate(model, gObj.position);
-        model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
-        model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
 
-        // Use the appropriate program
-        auto& p = mShaderProgramStore["cube"];
-        glUseProgram(p.Id());
+        if (gObj.type == "cube")
+        {
+            // Some additional transformations
+            model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
+            model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
 
-        // Bind the texture
-        auto& tex = mTextureStore["mahogany_wood"];
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex.Id());
-        GLuint samplerId = glGetUniformLocation(p.Id(), "tex");
-        glUniform1i(samplerId, 0);
+            // Bind the texture
+            auto& tex = mTextureStore["mahogany_wood"];
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, tex.Id());
+            GLuint samplerId = glGetUniformLocation(p.Id(), "tex");
+            glUniform1i(samplerId, 0);
+        }
+        else if (gObj.type == "light")
+        {
+            model = glm::scale(model, glm::vec3(0.3f));
+            model = glm::rotate(model, -10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        }
 
         // Combine the projection, view and model matrices
         glm::mat4 MVP = projection * view * model;

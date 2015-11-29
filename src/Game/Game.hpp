@@ -77,6 +77,7 @@ class Game
         {
             glm::vec3 position;
             std::string model;
+            std::string type;
         };
         std::vector<GameObject> mWorld;
 

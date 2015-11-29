@@ -22,6 +22,7 @@ auto JpegLoader::Load(BufferType fileData) -> RawImage<BufferType>
     jpeg_mem_src(&cinfo, fileData.data(), static_cast<unsigned long>(fileData.size()));
     if (!jpeg_read_header(&cinfo, TRUE))
     {
+        jpeg_destroy_decompress(&cinfo);
         mLastError = "Incorrect jpeg header";
         return RawImage<>(std::move(rawData), {0,0,0});
     }

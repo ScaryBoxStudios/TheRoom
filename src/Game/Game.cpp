@@ -81,9 +81,8 @@ void Game::Init()
     cubeData.colors.assign(std::begin(cubeColorData), std::end(cubeColorData));
     cubeData.texCoords.assign(std::begin(cubeTextureUVMappings), std::end(cubeTextureUVMappings));
 
-    std::unique_ptr<Model> cube = std::make_unique<Model>();
-    Model* cubePtr = cube.get();
-    cube->Load(cubeData);
+    Model cube;
+    cube.Load(cubeData);
     mModelStore["cube"] = std::move(cube);
 
     // Create various Cube instances in the world
@@ -100,7 +99,7 @@ void Game::Init()
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
     for (const auto& pos : cubePositions)
-        mWorld.push_back({pos, cubePtr});
+        mWorld.push_back({pos, "cube"});
 
     GLInit();
     mGLData.drawMode = GL_FILL;
@@ -134,8 +133,8 @@ void Game::GLInit()
     frag.Source(fShaderSrc);
 
     // Link them into a shader program
-    std::unique_ptr<ShaderProgram> prog = std::make_unique<ShaderProgram>();
-    prog->Link(vert.Id(), frag.Id());
+    ShaderProgram prog;
+    prog.Link(vert.Id(), frag.Id());
     mShaderProgramStore["cube"] = std::move(prog);
 
     // Load the file contents into memory buffer
@@ -149,8 +148,8 @@ void Game::GLInit()
     //auto pb = img.get_pixbuf();
 
     // Store the texture in the store
-    std::unique_ptr<Texture> tex = std::make_unique<Texture>();
-    tex->SetData(pb);
+    Texture tex;
+    tex.SetData(pb);
     mTextureStore["mahogany_wood"] = std::move(tex);
 
     CheckGLError();
@@ -229,24 +228,27 @@ void Game::Render(float interpolation)
 
         // Use the appropriate program
         auto& p = mShaderProgramStore["cube"];
-        glUseProgram(p->Id());
+        glUseProgram(p.Id());
 
         // Bind the texture
         auto& tex = mTextureStore["mahogany_wood"];
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex->Id());
-        GLuint samplerId = glGetUniformLocation(p->Id(), "tex");
+        glBindTexture(GL_TEXTURE_2D, tex.Id());
+        GLuint samplerId = glGetUniformLocation(p.Id(), "tex");
         glUniform1i(samplerId, 0);
 
         // Combine the projection, view and model matrices
         glm::mat4 MVP = projection * view * model;
         // Upload the combined matrix as a uniform
-        auto matrixId = glGetUniformLocation(p->Id(), "MVP");
+        auto matrixId = glGetUniformLocation(p.Id(), "MVP");
         glUniformMatrix4fv(matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
 
+        // Get the mesh
+        auto& mesh = mModelStore[gObj.model];
+
         // Draw the object
-        glBindVertexArray(gObj.model->VaoId());
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gObj.model->EboId());
+        glBindVertexArray(mesh.VaoId());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EboId());
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindVertexArray(0);

@@ -64,19 +64,19 @@ class Game
         GLData mGLData;
 
         // Stores the models loaded in the gpu
-        std::unordered_map<std::string, std::unique_ptr<Model>> mModelStore;
+        std::unordered_map<std::string, Model> mModelStore;
 
         // Stores the shader programs loaded in the gpu
-        std::unordered_map<std::string, std::unique_ptr<ShaderProgram>> mShaderProgramStore;
+        std::unordered_map<std::string, ShaderProgram> mShaderProgramStore;
 
         // Stores the textures loaded in the gpu
-        std::unordered_map<std::string, std::unique_ptr<Texture>> mTextureStore;
+        std::unordered_map<std::string, Texture> mTextureStore;
 
         // GameObject
         struct GameObject
         {
             glm::vec3 position;
-            Model* model;
+            std::string model;
         };
         std::vector<GameObject> mWorld;
 

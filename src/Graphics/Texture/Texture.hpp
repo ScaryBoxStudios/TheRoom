@@ -46,6 +46,14 @@ class Texture
         // Destructor
         ~Texture();
 
+        // Disable copy construction
+        Texture(const Texture& other) = delete;
+        Texture& operator=(const Texture& other) = delete;
+
+        // Enable move construction
+        Texture(Texture&& other) = default;
+        Texture& operator=(Texture&& other) = default;
+
         // Retrieves the internal opengl handle
         GLuint Id() const;
 

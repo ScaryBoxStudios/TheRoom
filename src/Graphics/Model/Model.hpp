@@ -56,6 +56,14 @@ class Model
         // Destructor
         ~Model();
 
+        // Disable copy construction
+        Model(const Model& other) = delete;
+        Model& operator=(const Model& other) = delete;
+
+        // Enable move construction
+        Model(Model&& other) = default;
+        Model& operator=(Model&& other) = default;
+
         // Loads given data into the GPU
         void Load(const ModelData& data);
 

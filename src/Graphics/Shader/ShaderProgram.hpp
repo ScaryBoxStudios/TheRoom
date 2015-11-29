@@ -45,6 +45,14 @@ class ShaderProgram
         // Destructor
         ~ShaderProgram();
 
+        // Disable copy construction
+        ShaderProgram(const ShaderProgram& other) = delete;
+        ShaderProgram& operator=(const ShaderProgram& other) = delete;
+
+        // Enable move construction
+        ShaderProgram(ShaderProgram&& other) = default;
+        ShaderProgram& operator=(ShaderProgram&& other) = default;
+
         // Links the given shaders in
         bool Link(const GLuint& vert, const GLuint& frag);
 

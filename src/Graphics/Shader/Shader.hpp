@@ -51,6 +51,14 @@ class Shader
         // Destructor
         ~Shader();
 
+        // Disable copy construction
+        Shader(const Shader& other) = delete;
+        Shader& operator=(const Shader& other) = delete;
+
+        // Enable move construction
+        Shader(Shader&& other) = default;
+        Shader& operator=(Shader&& other) = default;
+
         // Uploads new source to the shader object and compiles it
         bool Source(const std::string& src);
 

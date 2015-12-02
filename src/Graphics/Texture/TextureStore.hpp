@@ -28,47 +28,62 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _TEXTURE_HPP_
-#define _TEXTURE_HPP_
+#ifndef _TEXTURESTORE_HPP_
+#define _TEXTURESTORE_HPP_
 
+#include <unordered_map>
+#include <string>
 #include <glad/glad.h>
 #include <GL/gl.h>
 #include "../Image/PixelTraits.hpp"
 #include "../Image/PixelBufferTraits.hpp"
 #include "../Image/RawImageTraits.hpp"
 
-class Texture
+struct TextureDescription
+{
+    GLuint texId;
+};
+
+class TextureStore
 {
     public:
         // Constructor
-        Texture();
+        TextureStore();
 
         // Destructor
-        ~Texture();
+        ~TextureStore();
 
         // Disable copy construction
-        Texture(const Texture& other) = delete;
-        Texture& operator=(const Texture& other) = delete;
+        TextureStore(const TextureStore& other) = delete;
+        TextureStore& operator=(const TextureStore& other) = delete;
 
         // Enable move construction
-        Texture(Texture&& other);
-        Texture& operator=(Texture&& other);
+        TextureStore(TextureStore&& other) = default;
+        TextureStore& operator=(TextureStore&& other) = default;
 
-        // Retrieves the internal opengl handle
-        GLuint Id() const;
-
-        // Sets the texture data
+        // Loads given texture to the gpu, returns mapping
         template <typename PixelBuffer>
-        void SetData(const PixelBuffer& pb);
+        void Load(const std::string& name, const PixelBuffer& pb);
+
+        // Retrieves a pointer to a loader texture object
+        TextureDescription* operator[](const std::string& name);
+
+        // Unloads stored textures in the store
+        void Clear();
 
     private:
-        GLuint mId;
+        std::unordered_map<std::string, TextureDescription> mTextures;
 };
 
 template <typename PixelBuffer>
-void Texture::SetData(const PixelBuffer& pb)
+void TextureStore::Load(const std::string& name, const PixelBuffer& pb)
 {
-    glBindTexture(GL_TEXTURE_2D, mId);
+    // Gen texture
+    GLuint id;
+    glGenTextures(1, &id);
+
+    // Load data
+    glBindTexture(GL_TEXTURE_2D, id);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -81,6 +96,11 @@ void Texture::SetData(const PixelBuffer& pb)
 
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Store
+    TextureDescription td;
+    td.texId = id;
+    mTextures.insert({name, td});
 }
 
-#endif // ! _TEXTURE_HPP_
+#endif // ! _TEXTURESTORE_HPP_

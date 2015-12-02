@@ -1,61 +1,46 @@
-#include "Model.hpp"
+#include "ModelStore.hpp"
 
-Model::Model()
+ModelStore::ModelStore()
 {
-    glGenVertexArrays(1, &mVao);
-    glGenBuffers(1, &mVbo);
-    glGenBuffers(1, &mColBuf);
-    glGenBuffers(1, &mTexBuf);
-    glGenBuffers(1, &mEbo);
 }
 
-Model::~Model()
+ModelStore::~ModelStore()
 {
-    glDeleteBuffers(1, &mEbo);
-    glDeleteBuffers(1, &mTexBuf);
-    glDeleteBuffers(1, &mColBuf);
-    glDeleteBuffers(1, &mVbo);
-    glDeleteVertexArrays(1, &mVao);
+    Clear();
 }
 
-Model::Model(Model&& other) :
-    mVao(other.mVao),
-    mVbo(other.mVbo),
-    mColBuf(other.mColBuf),
-    mTexBuf(other.mTexBuf),
-    mEbo(other.mEbo)
+void ModelStore::Clear()
 {
-    other.mVao = 0;
-    other.mVbo = 0;
-    other.mColBuf = 0;
-    other.mTexBuf = 0;
-    other.mEbo = 0;
-}
-
-Model& Model::operator=(Model&& other)
-{
-    if (this != &other)
+    for (auto& p : mModels)
     {
-        mVao = other.mVao;
-        mVbo = other.mVbo;
-        mColBuf = other.mColBuf;
-        mTexBuf = other.mTexBuf;
-        mEbo = other.mEbo;
-
-        other.mVao = 0;
-        other.mVbo = 0;
-        other.mColBuf = 0;
-        other.mTexBuf = 0;
-        other.mEbo = 0;
+        const auto& modelDesc = p.second;
+        glDeleteBuffers(1, &modelDesc.eboId);
+        glDeleteBuffers(1, &modelDesc.texBufId);
+        glDeleteBuffers(1, &modelDesc.colBufId);
+        glDeleteBuffers(1, &modelDesc.vboId);
+        glDeleteVertexArrays(1, &modelDesc.vaoId);
     }
-    return *this;
+    mModels.clear();
 }
 
-void Model::Load(const ModelData& data)
+void ModelStore::Load(const std::string& name, const ModelData& data)
 {
-    glBindVertexArray(mVao);
+    ModelDescription modelDesc;
+    auto& vaoId = modelDesc.vaoId;
+    auto& vboId = modelDesc.vboId;
+    auto& colBufId = modelDesc.colBufId;
+    auto& texBufId = modelDesc.texBufId;
+    auto& eboId = modelDesc.eboId;
+
+    glGenVertexArrays(1, &vaoId);
+    glGenBuffers(1, &vboId);
+    glGenBuffers(1, &colBufId);
+    glGenBuffers(1, &texBufId);
+    glGenBuffers(1, &eboId);
+
+    glBindVertexArray(vaoId);
     {
-        glBindBuffer(GL_ARRAY_BUFFER, mVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vboId);
         {
             glBufferData(GL_ARRAY_BUFFER,
                 data.vertices.size() * sizeof(GLfloat),
@@ -68,7 +53,7 @@ void Model::Load(const ModelData& data)
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mColBuf);
+        glBindBuffer(GL_ARRAY_BUFFER, colBufId);
         {
             glBufferData(GL_ARRAY_BUFFER,
                 data.colors.size() * sizeof(GLfloat),
@@ -81,7 +66,7 @@ void Model::Load(const ModelData& data)
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mTexBuf);
+        glBindBuffer(GL_ARRAY_BUFFER, texBufId);
         {
             glBufferData(GL_ARRAY_BUFFER,
                 data.texCoords.size() * sizeof(GLfloat),
@@ -94,7 +79,7 @@ void Model::Load(const ModelData& data)
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
         {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                 data.indices.size() * sizeof(GLuint),
@@ -105,14 +90,16 @@ void Model::Load(const ModelData& data)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
     glBindVertexArray(0);
+
+    mModels.insert({name, modelDesc});
 }
 
-GLuint Model::VaoId() const
+ModelDescription* ModelStore::operator[](const std::string& name)
 {
-    return mVao;
+    auto it = mModels.find(name);
+    if(it == std::end(mModels))
+        return nullptr;
+    else
+        return &(it->second);
 }
 
-GLuint Model::EboId() const
-{
-    return mEbo;
-}

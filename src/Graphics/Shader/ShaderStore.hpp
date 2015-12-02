@@ -28,49 +28,66 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SHADER_HPP_
-#define _SHADER_HPP_
+#ifndef _SHADERSTORE_HPP_
+#define _SHADERSTORE_HPP_
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <glad/glad.h>
 #include <GL/gl.h>
 
-class Shader
+class ShaderStore
 {
     public:
-        enum class Type
+        enum class ShaderType
         {
             Vertex = GL_VERTEX_SHADER,
             Fragment = GL_FRAGMENT_SHADER
         };
 
         // Constructor
-        Shader(Type type);
+        ShaderStore();
 
         // Destructor
-        ~Shader();
+        ~ShaderStore();
 
         // Disable copy construction
-        Shader(const Shader& other) = delete;
-        Shader& operator=(const Shader& other) = delete;
+        ShaderStore(const ShaderStore& other) = delete;
+        ShaderStore& operator=(const ShaderStore& other) = delete;
 
         // Enable move construction
-        Shader(Shader&& other);
-        Shader& operator=(Shader&& other);
+        ShaderStore(ShaderStore&& other) = default;
+        ShaderStore& operator=(ShaderStore&& other) = default;
 
-        // Uploads new source to the shader object and compiles it
-        bool Source(const std::string& src);
+        // Compiles given shader from source
+        GLuint LoadShader(const std::string& shaderSrc, ShaderType type);
 
-        // Retrieves the internal opengl shader handle
-        GLuint Id() const;
+        // Links the given shaders in a program
+        bool LinkProgram(const std::string& name, GLuint vertShId, GLuint fragShId);
+
+        // Retrieves the program id with the given name
+        GLuint operator[](const std::string& name);
+
+        // Unloads the loaded shaders and programs from the store
+        void Clear();
+
+        // Retrieves the last linking error if set
+        const std::string& GetLastLinkError() const;
 
         // Retrieves the last compilation error if set
         const std::string& GetLastCompileError() const;
 
     private:
-        GLuint mId;
+        // Stored shaders
+        std::vector<GLuint> mShaders;
+
+        // Stored programs
+        std::unordered_map<std::string, GLuint> mPrograms;
+
+        // Error state
+        std::string mLastLinkError;
         std::string mLastCompileError;
 };
 
-#endif // ! _SHADER_HPP_
+#endif // ! _SHADERSTORE_HPP_

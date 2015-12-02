@@ -28,43 +28,65 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SHADERPROGRAM_HPP_
-#define _SHADERPROGRAM_HPP_
+#ifndef _MODELSTORE_HPP_
+#define _MODELSTORE_HPP_
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <glad/glad.h>
 #include <GL/gl.h>
+#include <GL/glu.h>
 
-class ShaderProgram
+// ModelData
+struct ModelData
+{
+    std::vector<GLfloat> vertices;
+    std::vector<GLfloat> normals;
+    std::vector<GLfloat> colors;
+    std::vector<GLfloat> texCoords;
+    std::vector<GLuint> indices;
+};
+
+// ModelDescription
+struct ModelDescription
+{
+    GLuint vaoId;
+    GLuint vboId;
+    GLuint colBufId;
+    GLuint texBufId;
+    GLuint eboId;
+};
+
+// ModelStore
+class ModelStore
 {
     public:
         // Constructor
-        ShaderProgram();
+        ModelStore();
 
         // Destructor
-        ~ShaderProgram();
+        ~ModelStore();
 
         // Disable copy construction
-        ShaderProgram(const ShaderProgram& other) = delete;
-        ShaderProgram& operator=(const ShaderProgram& other) = delete;
+        ModelStore(const ModelStore& other) = delete;
+        ModelStore& operator=(const ModelStore& other) = delete;
 
         // Enable move construction
-        ShaderProgram(ShaderProgram&& other);
-        ShaderProgram& operator=(ShaderProgram&& other);
+        ModelStore(ModelStore&& other) = default;
+        ModelStore& operator=(ModelStore&& other) = default;
 
-        // Links the given shaders in
-        bool Link(const GLuint& vert, const GLuint& frag);
+        // Loads given data into the GPU
+        void Load(const std::string& name, const ModelData& data);
 
-        // Retrieves the internal opengl program handle
-        GLuint Id() const;
+        // Retrieves pointer a loaded model object
+        ModelDescription* operator[](const std::string& name);
 
-        // Retrieves the last linking error if set
-        const std::string& GetLastLinkError() const;
+        // Unloads the stored models in the store
+        void Clear();
 
     private:
-        GLuint mId;
-        std::string mLastLinkError;
+        std::unordered_map<std::string, ModelDescription> mModels;
 };
 
-#endif // ! _SHADERPROGRAM_HPP_
+#endif // ! _MODELSTORE_HPP_

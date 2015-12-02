@@ -12,10 +12,9 @@
 #include "../Util/WarnGuard.hpp"
 #include "../Window/Window.hpp"
 #include "../Graphics/Util/Camera.hpp"
-#include "../Graphics/Model/Model.hpp"
-#include "../Graphics/Shader/Shader.hpp"
-#include "../Graphics/Shader/ShaderProgram.hpp"
-#include "../Graphics/Texture/Texture.hpp"
+#include "../Graphics/Model/ModelStore.hpp"
+#include "../Graphics/Shader/ShaderStore.hpp"
+#include "../Graphics/Texture/TextureStore.hpp"
 
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -64,13 +63,13 @@ class Game
         GLData mGLData;
 
         // Stores the models loaded in the gpu
-        std::unordered_map<std::string, Model> mModelStore;
+        ModelStore mModelStore;
 
-        // Stores the shader programs loaded in the gpu
-        std::unordered_map<std::string, ShaderProgram> mShaderProgramStore;
+        // Stores the shaders and shader programs loaded in the gpu
+        ShaderStore mShaderStore;
 
         // Stores the textures loaded in the gpu
-        std::unordered_map<std::string, Texture> mTextureStore;
+        TextureStore mTextureStore;
 
         // GameObject
         struct GameObject

@@ -80,10 +80,7 @@ void Game::Init()
     cubeData.indices.assign(std::begin(cubeIndices), std::end(cubeIndices));
     cubeData.colors.assign(std::begin(cubeColorData), std::end(cubeColorData));
     cubeData.texCoords.assign(std::begin(cubeTextureUVMappings), std::end(cubeTextureUVMappings));
-
-    Model cube;
-    cube.Load(cubeData);
-    mModelStore["cube"] = std::move(cube);
+    mModelStore.Load("cube", cubeData);
 
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
@@ -134,22 +131,14 @@ void Game::GLInit()
     std::string fLightShSrc((*lightFragFile).begin(), (*lightFragFile).end());
 
     // Compile shaders
-    Shader vert(Shader::Type::Vertex);
-    vert.Source(vShaderSrc);
-    Shader frag(Shader::Type::Fragment);
-    frag.Source(fShaderSrc);
-    Shader lightVert(Shader::Type::Vertex);
-    lightVert.Source(vLightShSrc);
-    Shader lightFrag(Shader::Type::Fragment);
-    lightFrag.Source(fLightShSrc);
+    GLuint vShId = mShaderStore.LoadShader(vShaderSrc, ShaderStore::ShaderType::Vertex);
+    GLuint fShId = mShaderStore.LoadShader(fShaderSrc, ShaderStore::ShaderType::Fragment);
+    GLuint vLightShId = mShaderStore.LoadShader(vLightShSrc, ShaderStore::ShaderType::Vertex);
+    GLuint fLightShId = mShaderStore.LoadShader(fLightShSrc, ShaderStore::ShaderType::Fragment);
 
     // Link them into a shader program
-    ShaderProgram prog;
-    prog.Link(vert.Id(), frag.Id());
-    mShaderProgramStore["cube"] = std::move(prog);
-    ShaderProgram lightProg;
-    lightProg.Link(lightVert.Id(), lightFrag.Id());
-    mShaderProgramStore["light"] = std::move(lightProg);
+    mShaderStore.LinkProgram("cube", vShId, fShId);
+    mShaderStore.LinkProgram("light", vLightShId, fLightShId);
 
     // Load the file contents into memory buffer
     std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
@@ -162,10 +151,7 @@ void Game::GLInit()
     //auto pb = img.get_pixbuf();
 
     // Store the texture in the store
-    Texture tex;
-    tex.SetData(pb);
-    mTextureStore["mahogany_wood"] = std::move(tex);
-
+    mTextureStore.Load("mahogany_wood", pb);
     CheckGLError();
 }
 
@@ -236,8 +222,8 @@ void Game::Render(float interpolation)
         const auto& gObj = mWorld[i];
 
         // Use the appropriate program
-        auto& p = mShaderProgramStore[gObj.type];
-        glUseProgram(p.Id());
+        GLuint progId = mShaderStore[gObj.type];
+        glUseProgram(progId);
 
         // Calculate the model matrix
         glm::mat4 model;
@@ -250,10 +236,10 @@ void Game::Render(float interpolation)
             model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
 
             // Bind the texture
-            auto& tex = mTextureStore["mahogany_wood"];
+            TextureDescription* tex = mTextureStore["mahogany_wood"];
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, tex.Id());
-            GLuint samplerId = glGetUniformLocation(p.Id(), "tex");
+            glBindTexture(GL_TEXTURE_2D, tex->texId);
+            GLuint samplerId = glGetUniformLocation(progId, "tex");
             glUniform1i(samplerId, 0);
         }
         else if (gObj.type == "light")
@@ -265,15 +251,15 @@ void Game::Render(float interpolation)
         // Combine the projection, view and model matrices
         glm::mat4 MVP = projection * view * model;
         // Upload the combined matrix as a uniform
-        auto matrixId = glGetUniformLocation(p.Id(), "MVP");
+        auto matrixId = glGetUniformLocation(progId, "MVP");
         glUniformMatrix4fv(matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
 
         // Get the mesh
-        auto& mesh = mModelStore[gObj.model];
+        ModelDescription* mesh = mModelStore[gObj.model];
 
         // Draw the object
-        glBindVertexArray(mesh.VaoId());
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EboId());
+        glBindVertexArray(mesh->vaoId);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->eboId);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -290,9 +276,9 @@ void Game::Render(float interpolation)
 void Game::Shutdown()
 {
     // Explicitly deallocate GPU data
-    mTextureStore.clear();
-    mModelStore.clear();
-    mShaderProgramStore.clear();
+    mTextureStore.Clear();
+    mModelStore.Clear();
+    mShaderStore.Clear();
 
     // Window
     mWindow.Destroy();

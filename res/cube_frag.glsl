@@ -1,5 +1,6 @@
 #version 330
 
+in vec3 Normal;
 in vec3 vertexColor;
 in vec2 texCoords;
 

@@ -80,6 +80,7 @@ void Game::Init()
     cubeData.indices.assign(std::begin(cubeIndices), std::end(cubeIndices));
     cubeData.colors.assign(std::begin(cubeColorData), std::end(cubeColorData));
     cubeData.texCoords.assign(std::begin(cubeTextureUVMappings), std::end(cubeTextureUVMappings));
+    cubeData.normals.assign(std::begin(cubeNormals), std::end(cubeNormals));
     mModelStore.Load("cube", cubeData);
 
     // Create various Cube instances in the world

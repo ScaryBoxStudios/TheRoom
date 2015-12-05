@@ -56,6 +56,7 @@ struct ModelDescription
     GLuint colBufId;
     GLuint texBufId;
     GLuint eboId;
+    GLuint normalBufId;
 };
 
 // ModelStore

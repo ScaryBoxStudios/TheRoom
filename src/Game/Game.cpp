@@ -66,11 +66,14 @@ void Game::Init()
                 else if (mGLData.drawMode == GL_LINE)
                     mGLData.drawMode = GL_FILL;
             }
+            if(k == Key::R && ka == KeyAction::Release)
+                mRenderData.rotating = !mRenderData.rotating;
         }
     );
 
     mRenderData.degrees = 0.1f;
     mRenderData.degreesInc = 0.05f;
+    mRenderData.rotating = false;
 
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
@@ -215,8 +218,9 @@ void Game::Update(float dt)
     // Update light position
     mLight->position = CalcLightPos(1.0f);
 
-    // Update state
-    mRenderData.degrees += mRenderData.degreesInc;
+    // Update cubes' rotations
+    if (mRenderData.rotating)
+        mRenderData.degrees += mRenderData.degreesInc;
 }
 
 void Game::Render(float interpolation)
@@ -259,8 +263,10 @@ void Game::Render(float interpolation)
         if (gObj.type == "cube")
         {
             // Some additional transformations
-            model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
             model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
+
+            if (mRenderData.rotating)
+                model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
 
             // Bind the texture
             TextureDescription* tex = mTextureStore["mahogany_wood"];

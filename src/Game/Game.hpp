@@ -89,6 +89,7 @@ class Game
         {
             float degrees;
             float degreesInc;
+            bool rotating;
         };
         RenderData mRenderData;
 

@@ -281,6 +281,10 @@ void Game::Render(float interpolation)
             const auto& lightPos = mLight->position;
             GLint lightPosId = glGetUniformLocation(progId, "lightPos");
             glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
+
+            const auto& viewPos = cameraPos;
+            GLint viewPosId = glGetUniformLocation(progId, "viewPos");
+            glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
         }
 
         // Upload projection, view and model matrices as uniforms

@@ -101,7 +101,7 @@ void Game::Init()
 
     // Add cube lights
     mWorld.push_back({glm::vec3(4.0f, 0.0f, 0.0f), "cube", "light"});
-    mLights.push_back({glm::vec3(4.0f, 0.0f, 0.0f), "cube", "light"});
+    mLight = &mWorld.back();
 
     GLInit();
     mGLData.drawMode = GL_FILL;
@@ -180,6 +180,25 @@ std::tuple<float, float> Game::CameraLookOffset()
     );
 }
 
+glm::vec3 Game::CalcLightPos(float interpolation)
+{
+    glm::vec3 nPos = mLight->position;
+    float increase = 0.1f * interpolation;
+    if(mWindow.IsKeyPressed(Key::Kp8))
+        nPos.y += increase;
+    if(mWindow.IsKeyPressed(Key::Kp4))
+        nPos.x -= increase;
+    if(mWindow.IsKeyPressed(Key::Kp2))
+        nPos.y -= increase;
+    if(mWindow.IsKeyPressed(Key::Kp6))
+        nPos.x += increase;
+    if(mWindow.IsKeyPressed(Key::Kp5))
+        nPos.z -= increase;
+    if(mWindow.IsKeyPressed(Key::Kp0))
+        nPos.z += increase;
+    return nPos;
+}
+
 void Game::Update(float dt)
 {
     (void) dt;
@@ -192,6 +211,9 @@ void Game::Update(float dt)
         mCamera.Look(CameraLookOffset());
 
     mCamera.Move(CameraMoveDirections());
+
+    // Update light position
+    mLight->position = CalcLightPos(1.0f);
 
     // Update state
     mRenderData.degrees += mRenderData.degreesInc;
@@ -229,7 +251,10 @@ void Game::Render(float interpolation)
 
         // Calculate the model matrix
         glm::mat4 model;
-        model = glm::translate(model, gObj.position);
+        if (gObj.type == "cube")
+            model = glm::translate(model, gObj.position);
+        else if (gObj.type == "light")
+            model = glm::translate(model, CalcLightPos(interpolation));
 
         if (gObj.type == "cube")
         {
@@ -253,7 +278,7 @@ void Game::Render(float interpolation)
         // Upload the light position for the cubes' diffuse lighting
         if (gObj.type == "cube")
         {
-            const auto& lightPos = mLights[0].position;
+            const auto& lightPos = mLight->position;
             GLint lightPosId = glGetUniformLocation(progId, "lightPos");
             glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
         }

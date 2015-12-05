@@ -80,8 +80,9 @@ class Game
         };
         std::vector<GameObject> mWorld;
 
-        // Store lights separately
-        std::vector<GameObject> mLights;
+        // Store light separately
+        glm::vec3 CalcLightPos(float interpolation);
+        GameObject* mLight;
 
         // The data needed for rendering
         struct RenderData

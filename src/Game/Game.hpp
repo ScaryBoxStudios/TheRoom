@@ -80,6 +80,9 @@ class Game
         };
         std::vector<GameObject> mWorld;
 
+        // Store lights separately
+        std::vector<GameObject> mLights;
+
         // The data needed for rendering
         struct RenderData
         {

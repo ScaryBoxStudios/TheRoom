@@ -101,6 +101,7 @@ void Game::Init()
 
     // Add cube lights
     mWorld.push_back({glm::vec3(4.0f, 0.0f, 0.0f), "cube", "light"});
+    mLights.push_back({glm::vec3(4.0f, 0.0f, 0.0f), "cube", "light"});
 
     GLInit();
     mGLData.drawMode = GL_FILL;
@@ -247,6 +248,14 @@ void Game::Render(float interpolation)
         {
             model = glm::scale(model, glm::vec3(0.3f));
             model = glm::rotate(model, -10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+
+        // Upload the light position for the cubes' diffuse lighting
+        if (gObj.type == "cube")
+        {
+            const auto& lightPos = mLights[0].position;
+            GLint lightPosId = glGetUniformLocation(progId, "lightPos");
+            glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
         }
 
         // Upload projection, view and model matrices as uniforms

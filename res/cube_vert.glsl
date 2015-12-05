@@ -8,6 +8,7 @@ layout(location=3) in vec2 uvCoords;
 out vec3 Color;
 out vec2 UVCoords;
 out vec3 Normal;
+out vec3 FragPos;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -18,5 +19,6 @@ void main(void)
     UVCoords = uvCoords;
     Color = color;
     Normal = normal;
+    FragPos = vec3(model * vec4(position, 1.0f));
     gl_Position = projection * view * model * vec4(position, 1.0f);
 }

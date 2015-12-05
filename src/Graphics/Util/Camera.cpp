@@ -84,7 +84,7 @@ auto Camera::CalcLook(const CameraState& prevState, const CameraProperties& camP
     yOffset *= sensitivity;
 
     yaw += xOffset;
-    pitch += yOffset;
+    pitch -= yOffset;
 
     if(pitch > pitchLim)
         pitch = pitchLim;

@@ -9,12 +9,14 @@ out vec3 vertexColor;
 out vec2 texCoords;
 out vec3 Normal;
 
-uniform mat4 MVP;
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
 void main(void)
 {
     texCoords = texUV;
     vertexColor = color;
     Normal = normal;
-    gl_Position = MVP * vec4(position, 1.0f);
+    gl_Position = projection * view * model * vec4(position, 1.0f);
 }

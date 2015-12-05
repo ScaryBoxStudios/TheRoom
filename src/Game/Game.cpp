@@ -249,11 +249,13 @@ void Game::Render(float interpolation)
             model = glm::rotate(model, -10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
-        // Combine the projection, view and model matrices
-        glm::mat4 MVP = projection * view * model;
-        // Upload the combined matrix as a uniform
-        auto matrixId = glGetUniformLocation(progId, "MVP");
-        glUniformMatrix4fv(matrixId, 1, GL_FALSE, glm::value_ptr(MVP));
+        // Upload projection, view and model matrices as uniforms
+        auto projectionId = glGetUniformLocation(progId, "projection");
+        glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
+        auto viewId = glGetUniformLocation(progId, "view");
+        glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
+        auto modelId = glGetUniformLocation(progId, "model");
+        glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
 
         // Get the mesh
         ModelDescription* mesh = mModelStore[gObj.model];

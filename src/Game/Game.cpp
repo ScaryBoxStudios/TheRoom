@@ -100,11 +100,19 @@ void Game::Init()
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
     for (const auto& pos : cubePositions)
-        mWorld.push_back({pos, "cube", "cube"});
+    {
+        Transform trans;
+        trans.Move(pos);
+        mWorld.push_back({trans, "cube", "cube"});
+    }
 
     // Add cube lights
-    mWorld.push_back({glm::vec3(4.0f, 0.0f, 0.0f), "cube", "light"});
-    mLight = &mWorld.back();
+    {
+        Transform trans;
+        trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
+        mWorld.push_back({trans, "cube", "light"});
+        mLight = &mWorld.back();
+    }
 
     GLInit();
     mGLData.drawMode = GL_FILL;
@@ -185,7 +193,7 @@ std::tuple<float, float> Game::CameraLookOffset()
 
 glm::vec3 Game::CalcLightPos(float interpolation)
 {
-    glm::vec3 nPos = mLight->position;
+    glm::vec3 nPos = mLight->transform.GetPosition();
     float increase = 0.1f * interpolation;
     if(mWindow.IsKeyPressed(Key::Kp8))
         nPos.y += increase;
@@ -216,7 +224,7 @@ void Game::Update(float dt)
     mCamera.Move(CameraMoveDirections());
 
     // Update light position
-    mLight->position = CalcLightPos(1.0f);
+    mLight->transform.SetPos(CalcLightPos(1.0f));
 
     // Update cubes' rotations
     if (mRenderData.rotating)
@@ -247,7 +255,7 @@ void Game::Render(float interpolation)
     for (std::size_t i = 0; i < mWorld.size(); ++i)
     {
         // Convinience reference
-        const auto& gObj = mWorld[i];
+        auto& gObj = mWorld[i];
 
         // Use the appropriate program
         GLuint progId = mShaderStore[gObj.type];
@@ -256,7 +264,7 @@ void Game::Render(float interpolation)
         // Calculate the model matrix
         glm::mat4 model;
         if (gObj.type == "cube")
-            model = glm::translate(model, gObj.position);
+            model = gObj.transform.Get();
         else if (gObj.type == "light")
             model = glm::translate(model, CalcLightPos(interpolation));
 
@@ -284,7 +292,7 @@ void Game::Render(float interpolation)
         // Upload the light position for the cubes' diffuse lighting
         if (gObj.type == "cube")
         {
-            const auto& lightPos = mLight->position;
+            const auto& lightPos = mLight->transform.GetPosition();
             GLint lightPosId = glGetUniformLocation(progId, "lightPos");
             glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
 

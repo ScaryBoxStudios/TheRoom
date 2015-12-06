@@ -12,6 +12,7 @@
 #include "../Util/WarnGuard.hpp"
 #include "../Window/Window.hpp"
 #include "../Graphics/Util/Camera.hpp"
+#include "../Graphics/Scene/Transform.hpp"
 #include "../Graphics/Model/ModelStore.hpp"
 #include "../Graphics/Shader/ShaderStore.hpp"
 #include "../Graphics/Texture/TextureStore.hpp"
@@ -74,7 +75,7 @@ class Game
         // GameObject
         struct GameObject
         {
-            glm::vec3 position;
+            Transform transform;
             std::string model;
             std::string type;
         };

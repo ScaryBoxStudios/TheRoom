@@ -71,7 +71,6 @@ void Game::Init()
         }
     );
 
-    mRenderData.degrees = 0.1f;
     mRenderData.degreesInc = 0.05f;
     mRenderData.rotating = false;
 
@@ -104,10 +103,10 @@ void Game::Init()
         const auto& pos = cubePositions[i];
 
         Transform trans;
+        trans.Move(pos);
         trans.RotateX(20.0f * i);
         trans.RotateY(7.0f * i);
         trans.RotateZ(10.0f * i);
-        trans.Move(pos);
         mWorld.push_back({trans, "cube", "cube"});
     }
 
@@ -115,6 +114,8 @@ void Game::Init()
     {
         Transform trans;
         trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
+        trans.Scale(glm::vec3(-0.7f));
+        trans.RotateY(-10.0f);
         mWorld.push_back({trans, "cube", "light"});
         mLight = &mWorld.back();
     }
@@ -196,23 +197,22 @@ std::tuple<float, float> Game::CameraLookOffset()
     );
 }
 
-glm::vec3 Game::CalcLightPos(float interpolation)
+void Game::CalcLightPos()
 {
-    glm::vec3 nPos = mLight->transform.GetPosition();
-    float increase = 0.1f * interpolation;
+    auto& trans = mLight->transform;
+    float increase = 0.1f;
     if(mWindow.IsKeyPressed(Key::Kp8))
-        nPos.y += increase;
+        trans.Move(glm::vec3(0.0f, increase, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp4))
-        nPos.x -= increase;
+        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp2))
-        nPos.y -= increase;
+        trans.Move(glm::vec3(0.0f, -increase, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp6))
-        nPos.x += increase;
+        trans.Move(glm::vec3(increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp5))
-        nPos.z -= increase;
+        trans.Move(glm::vec3(0.0f, 0.0f, -increase));
     if(mWindow.IsKeyPressed(Key::Kp0))
-        nPos.z += increase;
-    return nPos;
+        trans.Move(glm::vec3(0.0f, 0.0f, increase));
 }
 
 void Game::Update(float dt)
@@ -228,12 +228,20 @@ void Game::Update(float dt)
 
     mCamera.Move(CameraMoveDirections());
 
+    // Update interpolation variables
+    for (auto& gObj : mWorld)
+        gObj.transform.Update();
+
     // Update light position
-    mLight->transform.SetPos(CalcLightPos(1.0f));
+    CalcLightPos();
 
     // Update cubes' rotations
     if (mRenderData.rotating)
-        mRenderData.degrees += mRenderData.degreesInc;
+    {
+        for (auto& gObj : mWorld)
+            if (gObj.type == "cube")
+                gObj.transform.RotateY(mRenderData.degreesInc);
+    }
 }
 
 void Game::Render(float interpolation)
@@ -260,35 +268,23 @@ void Game::Render(float interpolation)
     for (std::size_t i = 0; i < mWorld.size(); ++i)
     {
         // Convinience reference
-        auto& gObj = mWorld[i];
+        const auto& gObj = mWorld[i];
 
         // Use the appropriate program
         GLuint progId = mShaderStore[gObj.type];
         glUseProgram(progId);
 
         // Calculate the model matrix
-        glm::mat4 model;
-        if (gObj.type == "cube")
-            model = gObj.transform.Get();
-        else if (gObj.type == "light")
-            model = glm::translate(model, CalcLightPos(interpolation));
+        glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
 
         if (gObj.type == "cube")
         {
-            if (mRenderData.rotating)
-                model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
-
             // Bind the texture
             TextureDescription* tex = mTextureStore["mahogany_wood"];
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, tex->texId);
             GLuint samplerId = glGetUniformLocation(progId, "tex");
             glUniform1i(samplerId, 0);
-        }
-        else if (gObj.type == "light")
-        {
-            model = glm::scale(model, glm::vec3(0.3f));
-            model = glm::rotate(model, -10.0f, glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
         // Upload the light position for the cubes' diffuse lighting

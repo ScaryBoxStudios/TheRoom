@@ -9,30 +9,26 @@ Transform::Transform() :
     mPitch(0.0f),
     mRoll(0.0f),
     mScale(1.0f),
-    mShouldRecalculate(false)
+    mOldTrans()
 {
 }
 
-const glm::mat4& Transform::Get()
+const glm::mat4& Transform::Get() const
 {
-    if (mShouldRecalculate)
-    {
-        CalcTransform();
-        mShouldRecalculate = false;
-    }
-
+    //if (mParent != nullptr) // TODO
+    //    mTransform = mTransform * mParent->Get();
     return mTransform;
 }
 
-void Transform::CalcTransform()
+void Transform::Update()
 {
-    mTransform = glm::scale(mTransform, mScale);
-    mTransform = glm::translate(mTransform, mPosition);
-    mTransform = glm::rotate(mTransform, mYaw, glm::vec3(0, 0, 1));
-    mTransform = glm::rotate(mTransform, mPitch, glm::vec3(0, 1, 0));
-    mTransform = glm::rotate(mTransform, mRoll, glm::vec3(1, 0, 0));
-    if (mParent != nullptr)
-        mTransform = mTransform * mParent->Get();
+    mOldTrans = mTransform;
+}
+
+glm::mat4 Transform::GetInterpolated(float interpolation) const
+{
+    glm::mat4 iTransform = mOldTrans + (mTransform - mOldTrans) * interpolation;
+    return iTransform;
 }
 
 const glm::vec3& Transform::GetPosition() const
@@ -43,48 +39,31 @@ const glm::vec3& Transform::GetPosition() const
 void Transform::Move(const glm::vec3& pos)
 {
     mPosition += pos;
-    mShouldRecalculate = true;
-}
-
-void Transform::SetPos(const glm::vec3& pos)
-{
-    mPosition = pos;
-    mShouldRecalculate = true;
+    mTransform = glm::translate(mTransform, pos);
 }
 
 void Transform::RotateX(float angle)
 {
     mRoll += angle;
-    mShouldRecalculate = true;
+    mTransform = glm::rotate(mTransform, angle, glm::vec3(1, 0, 0));
 }
 
 void Transform::RotateY(float angle)
 {
     mPitch += angle;
-    mShouldRecalculate = true;
+    mTransform = glm::rotate(mTransform, angle, glm::vec3(0, 1, 0));
 }
 
 void Transform::RotateZ(float angle)
 {
     mYaw += angle;
-    mShouldRecalculate = true;
+    mTransform = glm::rotate(mTransform, angle, glm::vec3(0, 0, 1));
 }
 
 void Transform::Scale(const glm::vec3& scale)
 {
     mScale += scale;
-    mShouldRecalculate = true;
-}
-
-void Transform::SetScale(const glm::vec3& scale)
-{
-    mScale = scale;
-    mShouldRecalculate = true;
-}
-
-void Transform::Invalidate()
-{
-    mShouldRecalculate = true;
+    mTransform = glm::scale(mTransform, scale);
 }
 
 void Transform::SetParent(Transform* par)

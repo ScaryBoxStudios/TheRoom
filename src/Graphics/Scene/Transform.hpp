@@ -43,16 +43,13 @@ class Transform
         Transform();
 
         // Retrieves the current transformation matrix
-        const glm::mat4& Get();
+        const glm::mat4& Get() const;
 
         // Retrieves the current local position vector
         const glm::vec3& GetPosition() const;
 
         // Moves relatively to the current position
         void Move(const glm::vec3& pos);
-
-        // Sets the current position relatively to the start of the axis
-        void SetPos(const glm::vec3& pos);
 
         // Rotates relatively to the current X rotation
         void RotateX(float angle);
@@ -66,23 +63,20 @@ class Transform
         // Scales relatively to the current scale
         void Scale(const glm::vec3& scale);
 
-        // Sets the current scale relatively to the initial size
-        void SetScale(const glm::vec3& scale);
-
         // Sets the parent transformation
         void SetParent(Transform* par);
 
-        // Sets the forces the recaclulation of the cached translation matrix
-        void Invalidate();
+        // Updates the interpolation state variables
+        void Update();
+
+        // Calculates interpolated translation matrix
+        glm::mat4 GetInterpolated(float interpolation) const;
 
     private:
-        // Recalculates cached translation matrix
-        void CalcTransform();
-
         // Parent node transformation
         Transform* mParent;
 
-        // Current cached transformation matrix (including parent transformations)
+        // Current cached transformation matrix
         glm::mat4 mTransform;
 
         // Transform position
@@ -94,8 +88,8 @@ class Transform
         // Transform scale
         glm::vec3 mScale;
 
-        // Flag indicating that the cached transform matrix should be recalculated
-        bool mShouldRecalculate;
+        // Stored for calculating interpolation states
+        glm::mat4 mOldTrans;
 };
 
 #endif // ! _TRANSFORM_HPP_

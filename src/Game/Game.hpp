@@ -82,13 +82,12 @@ class Game
         std::vector<GameObject> mWorld;
 
         // Store light separately
-        glm::vec3 CalcLightPos(float interpolation);
+        void CalcLightPos();
         GameObject* mLight;
 
         // The data needed for rendering
         struct RenderData
         {
-            float degrees;
             float degreesInc;
             bool rotating;
         };

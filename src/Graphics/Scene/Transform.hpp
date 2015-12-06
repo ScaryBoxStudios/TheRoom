@@ -54,8 +54,14 @@ class Transform
         // Sets the current position relatively to the start of the axis
         void SetPos(const glm::vec3& pos);
 
-        // Rotates relatively to the current rotation
-        void Rotate(float angle, const glm::vec3& normal);
+        // Rotates relatively to the current X rotation
+        void RotateX(float angle);
+
+        // Rotates relatively to the current Y rotation
+        void RotateY(float angle);
+
+        // Rotates relatively to the current Z rotation
+        void RotateZ(float angle);
 
         // Scales relatively to the current scale
         void Scale(const glm::vec3& scale);
@@ -83,7 +89,7 @@ class Transform
         glm::vec3 mPosition;
 
         // Transform rotation
-        glm::mat4 mRotation;
+        float mYaw, mPitch, mRoll;
 
         // Transform scale
         glm::vec3 mScale;

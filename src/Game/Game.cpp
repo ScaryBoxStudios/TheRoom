@@ -99,9 +99,14 @@ void Game::Init()
         glm::vec3(3.0f, 0.4f, -12.0f),
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
-    for (const auto& pos : cubePositions)
+    for (std::size_t i = 0; i < cubePositions.size(); ++i)
     {
+        const auto& pos = cubePositions[i];
+
         Transform trans;
+        trans.RotateX(20.0f * i);
+        trans.RotateY(7.0f * i);
+        trans.RotateZ(10.0f * i);
         trans.Move(pos);
         mWorld.push_back({trans, "cube", "cube"});
     }
@@ -270,9 +275,6 @@ void Game::Render(float interpolation)
 
         if (gObj.type == "cube")
         {
-            // Some additional transformations
-            model = glm::rotate(model, 20.0f * i, glm::vec3(1.0f, 0.3f, 0.5f));
-
             if (mRenderData.rotating)
                 model = glm::rotate(model, mRenderData.degrees + mRenderData.degreesInc * interpolation, glm::vec3(0, 1, 0));
 

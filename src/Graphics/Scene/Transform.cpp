@@ -5,7 +5,9 @@ Transform::Transform() :
     mParent(nullptr),
     mTransform(),
     mPosition(0.0f),
-    mRotation(),
+    mYaw(0.0f),
+    mPitch(0.0f),
+    mRoll(0.0f),
     mScale(1.0f),
     mShouldRecalculate(false)
 {
@@ -25,8 +27,10 @@ const glm::mat4& Transform::Get()
 void Transform::CalcTransform()
 {
     mTransform = glm::scale(mTransform, mScale);
-    mTransform = mTransform * mRotation;
     mTransform = glm::translate(mTransform, mPosition);
+    mTransform = glm::rotate(mTransform, mYaw, glm::vec3(0, 0, 1));
+    mTransform = glm::rotate(mTransform, mPitch, glm::vec3(0, 1, 0));
+    mTransform = glm::rotate(mTransform, mRoll, glm::vec3(1, 0, 0));
     if (mParent != nullptr)
         mTransform = mTransform * mParent->Get();
 }
@@ -48,9 +52,22 @@ void Transform::SetPos(const glm::vec3& pos)
     mShouldRecalculate = true;
 }
 
-void Transform::Rotate(float angle, const glm::vec3& normal)
+void Transform::RotateX(float angle)
 {
-    mTransform = glm::rotate(mTransform, angle, normal);
+    mRoll += angle;
+    mShouldRecalculate = true;
+}
+
+void Transform::RotateY(float angle)
+{
+    mPitch += angle;
+    mShouldRecalculate = true;
+}
+
+void Transform::RotateZ(float angle)
+{
+    mYaw += angle;
+    mShouldRecalculate = true;
 }
 
 void Transform::Scale(const glm::vec3& scale)

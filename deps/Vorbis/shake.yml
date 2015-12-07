@@ -1,0 +1,3 @@
+ProjectName: Vorbis
+ProjectType: StaticLib
+AdditionalIncludes: ["src", "../Ogg/include"]

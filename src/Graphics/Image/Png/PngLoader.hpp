@@ -4,12 +4,16 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include "../RawImage.hpp"
 
 class PngLoader
 {
     public:
+        // The buffer type used by the loader
+        using BufferType = std::vector<uint8_t>;
+
         // Retrieves the raw pixel data from the given png file data contents
-        std::vector<uint8_t> Load(std::vector<uint8_t>&& fileData);
+        RawImage<BufferType> Load(BufferType fileData);
 
         // Retrieves the last error that the png loader bumped into
         const std::string& GetLastError() const;

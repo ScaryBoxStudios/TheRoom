@@ -3,18 +3,15 @@
 #include <memory>
 #include <png.h>
 
-std::vector<uint8_t> PngLoader::Load(std::vector<uint8_t>&& fileData)
+auto PngLoader::Load(BufferType fileData) -> RawImage<BufferType>
 {
-    // Make a holder for our file data
-    std::vector<uint8_t> imgData = fileData;
-
     // The data that will be returned
-    std::vector<uint8_t> rawData;
+    BufferType rawData;
 
     if (png_sig_cmp(static_cast<png_byte*>(rawData.data()), 0, 8))
     {
         mLastError = "Incorrect png header";
-        return rawData;
+        return RawImage<>(std::move(rawData), {0,0,0});
     }
 
     auto del = [](png_struct* p){ png_destroy_read_struct(&p, nullptr, nullptr); };
@@ -32,9 +29,8 @@ std::vector<uint8_t> PngLoader::Load(std::vector<uint8_t>&& fileData)
             png_create_info_struct(png.get()),
             del3);
 
-    using BufferType = std::vector<uint8_t>;
     using CbData = std::tuple<const BufferType&, BufferType::const_iterator>;
-    CbData cbData = std::make_tuple(imgData, imgData.begin());
+    CbData cbData = std::make_tuple(fileData, std::begin(fileData));
 
     png_set_read_fn(png.get(), static_cast<void*>(&cbData),
         [](png_struct* png, png_byte* data, png_size_t length)
@@ -54,7 +50,7 @@ std::vector<uint8_t> PngLoader::Load(std::vector<uint8_t>&& fileData)
 
     // Bits per CHANNEL not per pixel
     uint32_t bitDepth = png_get_bit_depth(png.get(), info.get());
-    uint32_t channels = png_get_channels(png.get(), info.get());
+    uint8_t channels = png_get_channels(png.get(), info.get());
     //uint32_t colorType = png_get_color_type(png.get(), info.get());
 
     std::vector<png_byte*> rowPtrs(height);
@@ -69,5 +65,11 @@ std::vector<uint8_t> PngLoader::Load(std::vector<uint8_t>&& fileData)
     }
     png_read_image(png.get(), rowPtrs.data());
 
-    return rawData;
+    // Create the ImageProperties structure for the RawImage returned
+    ImageProperties imProps;
+    imProps.width = width;
+    imProps.height = height;
+    imProps.channels = channels;
+
+    return RawImage<>(std::move(rawData), imProps);
 }

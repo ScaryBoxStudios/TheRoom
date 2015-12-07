@@ -290,7 +290,8 @@ void Game::Render(float interpolation)
         // Upload the light position for the cubes' diffuse lighting
         if (gObj.type == "cube")
         {
-            const auto& lightPos = mLight->transform.GetPosition();
+            const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
+            const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
             GLint lightPosId = glGetUniformLocation(progId, "lightPos");
             glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
 

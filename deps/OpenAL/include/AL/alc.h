@@ -6,7 +6,8 @@ extern "C" {
 #endif
 
 #ifndef ALC_API
- #if defined(AL_LIBTYPE_STATIC)
+ #ifndef AL_DYNAMIC_BUILD
+  #define AL_LIBTYPE_STATIC
   #define ALC_API
  #elif defined(_WIN32)
   #define ALC_API __declspec(dllimport)

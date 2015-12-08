@@ -1,6 +1,19 @@
 /* API declaration export attribute */
-#define AL_API  __declspec(dllexport)
-#define ALC_API __declspec(dllexport)
+#ifdef AL_DYNAMIC_BUILD
+    #define AL_API  __declspec(dllexport)
+    #define ALC_API __declspec(dllexport)
+#else
+	#ifndef AL_LIBTYPE_STATIC
+    	#define AL_LIBTYPE_STATIC
+	#endif
+    #define AL_API
+    #define ALC_API
+#endif
+
+#if defined(_MSC_VER)
+  #define strcasecmp _stricmp
+  #define strncasecmp _strnicmp
+#endif
 
 /* Define to the library version */
 #define ALSOFT_VERSION "1.16.0"
@@ -8,7 +21,11 @@
 #define restrict
 
 /* Define any available alignment declaration */
+#ifdef _MSC_VER
 #define ALIGN(x) __declspec(align(x))
+#else
+#define ALIGN(x) __declspec(aligned(x))
+#endif
 
 /* Define if we have the C11 aligned_alloc function */
 /* #undef HAVE_ALIGNED_ALLOC */
@@ -104,7 +121,9 @@
 /* #undef HAVE_C11_ATOMIC */
 
 /* Define if we have GCC's destructor attribute */
-/* #undef HAVE_GCC_DESTRUCTOR */
+#ifdef __GNUC__
+#define HAVE_GCC_DESTRUCTOR
+#endif
 
 /* Define if we have GCC's format attribute */
 /* #undef HAVE_GCC_FORMAT */

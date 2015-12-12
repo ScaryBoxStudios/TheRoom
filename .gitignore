@@ -197,5 +197,5 @@ tmp/
 #=====================================
 
 # Allow obj model files
-!ext/*.obj
+!ext/**/*.obj
 

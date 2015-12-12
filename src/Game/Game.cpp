@@ -215,17 +215,17 @@ void Game::CalcLightPos()
     auto& trans = mLight->transform;
     float increase = 0.3f;
     if(mWindow.IsKeyPressed(Key::Kp8))
-        trans.Move(glm::vec3(0.0f, -increase, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp4))
-        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp2))
         trans.Move(glm::vec3(0.0f, increase, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp6))
+    if(mWindow.IsKeyPressed(Key::Kp4))
         trans.Move(glm::vec3(increase, 0.0f, 0.0f));
+    if(mWindow.IsKeyPressed(Key::Kp2))
+        trans.Move(glm::vec3(0.0f, -increase, 0.0f));
+    if(mWindow.IsKeyPressed(Key::Kp6))
+        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp5))
-        trans.Move(glm::vec3(0.0f, 0.0f, -increase));
-    if(mWindow.IsKeyPressed(Key::Kp0))
         trans.Move(glm::vec3(0.0f, 0.0f, increase));
+    if(mWindow.IsKeyPressed(Key::Kp0))
+        trans.Move(glm::vec3(0.0f, 0.0f, -increase));
 }
 
 void Game::Update(float dt)

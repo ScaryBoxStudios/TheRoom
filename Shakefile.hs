@@ -608,7 +608,10 @@ main = do
         -- Project name
         let projName = projectName cfg
         -- Sources
-        let sources = maybe ["//*.cpp", "//*.cc", "//*.c"] (commonSources cfg ++ ) (M.lookup hostOs (getOsMap (osSources cfg)))
+        let sources = let givenSources = commonSources cfg ++ fromMaybe [] (M.lookup hostOs (getOsMap (osSources cfg)))
+                      in if null givenSources
+                          then map (srcDir ++) ["//*.cpp", "//*.cc", "//*.c"]
+                          else givenSources
         -- Additional includes
         let addIncl = addIncludes cfg
         -- Link libraries
@@ -673,7 +676,7 @@ main = do
                 need ["banner"]
 
                 -- Gather the source files
-                srcfiles <- getDirectoryFiles srcDir sources
+                srcfiles <- getDirectoryFiles "." sources
 
                 -- Create the future object file list
                 let objfiles = [buildDir </> sf <.> "o" | sf <- srcfiles]
@@ -724,8 +727,8 @@ main = do
             buildDir <//> "*.o" %> \out -> do
                 -- Set the source
                 let dropDirectory n = foldr (.) id (replicate n dropDirectory1)
-                let c = toStandard $ srcDir </> dropDirectory 4 (dropExtension out)
-                let cdir = toStandard $ srcDir </> dropDirectory 4 (takeDirectory out)
+                let c = toStandard $ dropDirectory 4 (dropExtension out)
+                let cdir = toStandard $ dropDirectory 4 (takeDirectory out)
 
                 -- Need on the object source
                 need [c]

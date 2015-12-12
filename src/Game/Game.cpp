@@ -11,7 +11,9 @@ WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
-#include "Cube.hpp"
+
+// BufferType for the files loaded
+using BufferType = std::vector<std::uint8_t>;
 
 ///==============================================================
 ///= GL Helpers
@@ -77,22 +79,15 @@ void Game::Init()
 
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
-    // Load the Cube
-    Mesh cubeData;
-    cubeData.vertices.assign(std::begin(cubeVertexes), std::end(cubeVertexes));
-    cubeData.indices.assign(std::begin(cubeIndices), std::end(cubeIndices));
-    cubeData.colors.assign(std::begin(cubeColorData), std::end(cubeColorData));
-    cubeData.texCoords.assign(std::begin(cubeTextureUVMappings), std::end(cubeTextureUVMappings));
-    cubeData.normals.assign(std::begin(cubeNormals), std::end(cubeNormals));
-    Model cube;
-    cube.meshes.push_back(std::move(cubeData));
+    // Model loader instance
+    ModelLoader modelLoader;
+
+    // Load the cube
+    auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
+    Model cube = modelLoader.Load(*cubeFile);
     mModelStore.Load("cube", cube);
 
-    // Load the teapot
-    ModelLoader modelLoader;
-    // BufferType for the files loaded
-    using BufferType = std::vector<std::uint8_t>;
-    // Load shader files
+    // Load teapot
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
     Model teapot = modelLoader.Load(*teapotFile);
     mModelStore.Load("teapot", std::move(teapot));
@@ -110,12 +105,14 @@ void Game::Init()
         glm::vec3(3.0f, 0.4f, -12.0f),
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
+
     for (std::size_t i = 0; i < cubePositions.size(); ++i)
     {
         const auto& pos = cubePositions[i];
 
         Transform trans;
         trans.Move(pos);
+        trans.Scale(glm::vec3(2.0f));
         trans.RotateX(20.0f * i);
         trans.RotateY(7.0f * i);
         trans.RotateZ(10.0f * i);
@@ -126,7 +123,6 @@ void Game::Init()
     {
         Transform trans;
         trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
-        trans.Scale(glm::vec3(0.3f));
         trans.RotateY(-10.0f);
         mWorld.push_back({trans, "cube", "light"});
         mLight = &mWorld.back();
@@ -153,9 +149,6 @@ void Game::GLInit()
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_TEXTURE_2D);
     glDepthFunc(GL_LESS);
-
-    // BufferType for the files loaded
-    using BufferType = std::vector<std::uint8_t>;
 
     // Load shader files
     auto vertFile = FileLoad<BufferType>("res/cube_vert.glsl");

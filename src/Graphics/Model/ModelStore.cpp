@@ -13,99 +13,110 @@ void ModelStore::Clear()
 {
     for (auto& p : mModels)
     {
-        const auto& modelDesc = p.second;
-        glDeleteBuffers(1, &modelDesc.normalBufId);
-        glDeleteBuffers(1, &modelDesc.eboId);
-        glDeleteBuffers(1, &modelDesc.texBufId);
-        glDeleteBuffers(1, &modelDesc.colBufId);
-        glDeleteBuffers(1, &modelDesc.vboId);
-        glDeleteVertexArrays(1, &modelDesc.vaoId);
+        auto& modelDesc = p.second;
+        for (auto& meshDesc : modelDesc.meshes)
+        {
+            glDeleteBuffers(1, &meshDesc.normalBufId);
+            glDeleteBuffers(1, &meshDesc.eboId);
+            glDeleteBuffers(1, &meshDesc.texBufId);
+            glDeleteBuffers(1, &meshDesc.colBufId);
+            glDeleteBuffers(1, &meshDesc.vboId);
+            glDeleteVertexArrays(1, &meshDesc.vaoId);
+        }
+        modelDesc.meshes.clear();
     }
     mModels.clear();
 }
 
-void ModelStore::Load(const std::string& name, const ModelData& data)
+void ModelStore::Load(const std::string& name, const Model& data)
 {
     ModelDescription modelDesc;
-    auto& vaoId = modelDesc.vaoId;
-    auto& vboId = modelDesc.vboId;
-    auto& colBufId = modelDesc.colBufId;
-    auto& texBufId = modelDesc.texBufId;
-    auto& eboId = modelDesc.eboId;
-    auto& normalBufId = modelDesc.normalBufId;
 
-    glGenVertexArrays(1, &vaoId);
-    glGenBuffers(1, &vboId);
-    glGenBuffers(1, &colBufId);
-    glGenBuffers(1, &texBufId);
-    glGenBuffers(1, &eboId);
-    glGenBuffers(1, &normalBufId);
-
-    glBindVertexArray(vaoId);
+    for (const auto& mesh : data.meshes)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        {
-            glBufferData(GL_ARRAY_BUFFER,
-                data.vertices.size() * sizeof(GLfloat),
-                data.vertices.data(),
-                GL_STATIC_DRAW
-            );
-            GLuint index = 0;
-            glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glEnableVertexAttribArray(index);
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        MeshDescription meshDesc;
+        auto& vaoId = meshDesc.vaoId;
+        auto& vboId = meshDesc.vboId;
+        auto& colBufId = meshDesc.colBufId;
+        auto& texBufId = meshDesc.texBufId;
+        auto& eboId = meshDesc.eboId;
+        auto& normalBufId = meshDesc.normalBufId;
 
-        glBindBuffer(GL_ARRAY_BUFFER, normalBufId);
-        {
-            glBufferData(GL_ARRAY_BUFFER,
-                data.normals.size() * sizeof(GLfloat),
-                data.normals.data(),
-                GL_STATIC_DRAW
-            );
-            GLuint index = 1;
-            glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glEnableVertexAttribArray(index);
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glGenVertexArrays(1, &vaoId);
+        glGenBuffers(1, &vboId);
+        glGenBuffers(1, &colBufId);
+        glGenBuffers(1, &texBufId);
+        glGenBuffers(1, &eboId);
+        glGenBuffers(1, &normalBufId);
 
-        glBindBuffer(GL_ARRAY_BUFFER, colBufId);
+        glBindVertexArray(vaoId);
         {
-            glBufferData(GL_ARRAY_BUFFER,
-                data.colors.size() * sizeof(GLfloat),
-                data.colors.data(),
-                GL_STATIC_DRAW
-            );
-            GLuint index = 2;
-            glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glEnableVertexAttribArray(index);
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            {
+                glBufferData(GL_ARRAY_BUFFER,
+                    mesh.vertices.size() * sizeof(GLfloat),
+                    mesh.vertices.data(),
+                    GL_STATIC_DRAW
+                );
+                GLuint index = 0;
+                glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+                glEnableVertexAttribArray(index);
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, texBufId);
-        {
-            glBufferData(GL_ARRAY_BUFFER,
-                data.texCoords.size() * sizeof(GLfloat),
-                data.texCoords.data(),
-                GL_STATIC_DRAW
-            );
-            GLuint index = 3;
-            glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-            glEnableVertexAttribArray(index);
-        }
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, normalBufId);
+            {
+                glBufferData(GL_ARRAY_BUFFER,
+                    mesh.normals.size() * sizeof(GLfloat),
+                    mesh.normals.data(),
+                    GL_STATIC_DRAW
+                );
+                GLuint index = 1;
+                glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+                glEnableVertexAttribArray(index);
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-        {
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                data.indices.size() * sizeof(GLuint),
-                data.indices.data(),
-                GL_STATIC_DRAW
-            );
+            glBindBuffer(GL_ARRAY_BUFFER, colBufId);
+            {
+                glBufferData(GL_ARRAY_BUFFER,
+                    mesh.colors.size() * sizeof(GLfloat),
+                    mesh.colors.data(),
+                    GL_STATIC_DRAW
+                );
+                GLuint index = 2;
+                glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+                glEnableVertexAttribArray(index);
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            glBindBuffer(GL_ARRAY_BUFFER, texBufId);
+            {
+                glBufferData(GL_ARRAY_BUFFER,
+                    mesh.texCoords.size() * sizeof(GLfloat),
+                    mesh.texCoords.data(),
+                    GL_STATIC_DRAW
+                );
+                GLuint index = 3;
+                glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+                glEnableVertexAttribArray(index);
+            }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+            {
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                    mesh.indices.size() * sizeof(GLuint),
+                    mesh.indices.data(),
+                    GL_STATIC_DRAW
+                );
+            }
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
+        modelDesc.meshes.push_back(meshDesc);
     }
-    glBindVertexArray(0);
 
     mModels.insert({name, modelDesc});
 }

@@ -77,13 +77,15 @@ void Game::Init()
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
     // Load the Cube
-    ModelData cubeData;
+    Mesh cubeData;
     cubeData.vertices.assign(std::begin(cubeVertexes), std::end(cubeVertexes));
     cubeData.indices.assign(std::begin(cubeIndices), std::end(cubeIndices));
     cubeData.colors.assign(std::begin(cubeColorData), std::end(cubeColorData));
     cubeData.texCoords.assign(std::begin(cubeTextureUVMappings), std::end(cubeTextureUVMappings));
     cubeData.normals.assign(std::begin(cubeNormals), std::end(cubeNormals));
-    mModelStore.Load("cube", cubeData);
+    Model cube;
+    cube.meshes.push_back(std::move(cubeData));
+    mModelStore.Load("cube", cube);
 
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
@@ -309,15 +311,18 @@ void Game::Render(float interpolation)
         glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
 
         // Get the mesh
-        ModelDescription* mesh = mModelStore[gObj.model];
+        ModelDescription* mdl = mModelStore[gObj.model];
 
         // Draw the object
-        glBindVertexArray(mesh->vaoId);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->eboId);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-        glUseProgram(0);
+        for (const auto& mesh : mdl->meshes)
+        {
+            glBindVertexArray(mesh.vaoId);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
+            glUseProgram(0);
+        }
     }
 
     // Check for errors

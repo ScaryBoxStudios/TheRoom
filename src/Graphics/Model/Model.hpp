@@ -28,63 +28,15 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MODELSTORE_HPP_
-#define _MODELSTORE_HPP_
+#ifndef _MODEL_HPP_
+#define _MODEL_HPP_
 
-#include <string>
 #include <vector>
-#include <unordered_map>
-#include <glad/glad.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "Model.hpp"
+#include "Mesh.hpp"
 
-// MeshDescription
-struct MeshDescription
+struct Model
 {
-    GLuint vaoId;
-    GLuint vboId;
-    GLuint colBufId;
-    GLuint texBufId;
-    GLuint eboId;
-    GLuint normalBufId;
+    std::vector<Mesh> meshes;
 };
 
-// ModelDescription
-struct ModelDescription
-{
-    std::vector<MeshDescription> meshes;
-};
-
-// ModelStore
-class ModelStore
-{
-    public:
-        // Constructor
-        ModelStore();
-
-        // Destructor
-        ~ModelStore();
-
-        // Disable copy construction
-        ModelStore(const ModelStore& other) = delete;
-        ModelStore& operator=(const ModelStore& other) = delete;
-
-        // Enable move construction
-        ModelStore(ModelStore&& other) = default;
-        ModelStore& operator=(ModelStore&& other) = default;
-
-        // Loads given data into the GPU
-        void Load(const std::string& name, const Model& data);
-
-        // Retrieves pointer a loaded model object
-        ModelDescription* operator[](const std::string& name);
-
-        // Unloads the stored models in the store
-        void Clear();
-
-    private:
-        std::unordered_map<std::string, ModelDescription> mModels;
-};
-
-#endif // ! _MODELSTORE_HPP_
+#endif // ! _MODEL_HPP_

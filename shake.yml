@@ -1,6 +1,6 @@
 ProjectName: TheRoom
 ProjectType: Executable
-Defines:     []
+Defines:     ["_SCL_SECURE_NO_WARNINGS"]
 Libraries:   [ogg, vorbis, openal, png, glfw, glad, assimp, jpeg]
 OSLibraries:
   Windows: ["zlib", "winmm", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]

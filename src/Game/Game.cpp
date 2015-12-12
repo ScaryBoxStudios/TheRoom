@@ -126,7 +126,7 @@ void Game::Init()
     {
         Transform trans;
         trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
-        trans.Scale(glm::vec3(-0.3f));
+        trans.Scale(glm::vec3(0.3f));
         trans.RotateY(-10.0f);
         mWorld.push_back({trans, "cube", "light"});
         mLight = &mWorld.back();

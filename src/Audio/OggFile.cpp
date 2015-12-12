@@ -81,7 +81,7 @@ void OggFile::Load(std::vector<std::uint8_t> f)
     callbacks.tell_func = [](void* cbData) -> long
     {
         CbData* cbd = reinterpret_cast<CbData*>(cbData);
-        return (cbd->cur - cbd->begin);
+        return static_cast<long>(cbd->cur - cbd->begin);
     };
     callbacks.close_func = [](void*) -> int { return 0; };
 
@@ -91,10 +91,10 @@ void OggFile::Load(std::vector<std::uint8_t> f)
 
     // Gather audio info
     vorbis_info* vi = ov_info(&oggFile, -1);
-    mChannels = vi->channels;
+    mChannels = static_cast<std::uint16_t>(vi->channels);
     mSampleRate = vi->rate;
     mBitsPerSample = 16;
-    mDataSz = ov_pcm_total(&oggFile, -1) * mChannels * 2;
+    mDataSz = static_cast<std::uint32_t>(ov_pcm_total(&oggFile, -1) * mChannels * 2);
 
     // Pre-resize destination buffer
     std::vector<uint8_t> pcmData;

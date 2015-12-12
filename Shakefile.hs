@@ -167,7 +167,7 @@ msvcLinkCommand params input output =
     ldflgs = ldflags params
     libraryPaths = map ("/LIBPATH:" ++) (libPaths params)
     librs = map (++ ".lib") (libraries params)
-    
+
 -- | Generates Msvc archive commands
 msvcArchiveCommand :: ArchiveAction
 msvcArchiveCommand params input output =

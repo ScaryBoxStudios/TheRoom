@@ -5,6 +5,7 @@
 WARN_GUARD_ON
 #include "../Graphics/Image/Jpeg/JpegLoader.hpp"
 #include "../Graphics/Image/Png/Png.hpp"
+#include "../Graphics/Model/ModelLoader.hpp"
 #include <png++/png.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -87,6 +88,15 @@ void Game::Init()
     cube.meshes.push_back(std::move(cubeData));
     mModelStore.Load("cube", cube);
 
+    // Load the teapot
+    ModelLoader modelLoader;
+    // BufferType for the files loaded
+    using BufferType = std::vector<std::uint8_t>;
+    // Load shader files
+    auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
+    Model teapot = modelLoader.Load(*teapotFile);
+    mModelStore.Load("teapot", std::move(teapot));
+
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
         glm::vec3(0.0f, 0.0f, 0.0f),
@@ -120,6 +130,14 @@ void Game::Init()
         trans.RotateY(-10.0f);
         mWorld.push_back({trans, "cube", "light"});
         mLight = &mWorld.back();
+    }
+
+    // Add teapot
+    {
+        Transform trans;
+        trans.Move(glm::vec3(0.0f, 4.0f, -5.0f));
+        trans.Scale(glm::vec3(0.5f));
+        mWorld.push_back({trans, "teapot", "light"});
     }
 
     GLInit();
@@ -318,7 +336,7 @@ void Game::Render(float interpolation)
         {
             glBindVertexArray(mesh.vaoId);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
             glUseProgram(0);

@@ -41,6 +41,7 @@ void ModelStore::Load(const std::string& name, const Model& data)
         auto& texBufId = meshDesc.texBufId;
         auto& eboId = meshDesc.eboId;
         auto& normalBufId = meshDesc.normalBufId;
+        auto& numIndices = meshDesc.numIndices;
 
         glGenVertexArrays(1, &vaoId);
         glGenBuffers(1, &vboId);
@@ -114,6 +115,7 @@ void ModelStore::Load(const std::string& name, const Model& data)
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
         glBindVertexArray(0);
+        numIndices = static_cast<GLsizei>(mesh.indices.size());
 
         modelDesc.meshes.push_back(meshDesc);
     }

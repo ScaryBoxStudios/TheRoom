@@ -40,9 +40,12 @@ Game::Game()
 
 void Game::Init()
 {
+    // Setup window
     mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
     mWindow.SetShowFPS(true);
     mWindow.SetCloseHandler(mExitHandler);
+
+    // Setup input event handlers
     mWindow.SetMouseButtonPressHandler(
         [this](MouseButton mb, ButtonAction ba)
         {
@@ -62,21 +65,31 @@ void Game::Init()
             // Toggle polygon mode
             if(k == Key::P && ka == KeyAction::Release)
             {
-                if (mGLData.drawMode == GL_FILL)
-                    mGLData.drawMode = GL_POINT;
-                else if (mGLData.drawMode == GL_POINT)
-                    mGLData.drawMode = GL_LINE;
-                else if (mGLData.drawMode == GL_LINE)
-                    mGLData.drawMode = GL_FILL;
+                if (mDrawMode == GL_FILL)
+                    mDrawMode = GL_POINT;
+                else if (mDrawMode == GL_POINT)
+                    mDrawMode = GL_LINE;
+                else if (mDrawMode == GL_LINE)
+                    mDrawMode = GL_FILL;
             }
             if(k == Key::R && ka == KeyAction::Release)
-                mRenderData.rotating = !mRenderData.rotating;
+                mRotationData.rotating = !mRotationData.rotating;
         }
     );
 
-    mRenderData.degreesInc = 0.05f;
-    mRenderData.rotating = false;
+    // Set the clear color
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    // Enable the depth buffer
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    mDrawMode = GL_FILL;
+
+    // Cube rotation state
+    mRotationData.degreesInc = 0.05f;
+    mRotationData.rotating = false;
+
+    // Camera initial position
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
     // Model loader instance
@@ -136,20 +149,6 @@ void Game::Init()
         mWorld.push_back({trans, "teapot", "light"});
     }
 
-    GLInit();
-    mGLData.drawMode = GL_FILL;
-}
-
-void Game::GLInit()
-{
-    // Set the clear color
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Enable the depth buffer
-    glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_TEXTURE_2D);
-    glDepthFunc(GL_LESS);
-
     // Load shader files
     auto vertFile = FileLoad<BufferType>("res/cube_vert.glsl");
     auto fragFile = FileLoad<BufferType>("res/cube_frag.glsl");
@@ -172,18 +171,14 @@ void Game::GLInit()
     mShaderStore.LinkProgram("cube", vShId, fShId);
     mShaderStore.LinkProgram("light", vLightShId, fLightShId);
 
-    // Load the file contents into memory buffer
+    // Load the texture file contents into memory buffer
     std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
     // Parse them using the JpegLoader
     JpegLoader jL;
     RawImage<> pb = jL.Load(*imgData);
-
-    // Parse them using the PngLoader
-    //png::image<png::rgba_pixel, png::solid_pixel_buffer<png::rgba_pixel>> img("ext/tree.png");
-    //auto pb = img.get_pixbuf();
-
     // Store the texture in the store
     mTextureStore.Load("mahogany_wood", pb);
+
     CheckGLError();
 }
 
@@ -249,11 +244,11 @@ void Game::Update(float dt)
     CalcLightPos();
 
     // Update cubes' rotations
-    if (mRenderData.rotating)
+    if (mRotationData.rotating)
     {
         for (auto& gObj : mWorld)
             if (gObj.type == "cube")
-                gObj.transform.RotateY(mRenderData.degreesInc);
+                gObj.transform.RotateY(mRotationData.degreesInc);
     }
 }
 
@@ -263,7 +258,7 @@ void Game::Render(float interpolation)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Set the polygon mode
-    glPolygonMode(GL_FRONT_AND_BACK, mGLData.drawMode);
+    glPolygonMode(GL_FRONT_AND_BACK, mDrawMode);
 
     // Create the projection matrix
     glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);

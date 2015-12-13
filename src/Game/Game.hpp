@@ -53,15 +53,8 @@ class Game
         // The game window
         Window mWindow;
 
-        // Initializes the OpenGL data
-        void GLInit();
-
-        // The OpenGL data
-        struct GLData
-        {
-            GLenum drawMode;
-        };
-        GLData mGLData;
+        // The polygon rendering mode
+        GLenum mDrawMode;
 
         // Stores the models loaded in the gpu
         ModelStore mModelStore;
@@ -85,13 +78,13 @@ class Game
         void CalcLightPos();
         GameObject* mLight;
 
-        // The data needed for rendering
-        struct RenderData
+        // The data needed for rotating the cubes
+        struct RotationData
         {
             float degreesInc;
             bool rotating;
         };
-        RenderData mRenderData;
+        RotationData mRotationData;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

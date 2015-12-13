@@ -720,8 +720,8 @@ main = do
                 quietly $ cmd outCommand :: Action ()
 
                 -- Copy pdb on MSVC debug builds
-                pdb <- liftM head $ getDirectoryFiles buildDir ["*.pdb"]
-                when (toolchain == MSVC && variant == Debug) $
+                when (toolchain == MSVC && variant == Debug) $ do
+                    pdb <- liftM head $ getDirectoryFiles buildDir ["*.pdb"]
                     copyFile' (buildDir </> pdb) (takeDirectory mainTgt </> pdb)
 
             buildDir <//> "*.o" %> \out -> do

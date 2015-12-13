@@ -139,6 +139,14 @@ void Game::Init()
         trans.RotateZ(10.0f * i);
         normalObjects.push_back({trans, "cube"});
     }
+
+    // Add house
+    {
+        Transform trans;
+        trans.Move(glm::vec3(0.0f, -10.0f, -40.0f));
+        trans.Scale(glm::vec3(0.3f));
+        normalObjects.push_back({trans, "house"});
+    }
     mWorld.insert({"normal", normalObjects});
 
     //
@@ -151,14 +159,6 @@ void Game::Init()
         trans.Move(glm::vec3(0.0f, 4.0f, -5.0f));
         trans.Scale(glm::vec3(0.5f));
         lightObjects.push_back({trans, "teapot"});
-    }
-
-    // Add house
-    {
-        Transform trans;
-        trans.Move(glm::vec3(0.0f, -10.0f, -40.0f));
-        trans.Scale(glm::vec3(0.3f));
-        lightObjects.push_back({trans, "house"});
     }
 
     // Add cube lights

@@ -325,15 +325,23 @@ void Game::Render(float interpolation)
 
         if (type == "normal")
         {
-            // Setup lighting parameters
+            // Setup lighting position parameters
             const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
             const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-            GLint lightPosId = glGetUniformLocation(progId, "lightPos");
+            GLint lightPosId = glGetUniformLocation(progId, "light.position");
             glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
 
             const auto& viewPos = cameraPos;
             GLint viewPosId = glGetUniformLocation(progId, "viewPos");
             glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
+
+            // Set lights properties
+            glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);
+            glUniform3f(glGetUniformLocation(progId, "light.diffuse"),  0.5f, 0.5f, 0.5f);
+            glUniform3f(glGetUniformLocation(progId, "light.specular"), 1.0f, 1.0f, 1.0f);
+
+            // Set material properties
+            glUniform1f(glGetUniformLocation(progId, "material.shininess"), 32.0f);
         }
 
         // Upload projection and view matrices
@@ -361,8 +369,8 @@ void Game::Render(float interpolation)
                 // Bind the needed textures
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
-                GLuint samplerId = glGetUniformLocation(progId, "tex");
-                glUniform1i(samplerId, 0);
+                GLuint diffuseId = glGetUniformLocation(progId, "material.diffuse");
+                glUniform1i(diffuseId, 0);
             }
 
             // Draw all its meshes

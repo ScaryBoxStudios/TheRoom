@@ -10,7 +10,13 @@ Model ModelLoader::Load(std::vector<std::uint8_t> fileData)
     const aiScene* scene = importer.ReadFileFromMemory(
                                         fileData.data(),
                                         fileData.size(),
-                                        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals,
+                                        aiProcess_Triangulate |
+                                        aiProcess_FlipUVs |
+                                        aiProcess_GenNormals |
+                                        aiProcess_CalcTangentSpace |
+                                        aiProcess_SortByPType |
+                                        aiProcess_JoinIdenticalVertices |
+                                        aiProcess_ImproveCacheLocality,
                                         "obj");
 
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -71,7 +77,8 @@ Model ModelLoader::Load(std::vector<std::uint8_t> fileData)
         for (std::uint32_t i = 0; i < node->mNumChildren; ++i)
         {
             Model childModel = processNode(node->mChildren[i], scene);
-            model.meshes.insert(std::end(model.meshes), std::begin(childModel.meshes), std::end(childModel.meshes));
+            for (auto& mesh : childModel.meshes)
+                model.meshes.push_back(std::move(mesh));
         }
 
         return model;

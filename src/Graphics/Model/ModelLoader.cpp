@@ -58,6 +58,26 @@ Model ModelLoader::Load(std::vector<std::uint8_t> fileData, const char* type)
                 mData.indices.push_back(face.mIndices[j]);
         }
 
+        // Material
+        if (scene->HasMaterials())
+        {
+            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+            if (material)
+            {
+                auto texTypes = {aiTextureType_DIFFUSE, aiTextureType_SPECULAR, aiTextureType_NORMALS, aiTextureType_NONE};
+                for (auto type : texTypes)
+                {
+                    std::uint32_t texCount = material->GetTextureCount(type);
+                    for (std::uint32_t i = 0; i < texCount; ++i)
+                    {
+                        aiString str;
+                        material->GetTexture(type, i, &str);
+                        // TODO
+                    }
+                }
+            }
+        }
+
         return mData;
     };
 

@@ -102,7 +102,9 @@ void Game::Init()
     std::unordered_map<std::string, std::string> textures =
     {
         {"ext/mahogany_wood.jpg", "mahogany_wood"},
+        {"ext/mahogany_wood_spec.jpg", "mahogany_wood_spec"},
         {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
+        {"ext/WoodenCabin/WoodCabinSM.jpg", "house_spec"},
     };
 
     // Load the textures
@@ -123,6 +125,7 @@ void Game::Init()
     Model cube = modelLoader.Load(*cubeFile, "obj");
     mModelStore.Load("cube", std::move(cube));
     mModelStore["cube"]->diffTexId = mTextureStore["mahogany_wood"]->texId;
+    mModelStore["cube"]->specTexId = mTextureStore["mahogany_wood_spec"]->texId;
 
     // Load teapot
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
@@ -134,6 +137,7 @@ void Game::Init()
     Model house = modelLoader.Load(*houseFile, "dae");
     mModelStore.Load("house", std::move(house));
     mModelStore["house"]->diffTexId = mTextureStore["house_diff"]->texId;
+    mModelStore["house"]->specTexId = mTextureStore["house_spec"]->texId;
 
     //
     // Normal objects
@@ -371,6 +375,11 @@ void Game::Render(float interpolation)
                 glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
                 GLuint diffuseId = glGetUniformLocation(progId, "material.diffuse");
                 glUniform1i(diffuseId, 0);
+
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, mdl->specTexId);
+                GLuint specId = glGetUniformLocation(progId, "material.specular");
+                glUniform1i(specId, 1);
             }
 
             // Draw all its meshes

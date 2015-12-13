@@ -30,7 +30,7 @@ void ModelStore::Clear()
 
 void ModelStore::Load(const std::string& name, const Model& data)
 {
-    ModelDescription modelDesc;
+    ModelDescription modelDesc = {};
 
     for (const auto& mesh : data.meshes)
     {

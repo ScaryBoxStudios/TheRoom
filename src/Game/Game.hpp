@@ -70,9 +70,8 @@ class Game
         {
             Transform transform;
             std::string model;
-            std::string type;
         };
-        std::vector<GameObject> mWorld;
+        std::unordered_map<std::string, std::vector<GameObject>> mWorld;
 
         // Store light separately
         void CalcLightPos();

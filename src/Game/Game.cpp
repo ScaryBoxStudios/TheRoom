@@ -110,6 +110,10 @@ void Game::Init()
     Model house = modelLoader.Load(*houseFile, "dae");
     mModelStore.Load("house", std::move(house));
 
+    //
+    // Normal objects
+    //
+    std::vector<GameObject> normalObjects;
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
         glm::vec3(0.0f, 0.0f, 0.0f),
@@ -123,7 +127,6 @@ void Game::Init()
         glm::vec3(3.0f, 0.4f, -12.0f),
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
-
     for (std::size_t i = 0; i < cubePositions.size(); ++i)
     {
         const auto& pos = cubePositions[i];
@@ -134,24 +137,20 @@ void Game::Init()
         trans.RotateX(20.0f * i);
         trans.RotateY(7.0f * i);
         trans.RotateZ(10.0f * i);
-        mWorld.push_back({trans, "cube", "cube"});
+        normalObjects.push_back({trans, "cube"});
     }
+    mWorld.insert({"normal", normalObjects});
 
-    // Add cube lights
-    {
-        Transform trans;
-        trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
-        trans.RotateY(-10.0f);
-        mWorld.push_back({trans, "cube", "light"});
-        mLight = &mWorld.back();
-    }
-
+    //
+    // Light objects
+    //
+    std::vector<GameObject> lightObjects;
     // Add teapot
     {
         Transform trans;
         trans.Move(glm::vec3(0.0f, 4.0f, -5.0f));
         trans.Scale(glm::vec3(0.5f));
-        mWorld.push_back({trans, "teapot", "light"});
+        lightObjects.push_back({trans, "teapot"});
     }
 
     // Add house
@@ -159,12 +158,22 @@ void Game::Init()
         Transform trans;
         trans.Move(glm::vec3(0.0f, -10.0f, -40.0f));
         trans.Scale(glm::vec3(0.3f));
-        mWorld.push_back({trans, "house", "light"});
+        lightObjects.push_back({trans, "house"});
     }
 
+    // Add cube lights
+    {
+        Transform trans;
+        trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
+        trans.RotateY(-10.0f);
+        lightObjects.push_back({trans, "cube"});
+    }
+    mWorld.insert({"light", lightObjects});
+    mLight = &mWorld["light"].back();
+
     // Load shader files
-    auto vertFile = FileLoad<BufferType>("res/cube_vert.glsl");
-    auto fragFile = FileLoad<BufferType>("res/cube_frag.glsl");
+    auto vertFile = FileLoad<BufferType>("res/normal_vert.glsl");
+    auto fragFile = FileLoad<BufferType>("res/normal_frag.glsl");
     auto lightVertFile = FileLoad<BufferType>("res/light_vert.glsl");
     auto lightFragFile = FileLoad<BufferType>("res/light_frag.glsl");
 
@@ -181,7 +190,7 @@ void Game::Init()
     GLuint fLightShId = mShaderStore.LoadShader(fLightShSrc, ShaderStore::ShaderType::Fragment);
 
     // Link them into a shader program
-    mShaderStore.LinkProgram("cube", vShId, fShId);
+    mShaderStore.LinkProgram("normal", vShId, fShId);
     mShaderStore.LinkProgram("light", vLightShId, fLightShId);
 
     // Load the texture file contents into memory buffer
@@ -250,8 +259,9 @@ void Game::Update(float dt)
     mCamera.Move(CameraMoveDirections());
 
     // Update interpolation variables
-    for (auto& gObj : mWorld)
-        gObj.transform.Update();
+    for (auto& p : mWorld)
+        for (auto& gObj : p.second)
+            gObj.transform.Update();
 
     // Update light position
     CalcLightPos();
@@ -259,9 +269,10 @@ void Game::Update(float dt)
     // Update cubes' rotations
     if (mRotationData.rotating)
     {
-        for (auto& gObj : mWorld)
-            if (gObj.type == "cube")
-                gObj.transform.RotateY(mRotationData.degreesInc);
+        for (auto& p : mWorld)
+            if (p.first == "normal")
+                for (auto& gObj : p.second)
+                    gObj.transform.RotateY(mRotationData.degreesInc);
     }
 }
 
@@ -286,31 +297,25 @@ void Game::Render(float interpolation)
     // Create the view matrix
     glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
-    for (std::size_t i = 0; i < mWorld.size(); ++i)
+    for (const auto& objCategory : mWorld)
     {
-        // Convinience reference
-        const auto& gObj = mWorld[i];
+        // The object material category iterating through
+        const auto& type = objCategory.first;
 
         // Use the appropriate program
-        GLuint progId = mShaderStore[gObj.type];
+        GLuint progId = mShaderStore[type];
         glUseProgram(progId);
 
-        // Calculate the model matrix
-        glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
-
-        if (gObj.type == "cube")
+        if (type == "normal")
         {
-            // Bind the texture
+            // Bind the needed textures
             TextureDescription* tex = mTextureStore["mahogany_wood"];
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, tex->texId);
             GLuint samplerId = glGetUniformLocation(progId, "tex");
             glUniform1i(samplerId, 0);
-        }
 
-        // Upload the light position for the cubes' diffuse lighting
-        if (gObj.type == "cube")
-        {
+            // Setup lighting parameters
             const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
             const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
             GLint lightPosId = glGetUniformLocation(progId, "lightPos");
@@ -321,26 +326,37 @@ void Game::Render(float interpolation)
             glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
         }
 
-        // Upload projection, view and model matrices as uniforms
+        // Upload projection and view matrices
         auto projectionId = glGetUniformLocation(progId, "projection");
         glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
         auto viewId = glGetUniformLocation(progId, "view");
         glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
-        auto modelId = glGetUniformLocation(progId, "model");
-        glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
 
-        // Get the mesh
-        ModelDescription* mdl = mModelStore[gObj.model];
-
-        // Draw the object
-        for (const auto& mesh : mdl->meshes)
+        // The actual object list
+        const auto& list = objCategory.second;
+        for (const auto& gObj : list)
         {
-            glBindVertexArray(mesh.vaoId);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
-            glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
+            // Calculate the model matrix
+            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
+
+            // Upload it
+            auto modelId = glGetUniformLocation(progId, "model");
+            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
+
+            // Get the model
+            ModelDescription* mdl = mModelStore[gObj.model];
+
+            // Draw all its meshes
+            for (const auto& mesh : mdl->meshes)
+            {
+                glBindVertexArray(mesh.vaoId);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
+                glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+            }
         }
+
         glUseProgram(0);
     }
 

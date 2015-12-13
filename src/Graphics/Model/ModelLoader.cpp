@@ -4,7 +4,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-Model ModelLoader::Load(std::vector<std::uint8_t> fileData)
+Model ModelLoader::Load(std::vector<std::uint8_t> fileData, const char* type)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFileFromMemory(
@@ -17,7 +17,7 @@ Model ModelLoader::Load(std::vector<std::uint8_t> fileData)
                                         aiProcess_SortByPType |
                                         aiProcess_JoinIdenticalVertices |
                                         aiProcess_ImproveCacheLocality,
-                                        "obj");
+                                        type);
 
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         return Model();

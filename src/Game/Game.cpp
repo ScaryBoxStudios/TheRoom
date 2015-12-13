@@ -97,13 +97,18 @@ void Game::Init()
 
     // Load the cube
     auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
-    Model cube = modelLoader.Load(*cubeFile);
+    Model cube = modelLoader.Load(*cubeFile, "obj");
     mModelStore.Load("cube", std::move(cube));
 
     // Load teapot
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
-    Model teapot = modelLoader.Load(*teapotFile);
+    Model teapot = modelLoader.Load(*teapotFile, "obj");
     mModelStore.Load("teapot", std::move(teapot));
+
+    // Load house
+    auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");
+    Model house = modelLoader.Load(*houseFile, "dae");
+    mModelStore.Load("house", std::move(house));
 
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
@@ -147,6 +152,14 @@ void Game::Init()
         trans.Move(glm::vec3(0.0f, 4.0f, -5.0f));
         trans.Scale(glm::vec3(0.5f));
         mWorld.push_back({trans, "teapot", "light"});
+    }
+
+    // Add house
+    {
+        Transform trans;
+        trans.Move(glm::vec3(0.0f, -10.0f, -40.0f));
+        trans.Scale(glm::vec3(0.3f));
+        mWorld.push_back({trans, "house", "light"});
     }
 
     // Load shader files

@@ -85,7 +85,7 @@ void Game::Init()
     // Load the cube
     auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
     Model cube = modelLoader.Load(*cubeFile);
-    mModelStore.Load("cube", cube);
+    mModelStore.Load("cube", std::move(cube));
 
     // Load teapot
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");

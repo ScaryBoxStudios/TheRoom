@@ -55,6 +55,7 @@ struct MeshDescription
 struct ModelDescription
 {
     std::vector<MeshDescription> meshes;
+    GLuint diffTexId;
 };
 
 // ModelStore

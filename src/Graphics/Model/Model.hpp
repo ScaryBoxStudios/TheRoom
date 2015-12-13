@@ -31,6 +31,7 @@
 #ifndef _MODEL_HPP_
 #define _MODEL_HPP_
 
+#include <string>
 #include <vector>
 #include "Mesh.hpp"
 

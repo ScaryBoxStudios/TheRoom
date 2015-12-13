@@ -92,13 +92,37 @@ void Game::Init()
     // Camera initial position
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
+    //
+    // Textures
+    //
+    // The JpegLoader object
+    JpegLoader jL;
+
+    // The texture map
+    std::unordered_map<std::string, std::string> textures =
+    {
+        {"ext/mahogany_wood.jpg", "mahogany_wood"},
+        {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
+    };
+
+    // Load the textures
+    for (const auto& p : textures)
+    {
+        auto textureFile = FileLoad<BufferType>(p.first);
+        RawImage<> pb = jL.Load(*textureFile);
+        mTextureStore.Load(p.second, pb);
+    }
+
+    //
+    // Models
+    //
     // Model loader instance
     ModelLoader modelLoader;
-
     // Load the cube
     auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
     Model cube = modelLoader.Load(*cubeFile, "obj");
     mModelStore.Load("cube", std::move(cube));
+    mModelStore["cube"]->diffTexId = mTextureStore["mahogany_wood"]->texId;
 
     // Load teapot
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
@@ -109,6 +133,7 @@ void Game::Init()
     auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");
     Model house = modelLoader.Load(*houseFile, "dae");
     mModelStore.Load("house", std::move(house));
+    mModelStore["house"]->diffTexId = mTextureStore["house_diff"]->texId;
 
     //
     // Normal objects
@@ -192,14 +217,6 @@ void Game::Init()
     // Link them into a shader program
     mShaderStore.LinkProgram("normal", vShId, fShId);
     mShaderStore.LinkProgram("light", vLightShId, fLightShId);
-
-    // Load the texture file contents into memory buffer
-    std::unique_ptr<BufferType> imgData = FileLoad<BufferType>("ext/mahogany_wood.jpg");
-    // Parse them using the JpegLoader
-    JpegLoader jL;
-    RawImage<> pb = jL.Load(*imgData);
-    // Store the texture in the store
-    mTextureStore.Load("mahogany_wood", pb);
 
     CheckGLError();
 }
@@ -308,13 +325,6 @@ void Game::Render(float interpolation)
 
         if (type == "normal")
         {
-            // Bind the needed textures
-            TextureDescription* tex = mTextureStore["mahogany_wood"];
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, tex->texId);
-            GLuint samplerId = glGetUniformLocation(progId, "tex");
-            glUniform1i(samplerId, 0);
-
             // Setup lighting parameters
             const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
             const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
@@ -345,6 +355,15 @@ void Game::Render(float interpolation)
 
             // Get the model
             ModelDescription* mdl = mModelStore[gObj.model];
+
+            if (type == "normal")
+            {
+                // Bind the needed textures
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
+                GLuint samplerId = glGetUniformLocation(progId, "tex");
+                glUniform1i(samplerId, 0);
+            }
 
             // Draw all its meshes
             for (const auto& mesh : mdl->meshes)

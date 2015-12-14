@@ -343,6 +343,9 @@ void Game::Render(float interpolation)
             glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);
             glUniform3f(glGetUniformLocation(progId, "light.diffuse"),  0.5f, 0.5f, 0.5f);
             glUniform3f(glGetUniformLocation(progId, "light.specular"), 1.0f, 1.0f, 1.0f);
+            glUniform1f(glGetUniformLocation(progId, "light.constant"), 1.0f);
+            glUniform1f(glGetUniformLocation(progId, "light.linear"), 0.09f);
+            glUniform1f(glGetUniformLocation(progId, "light.quadratic"), 0.032f);
 
             // Set material properties
             glUniform1f(glGetUniformLocation(progId, "material.shininess"), 32.0f);

@@ -706,7 +706,7 @@ main = do
 
                 -- Pretty print info about the command to be executed
                 liftIO $ setSGR [SetColor Foreground Dull Green]
-                putNormal "[\240] Linking "
+                putNormal "[+] Linking "
                 liftIO $ setSGR [SetColor Foreground Dull Yellow]
                 putNormal $ out ++ "\n"
                 liftIO $ setSGR [Reset]
@@ -752,7 +752,7 @@ main = do
 
                 liftIO $ takeMVar stdoutMvar
                 liftIO $ setSGR [SetColor Foreground Vivid Green]
-                putNormal "[\175] Compiling "
+                putNormal "[>] Compiling "
                 liftIO $ setSGR [SetColor Foreground Vivid Yellow]
                 putNormal $ c ++ "\n"
                 liftIO $ setSGR [Reset]

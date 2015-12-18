@@ -18,6 +18,7 @@ import System.Directory
 import Text.Read
 import qualified Data.Map as M
 import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.UTF8 as B8
 import qualified System.Info as System
 
 --
@@ -389,7 +390,7 @@ gatherHeaderDeps searchDirs src = do
           Just f  -> if f `elem` chkdFiles
                         then return []
                         else do
-                               contents <- readFile f
+                               contents <- B8.toString <$> BS.readFile f
                                let incls = listIncludes contents
                                moreIncs <- mapM (gatherInternal sDirs (f : chkdFiles)) incls
                                return (f : concat moreIncs)

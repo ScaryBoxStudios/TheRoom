@@ -230,7 +230,7 @@ gccDefaultCompilerFlags variant language =
          Release -> ["-O2"]
          Debug   -> ["-g", "-O0"]) ++
     case language of
-        Cpp -> ["-std=c++11"]
+        Cpp -> ["-std=c++14"]
         _   -> []
 
 gccDefaultLinkerFlags :: OS -> LinkResult -> BuildVariant -> [String]

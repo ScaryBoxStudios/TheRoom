@@ -35,8 +35,8 @@
 #include <string>
 #include <vector>
 #include <thread>
-#include <AL/Al.h>
-#include <AL/Alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 class PhonoGraph
 {

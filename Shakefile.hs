@@ -399,7 +399,7 @@ gatherHeaderDeps searchDirs src = do
 -- | Build Parameters
 ---------------------------------------------------------------------------
 -- The datatype that holds any flag information
-data AdditionalFlag = BVFlag BuildVariant | AFlag Arch | TVFlag ToolChainVariant deriving Eq
+data AdditionalFlag = BVFlag BuildVariant | TVFlag ToolChainVariant | Mute deriving Eq
 
 -- Used by ReqArg to parse Build Variant Flag
 parseBuildVariantFlag :: String -> Either String AdditionalFlag
@@ -415,10 +415,15 @@ parseTVFlag s =
         Nothing -> Left "Could not parse given toolchain variant."
         Just x  -> Right (TVFlag x)
 
+-- Used by NoArg to parse Mute Flag
+parseMuteFlag :: Either String AdditionalFlag
+parseMuteFlag = Right Mute
+
 additionalFlags :: [OptDescr (Either String AdditionalFlag)]
 additionalFlags =
     [ Option [] ["variant"]   (ReqArg parseBuildVariantFlag "VARIANT") "The build variant to make (Release/Debug)"
     , Option [] ["toolchain"] (ReqArg parseTVFlag "TOOLCHAIN")         "The toolchain to use for building the target"
+    , Option [] ["mute"]      (NoArg parseMuteFlag)                    "Suppress console output streams in build commands"
     ]
 
 ---------------------------------------------------------------------------
@@ -629,9 +634,12 @@ main = do
           -- Extract the parameters from the flag arguments or set defaults if not given
           let givenVariant = listToMaybe [v | BVFlag v <- flags]
           let givenToolchain = listToMaybe [v | TVFlag v <- flags]
+          let givenMute = listToMaybe [True | Mute <- flags]
 
           let variant = fromMaybe defVariant givenVariant
           let toolchain = fromMaybe defToolchain givenToolchain
+          let outputEnabled = null givenMute
+
 
           -- Gather the target architecture from the used compiler
           foundArch <- gatherArchFromToolchain toolchain
@@ -761,7 +769,7 @@ main = do
                 liftIO $ putMVar stdoutMvar ()
 
                 -- Execute the command
-                () <- quietly $ cmd (EchoStdout True) (EchoStderr True) compileCmd
+                () <- quietly $ cmd (EchoStdout outputEnabled) (EchoStderr outputEnabled) compileCmd
 
                 -- Set up the dependencies upon the header files
                 let fileName = dropExtension (takeFileName out)

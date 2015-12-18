@@ -49,8 +49,9 @@ Sources:
     - "src/Alc/backends/base.c"
     - "src/Alc/backends/loopback.c"
     - "src/Alc/backends/null.c"
+    - "src/Alc/backends/wave.c"
 OSSources:
-  Windows: ["src/Alc/backends/winmm.c", "src/Alc/backends/wave.c", "src/Alc/backends/mmdevapi.c"]
+  Windows: ["src/Alc/backends/winmm.c", "src/Alc/backends/mmdevapi.c"]
   Linux: ["src/Alc/backends/alsa.c"]
 Defines: ["AL_ALEXT_PROTOTYPES", "AL_BUILD_LIBRARY", "AL_LIBTYPE_STATIC"]
 AdditionalIncludes: ["src/OpenAL32/Include", "src/Alc"]

@@ -23,8 +23,10 @@
 /* Define any available alignment declaration */
 #ifdef _MSC_VER
 #define ALIGN(x) __declspec(align(x))
-#else
+#elif __MINGW32__
 #define ALIGN(x) __declspec(aligned(x))
+#else
+#define ALIGN(x) __attribute__ ((aligned (x)))
 #endif
 
 /* Define if we have the C11 aligned_alloc function */
@@ -34,7 +36,9 @@
 /* #undef HAVE_POSIX_MEMALIGN */
 
 /* Define if we have the _aligned_malloc function */
+#ifdef _WIN32
 #define HAVE__ALIGNED_MALLOC
+#endif
 
 /* Define if we have SSE CPU extensions */
 /*
@@ -64,13 +68,17 @@
 /* #undef HAVE_QSA */
 
 /* Define if we have the MMDevApi backend */
+#ifdef _WIN32
 #define HAVE_MMDEVAPI
+#endif
 
 /* Define if we have the DSound backend */
 /* #undef HAVE_DSOUND */
 
 /* Define if we have the Windows Multimedia backend */
+#ifdef _WIN32
 #define HAVE_WINMM
+#endif
 
 /* Define if we have the PortAudio backend */
 /* #undef HAVE_PORTAUDIO */
@@ -138,7 +146,9 @@
 /* #undef HAVE_STDALIGN_H */
 
 /* Define if we have windows.h */
+#ifdef _WIN32
 #define HAVE_WINDOWS_H
+#endif
 
 /* Define if we have dlfcn.h */
 /* #undef HAVE_DLFCN_H */
@@ -165,13 +175,17 @@
 /* #undef HAVE_CPUID_H */
 
 /* Define if we have intrin.h */
+#ifdef _WIN32
 #define HAVE_INTRIN_H
+#endif
 
 /* Define if we have sys/sysconf.h */
 /* #undef HAVE_SYS_SYSCONF_H */
 
 /* Define if we have guiddef.h */
+#ifdef _WIN32
 #define HAVE_GUIDDEF_H
+#endif
 
 /* Define if we have initguid.h */
 /* #undef HAVE_INITGUID_H */

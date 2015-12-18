@@ -24,5 +24,13 @@ OSSources:
     - "src/posix_time.c"
     - "src/posix_tls.c"
     - "src/glx_context.c"
-Defines: ["_GLFW_WIN32", "_GLFW_WGL", "_GLFW_USE_OPENGL"]
+Defines: ["_GLFW_USE_OPENGL"]
+OSDefines:
+    Windows:
+      - "_GLFW_WIN32"
+      - "_GLFW_WGL"
+    Linux:
+      - "_GLFW_X11"
+      - "_GLFW_GLX"
+      - "_GLFW_HAS_GLXGETPROCADDRESS"
 AdditionalIncludes: ["../GL/include", "../EGL/include"]

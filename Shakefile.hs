@@ -535,6 +535,7 @@ data Config = Config
   , commonSources :: [String]
   , osSources :: OSMap
   , userDefines :: [String]
+  , userOSDefines :: OSMap
   , addIncludes :: [String]
   , commonLibs :: [String]
   , osLibs :: OSMap
@@ -577,6 +578,7 @@ instance FromJSON Config where
         m .:? "Sources" .!= [] <*>
         m .:? "OSSources" .!= OSMap mempty <*>
         m .:? "Defines" .!= [] <*>
+        m .:? "OSDefines" .!= OSMap mempty <*>
         m .:? "AdditionalIncludes" .!= [] <*>
         m .:? "Libraries" .!= [] <*>
         m .:? "OSLibraries" .!= OSMap mempty
@@ -623,7 +625,7 @@ main = do
         -- Link libraries
         let libs = commonLibs cfg ++ fromMaybe [] (M.lookup hostOs (getOsMap (osLibs cfg)))
         -- Defines
-        let defines = userDefines cfg
+        let defines = userDefines cfg ++ fromMaybe [] (M.lookup hostOs (getOsMap (userOSDefines cfg)))
 
         -- The mutex for the status messages
         stdoutMvar <- newMVar ()

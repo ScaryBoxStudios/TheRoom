@@ -1,40 +1,21 @@
 #include "Game.hpp"
-#include <sstream>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include "../Window/GlfwError.hpp"
+#include "../Util/WarnGuard.hpp"
 WARN_GUARD_ON
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "../Graphics/Image/Jpeg/JpegLoader.hpp"
 #include "../Graphics/Image/Png/Png.hpp"
 #include "../Graphics/Model/ModelLoader.hpp"
-#include <png++/png.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
-
-// BufferType for the files loaded
-using BufferType = std::vector<std::uint8_t>;
-
-///==============================================================
-///= GL Helpers
-///==============================================================
-static void CheckGLError()
-{
-    GLenum errVal = glGetError();
-    if (errVal != GL_NO_ERROR)
-    {
-        std::stringstream ss;
-        ss << "OpenGL Error! Code: " << errVal;
-        const char* desc = reinterpret_cast<const char*>(gluErrorString(errVal));
-        (void) desc;
-        throw std::runtime_error(std::string("OpenGL error: \n") + desc);
-    }
-}
 
 ///==============================================================
 ///= Game
 ///==============================================================
+// BufferType for the files loaded
+using BufferType = std::vector<std::uint8_t>;
+
 Game::Game()
 {
 }
@@ -81,12 +62,16 @@ void Game::Init()
         }
     );
 
-    // Set the clear color
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // Initialize the renderer
+    renderer.Init();
+    // Retrieve the shaderStore, textureStore, modelStore from the renderer
+    auto& modelStore = renderer.GetModelStore();
+    auto& shaderStore = renderer.GetShaderStore();
+    auto& textureStore = renderer.GetTextureStore();
+    // Retrieve the world from the renderer
+    auto& world = renderer.GetWorld();
 
-    // Enable the depth buffer
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    // Set the initial draw mode
     mDrawMode = GL_FILL;
 
     // Cube rotation state
@@ -118,7 +103,7 @@ void Game::Init()
         if (!textureFile)
             throw std::runtime_error("Could not find file: \n" + p.first);
         RawImage<> pb = jL.Load(*textureFile);
-        mTextureStore.Load(p.second, pb);
+        textureStore.Load(p.second, pb);
     }
 
     //
@@ -126,29 +111,30 @@ void Game::Init()
     //
     // Model loader instance
     ModelLoader modelLoader;
+    // TODO: Add error handling
     // Load the cube
     auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
     Model cube = modelLoader.Load(*cubeFile, "obj");
-    mModelStore.Load("cube", std::move(cube));
-    mModelStore["cube"]->diffTexId = mTextureStore["mahogany_wood"]->texId;
-    mModelStore["cube"]->specTexId = mTextureStore["mahogany_wood_spec"]->texId;
+    modelStore.Load("cube", std::move(cube));
+    modelStore["cube"]->diffTexId = textureStore["mahogany_wood"]->texId;
+    modelStore["cube"]->specTexId = textureStore["mahogany_wood_spec"]->texId;
 
     // Load teapot
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
     Model teapot = modelLoader.Load(*teapotFile, "obj");
-    mModelStore.Load("teapot", std::move(teapot));
+    modelStore.Load("teapot", std::move(teapot));
 
     // Load house
     auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");
     Model house = modelLoader.Load(*houseFile, "dae");
-    mModelStore.Load("house", std::move(house));
-    mModelStore["house"]->diffTexId = mTextureStore["house_diff"]->texId;
-    mModelStore["house"]->specTexId = mTextureStore["house_spec"]->texId;
+    modelStore.Load("house", std::move(house));
+    modelStore["house"]->diffTexId = textureStore["house_diff"]->texId;
+    modelStore["house"]->specTexId = textureStore["house_spec"]->texId;
 
     //
     // Normal objects
     //
-    std::vector<GameObject> normalObjects;
+    std::vector<Renderer::WorldObject> normalObjects;
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
         glm::vec3(0.0f, 0.0f, 0.0f),
@@ -182,12 +168,12 @@ void Game::Init()
         trans.Scale(glm::vec3(0.3f));
         normalObjects.push_back({trans, "house"});
     }
-    mWorld.insert({"normal", normalObjects});
+    world.insert({"normal", normalObjects});
 
     //
     // Light objects
     //
-    std::vector<GameObject> lightObjects;
+    std::vector<Renderer::WorldObject> lightObjects;
     // Add teapot
     {
         Transform trans;
@@ -203,8 +189,8 @@ void Game::Init()
         trans.RotateY(-10.0f);
         lightObjects.push_back({trans, "cube"});
     }
-    mWorld.insert({"light", lightObjects});
-    mLight = &mWorld["light"].back();
+    world.insert({"light", lightObjects});
+    renderer.mLight = &world["light"].back();
 
     // The shader map
     std::unordered_map<std::string, std::vector<std::pair<ShaderStore::ShaderType,std::string>>> shaders =
@@ -238,21 +224,20 @@ void Game::Init()
                 throw std::runtime_error("Could not find shader file: \n" + f.second);
             // Convert it to std::string containter
             std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
-            GLuint sId = mShaderStore.LoadShader(shaderSrc, f.first);
+            GLuint sId = shaderStore.LoadShader(shaderSrc, f.first);
             if (sId == 0)
-                throw std::runtime_error("Shader compilation error: \n" + mShaderStore.GetLastCompileError());
+                throw std::runtime_error("Shader compilation error: \n" + shaderStore.GetLastCompileError());
             // Insert loaded shader id to temp map
             shaderIds.insert({f.first, sId});
         }
         // Fetch vert and frag shader id's from temp map and link
-        bool s = mShaderStore.LinkProgram(p.first,
+        bool s = shaderStore.LinkProgram(p.first,
             shaderIds[ShaderStore::ShaderType::Vertex],
             shaderIds[ShaderStore::ShaderType::Fragment]);
         if (!s)
-            throw std::runtime_error("OpenGL program link error: \n" + mShaderStore.GetLastLinkError());
+            throw std::runtime_error("OpenGL program link error: \n" + shaderStore.GetLastLinkError());
     }
 
-    CheckGLError();
 }
 
 std::vector<Camera::MoveDirection> Game::CameraMoveDirections()
@@ -278,9 +263,9 @@ std::tuple<float, float> Game::CameraLookOffset()
     );
 }
 
-void Game::CalcLightPos()
+void Game::CalcLightPos(Transform& t)
 {
-    auto& trans = mLight->transform;
+    auto& trans = t;
     float increase = 0.3f;
     if(mWindow.IsKeyPressed(Key::Kp8))
         trans.Move(glm::vec3(0.0f, increase, 0.0f));
@@ -303,24 +288,23 @@ void Game::Update(float dt)
     // Poll window events
     mWindow.Update();
 
+    // Update the interpolation state of the world
+    renderer.Update(dt);
+
     // Update camera euler angles
     if (mWindow.MouseGrabEnabled())
         mCamera.Look(CameraLookOffset());
 
+    // Update camera position
     mCamera.Move(CameraMoveDirections());
 
-    // Update interpolation variables
-    for (auto& p : mWorld)
-        for (auto& gObj : p.second)
-            gObj.transform.Update();
-
     // Update light position
-    CalcLightPos();
+    CalcLightPos(renderer.mLight->transform);
 
     // Update cubes' rotations
     if (mRotationData.rotating)
     {
-        for (auto& p : mWorld)
+        for (auto& p : renderer.GetWorld())
             if (p.first == "normal")
                 for (auto& gObj : p.second)
                     gObj.transform.RotateY(mRotationData.degreesInc);
@@ -329,108 +313,19 @@ void Game::Update(float dt)
 
 void Game::Render(float interpolation)
 {
-    // Clear color
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Set the polygon mode
     glPolygonMode(GL_FRONT_AND_BACK, mDrawMode);
-
-    // Create the projection matrix
-    glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 
     // View calculation with camera
     auto lookOffset = mWindow.MouseGrabEnabled() ? CameraLookOffset() : std::make_tuple(0.0f, 0.0f);
     auto iCamState = mCamera.Interpolate(CameraMoveDirections(), lookOffset, interpolation);
-    glm::vec3& cameraPos = iCamState.position;
-    glm::vec3& cameraFront = iCamState.front;
-    glm::vec3& cameraUp = iCamState.up;
 
-    // Create the view matrix
-    glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    // Create the view matrix and pass it to the renderer
+    glm::mat4 view = glm::lookAt(iCamState.position, iCamState.position + iCamState.front, iCamState.up);
+    renderer.SetView(view);
 
-    for (const auto& objCategory : mWorld)
-    {
-        // The object material category iterating through
-        const auto& type = objCategory.first;
-
-        // Use the appropriate program
-        GLuint progId = mShaderStore[type];
-        glUseProgram(progId);
-
-        if (type == "normal")
-        {
-            // Setup lighting position parameters
-            const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
-            const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-            GLint lightPosId = glGetUniformLocation(progId, "light.position");
-            glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
-
-            const auto& viewPos = cameraPos;
-            GLint viewPosId = glGetUniformLocation(progId, "viewPos");
-            glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
-
-            // Set lights properties
-            glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);
-            glUniform3f(glGetUniformLocation(progId, "light.diffuse"),  0.5f, 0.5f, 0.5f);
-            glUniform3f(glGetUniformLocation(progId, "light.specular"), 1.0f, 1.0f, 1.0f);
-            glUniform1f(glGetUniformLocation(progId, "light.constant"), 1.0f);
-            glUniform1f(glGetUniformLocation(progId, "light.linear"), 0.09f);
-            glUniform1f(glGetUniformLocation(progId, "light.quadratic"), 0.032f);
-
-            // Set material properties
-            glUniform1f(glGetUniformLocation(progId, "material.shininess"), 32.0f);
-        }
-
-        // Upload projection and view matrices
-        auto projectionId = glGetUniformLocation(progId, "projection");
-        glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
-        auto viewId = glGetUniformLocation(progId, "view");
-        glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
-
-        // The actual object list
-        const auto& list = objCategory.second;
-        for (const auto& gObj : list)
-        {
-            // Calculate the model matrix
-            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
-
-            // Upload it
-            auto modelId = glGetUniformLocation(progId, "model");
-            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
-
-            // Get the model
-            ModelDescription* mdl = mModelStore[gObj.model];
-
-            if (type == "normal")
-            {
-                // Bind the needed textures
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
-                GLuint diffuseId = glGetUniformLocation(progId, "material.diffuse");
-                glUniform1i(diffuseId, 0);
-
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, mdl->specTexId);
-                GLuint specId = glGetUniformLocation(progId, "material.specular");
-                glUniform1i(specId, 1);
-            }
-
-            // Draw all its meshes
-            for (const auto& mesh : mdl->meshes)
-            {
-                glBindVertexArray(mesh.vaoId);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
-                glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                glBindVertexArray(0);
-            }
-        }
-
-        glUseProgram(0);
-    }
-
-    // Check for errors
-    CheckGLError();
+    // Render
+    renderer.Render(interpolation);
 
     // Show it
     mWindow.SwapBuffers();
@@ -438,10 +333,8 @@ void Game::Render(float interpolation)
 
 void Game::Shutdown()
 {
-    // Explicitly deallocate GPU data
-    mTextureStore.Clear();
-    mModelStore.Clear();
-    mShaderStore.Clear();
+    // Renderer
+    renderer.Shutdown();
 
     // Window
     mWindow.Destroy();

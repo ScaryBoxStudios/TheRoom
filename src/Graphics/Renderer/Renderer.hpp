@@ -28,69 +28,74 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _RENDERER_HPP_
+#define _RENDERER_HPP_
 
-#include <functional>
-#include <vector>
-#include "../Window/Window.hpp"
-#include "../Graphics/Util/Camera.hpp"
-#include "../Graphics/Renderer/Renderer.hpp"
+#include "../Model/ModelStore.hpp"
+#include "../Shader/ShaderStore.hpp"
+#include "../Texture/TextureStore.hpp"
+#include "../Scene/Transform.hpp"
+#include "../../Util/WarnGuard.hpp"
 
-class Game
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+WARN_GUARD_OFF
+
+class Renderer
 {
     public:
-        /*! Constructor */
-        Game();
-
-        /*! Initializes all the low level modules of the game */
+        /*! Initializes the renderer */
         void Init();
 
-        /*! Called by the mainloop to update the game state */
+        /*! Called when updating the game state */
         void Update(float dt);
 
-        /*! Called by the mainloop to render the current frame */
+        /*! Called when rendering the current frame */
         void Render(float interpolation);
 
-        /*! Deinitializes all the low level modules of the game */
+        /*! Deinitializes the renderer */
         void Shutdown();
 
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
+        /*! Sets the view matrix */
+        void SetView(const glm::mat4& view);
+
+        /*! Retrieves the renderer's TextureStore */
+        TextureStore& GetTextureStore();
+
+        /*! Retrieves the renderer's ShaderStore */
+        ShaderStore& GetShaderStore();
+
+        /*! Retrieves the renderer's ModelStore */
+        ModelStore& GetModelStore();
+
+        // WorldObject
+        struct WorldObject
+        {
+            Transform transform;
+            std::string model;
+        };
+
+        /*! Retrieves the renderer's World */
+        std::unordered_map<std::string, std::vector<WorldObject>>& GetWorld();
+
+        // Store light separately
+        WorldObject* mLight;
 
     private:
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
+        // The view matrix
+        glm::mat4 mView;
 
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        // Stores the world objects
+        std::unordered_map<std::string, std::vector<WorldObject>> mWorld;
 
-        // The game window
-        Window mWindow;
+        // Stores the models loaded in the gpu
+        ModelStore mModelStore;
 
-        // The Renderer
-        Renderer renderer;
+        // Stores the shaders and shader programs loaded in the gpu
+        ShaderStore mShaderStore;
 
-        // The polygon rendering mode
-        GLenum mDrawMode;
-
-        // Updates movable light position
-        void CalcLightPos(Transform& t);
-
-        // The data needed for rotating the cubes
-        struct RotationData
-        {
-            float degreesInc;
-            bool rotating;
-        };
-        RotationData mRotationData;
-
-        // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
-        std::tuple<float, float> CameraLookOffset();
-        Camera mCamera;
+        // Stores the textures loaded in the gpu
+        TextureStore mTextureStore;
 };
 
-#endif // ! _GAME_HPP_
-
+#endif // ! _RENDERER_HPP_

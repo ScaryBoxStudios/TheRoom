@@ -1,5 +1,6 @@
 #include "GlfwContext.hpp"
 #include <string>
+#include <stdexcept>
 #include <GLFW/glfw3.h>
 
 ///==============================================================
@@ -8,16 +9,15 @@
 
 bool GlfwContext::sInitialized = false;
 
-bool GlfwContext::Init()
+void GlfwContext::Init()
 {
     RegisterGlfwErrorHandler();
     glfwInit();
 
     if (IsGlfwErrorSet())
-        return false;
+        throw std::runtime_error(GetLastGlfwError().GetDescription());
 
     sInitialized = true;
-    return true;
 }
 
 void GlfwContext::Shutdown()
@@ -30,5 +30,4 @@ bool GlfwContext::IsInitialized()
 {
     return sInitialized;
 }
-
 

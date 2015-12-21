@@ -2,6 +2,7 @@
 #include <sstream>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "../Window/GlfwError.hpp"
 WARN_GUARD_ON
 #include "../Graphics/Image/Jpeg/JpegLoader.hpp"
 #include "../Graphics/Image/Png/Png.hpp"
@@ -27,7 +28,7 @@ static void CheckGLError()
         ss << "OpenGL Error! Code: " << errVal;
         const char* desc = reinterpret_cast<const char*>(gluErrorString(errVal));
         (void) desc;
-        //Error(ss.str().c_str(), desc);
+        throw std::runtime_error(std::string("OpenGL error: \n") + desc);
     }
 }
 
@@ -41,7 +42,10 @@ Game::Game()
 void Game::Init()
 {
     // Setup window
-    mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
+    bool success = mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
+    if (!success)
+        throw std::runtime_error(GetLastGlfwError().GetDescription());
+
     mWindow.SetShowFPS(true);
     mWindow.SetCloseHandler(mExitHandler);
 
@@ -111,6 +115,8 @@ void Game::Init()
     for (const auto& p : textures)
     {
         auto textureFile = FileLoad<BufferType>(p.first);
+        if (!textureFile)
+            throw std::runtime_error("Could not find file: \n" + p.first);
         RawImage<> pb = jL.Load(*textureFile);
         mTextureStore.Load(p.second, pb);
     }
@@ -200,27 +206,51 @@ void Game::Init()
     mWorld.insert({"light", lightObjects});
     mLight = &mWorld["light"].back();
 
-    // Load shader files
-    auto vertFile = FileLoad<BufferType>("res/normal_vert.glsl");
-    auto fragFile = FileLoad<BufferType>("res/normal_frag.glsl");
-    auto lightVertFile = FileLoad<BufferType>("res/light_vert.glsl");
-    auto lightFragFile = FileLoad<BufferType>("res/light_frag.glsl");
+    // The shader map
+    std::unordered_map<std::string, std::vector<std::pair<ShaderStore::ShaderType,std::string>>> shaders =
+    {
+        {
+            "normal",
+            {
+                { ShaderStore::ShaderType::Vertex,   "res/normal_vert.glsl" },
+                { ShaderStore::ShaderType::Fragment, "res/normal_frag.glsl" },
+            }
+        },
+        {
+            "light",
+            {
+                { ShaderStore::ShaderType::Vertex,   "res/light_vert.glsl" },
+                { ShaderStore::ShaderType::Fragment, "res/light_frag.glsl" },
+            }
+        }
+    };
 
-    // Convert them to std::string containers and get the raw pointer to their start
-    std::string vShaderSrc((*vertFile).begin(), (*vertFile).end());
-    std::string fShaderSrc((*fragFile).begin(), (*fragFile).end());
-    std::string vLightShSrc((*lightVertFile).begin(), (*lightVertFile).end());
-    std::string fLightShSrc((*lightFragFile).begin(), (*lightFragFile).end());
-
-    // Compile shaders
-    GLuint vShId = mShaderStore.LoadShader(vShaderSrc, ShaderStore::ShaderType::Vertex);
-    GLuint fShId = mShaderStore.LoadShader(fShaderSrc, ShaderStore::ShaderType::Fragment);
-    GLuint vLightShId = mShaderStore.LoadShader(vLightShSrc, ShaderStore::ShaderType::Vertex);
-    GLuint fLightShId = mShaderStore.LoadShader(fLightShSrc, ShaderStore::ShaderType::Fragment);
-
-    // Link them into a shader program
-    mShaderStore.LinkProgram("normal", vShId, fShId);
-    mShaderStore.LinkProgram("light", vLightShId, fLightShId);
+    // Load shaders
+    for (const auto& p : shaders)
+    {
+        // Will temporarily store the id's of the compiled shaders
+        std::unordered_map<ShaderStore::ShaderType, GLuint> shaderIds;
+        for (const auto& f : p.second)
+        {
+            // Load file
+            auto shaderFile = FileLoad<BufferType>(f.second);
+            if (!shaderFile)
+                throw std::runtime_error("Could not find shader file: \n" + f.second);
+            // Convert it to std::string containter
+            std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
+            GLuint sId = mShaderStore.LoadShader(shaderSrc, f.first);
+            if (sId == 0)
+                throw std::runtime_error("Shader compilation error: \n" + mShaderStore.GetLastCompileError());
+            // Insert loaded shader id to temp map
+            shaderIds.insert({f.first, sId});
+        }
+        // Fetch vert and frag shader id's from temp map and link
+        bool s = mShaderStore.LinkProgram(p.first,
+            shaderIds[ShaderStore::ShaderType::Vertex],
+            shaderIds[ShaderStore::ShaderType::Fragment]);
+        if (!s)
+            throw std::runtime_error("OpenGL program link error: \n" + mShaderStore.GetLastLinkError());
+    }
 
     CheckGLError();
 }

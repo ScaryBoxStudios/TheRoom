@@ -28,50 +28,22 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#include <functional>
-#include <chrono>
-#include "System/HeartBeat.hpp"
-#include "Window/GlfwContext.hpp"
-#include "Game/Game.hpp"
-#include "Util/MsgBox.hpp"
+#ifndef _MSG_BOX_HPP_
+#define _MSG_BOX_HPP_
 
-int main(int argc, char* argv[])
+#include <string>
+
+class MsgBox
 {
-    (void) argc;
-    (void) argv;
+    public:
+        // Constructor
+        MsgBox(const std::string& title, const std::string& msg);
 
-    try
-    {
-        GlfwContext glfwContext;
-        glfwContext.Init();
+        // Shows the constructed MessageBox
+        void Show() const;
 
-        HeartBeat hb;
-        Game game;
+    private:
+        std::string mTitle, mMessage;
+};
 
-        hb.SetTimer([]
-            {
-                return static_cast<double>(
-                    std::chrono::duration_cast<std::chrono::milliseconds>(
-                        std::chrono::system_clock::now().time_since_epoch()
-                    ).count()
-                );
-            }
-        );
-        hb.SetUpdate(std::bind(&Game::Update, &game, std::placeholders::_1));
-        hb.SetRender(std::bind(&Game::Render, &game, std::placeholders::_1));
-        game.SetExitHandler(std::bind(&HeartBeat::SetRunning, &hb, false));
-
-        game.Init();
-        hb.Run();
-        game.Shutdown();
-
-        glfwContext.Shutdown();
-    }
-    catch(std::exception& e)
-    {
-        MsgBox("Error", e.what()).Show();
-    }
-
-    return 0;
-}
-
+#endif // ! _MSG_BOX_HPP_

@@ -41,7 +41,7 @@ class GlfwContext
 {
     public:
         /// Initializes the Glfw library context needed for glfw to operate
-        bool Init();
+        void Init();
 
         /// Deinitializes the Glfw context
         void Shutdown();

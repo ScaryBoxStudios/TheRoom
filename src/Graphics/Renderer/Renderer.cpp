@@ -18,7 +18,6 @@ static void CheckGLError()
         std::stringstream ss;
         ss << "OpenGL Error! Code: " << errVal;
         const char* desc = reinterpret_cast<const char*>(gluErrorString(errVal));
-        (void) desc;
         throw std::runtime_error(std::string("OpenGL error: \n") + desc);
     }
 }
@@ -73,7 +72,8 @@ void Renderer::Render(float interpolation)
             glUniform3f(lightPosId, lightPos.x, lightPos.y, lightPos.z);
 
             //const auto& viewPos = cameraPos;
-            const glm::vec3 viewPos = glm::vec3(view[3].x, view[3].y, view[3].z);
+            const glm::mat4 inverseView = glm::inverse(view);
+            const glm::vec3 viewPos = glm::vec3(inverseView[3].x, inverseView[3].y, inverseView[3].z);
             GLint viewPosId = glGetUniformLocation(progId, "viewPos");
             glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 

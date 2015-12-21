@@ -43,6 +43,10 @@ class Game
         /*! Constructor */
         Game();
 
+        // Disable copy construction
+        Game(const Game& other) = delete;
+        Game& operator=(const Game& other) = delete;
+
         /*! Initializes all the low level modules of the game */
         void Init();
 
@@ -59,14 +63,21 @@ class Game
         void SetExitHandler(std::function<void()> f);
 
     private:
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
+        // Called during initialization to setup window and input
+        void SetupWindow();
+        // Called during initialization to load shaders
+        void LoadShaders();
+        // Called during initialization to load textures
+        void LoadTextures();
+        // Called during initialization to load models
+        void LoadModels();
+        // Called during initialization to setup the world
+        void SetupWorld();
 
         // Master switch, called when game is exiting
         std::function<void()> mExitHandler;
 
-        // The game window
+        // The Game Window
         Window mWindow;
 
         // The Renderer
@@ -75,8 +86,10 @@ class Game
         // The polygon rendering mode
         GLenum mDrawMode;
 
-        // Updates movable light position
-        void CalcLightPos(Transform& t);
+        // The camera view
+        std::vector<Camera::MoveDirection> CameraMoveDirections();
+        std::tuple<float, float> CameraLookOffset();
+        Camera mCamera;
 
         // The data needed for rotating the cubes
         struct RotationData
@@ -85,11 +98,6 @@ class Game
             bool rotating;
         };
         RotationData mRotationData;
-
-        // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
-        std::tuple<float, float> CameraLookOffset();
-        Camera mCamera;
 };
 
 #endif // ! _GAME_HPP_

@@ -22,54 +22,11 @@ Game::Game()
 
 void Game::Init()
 {
-    // Setup window
-    bool success = mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
-    if (!success)
-        throw std::runtime_error(GetLastGlfwError().GetDescription());
-
-    mWindow.SetShowFPS(true);
-    mWindow.SetCloseHandler(mExitHandler);
-
-    // Setup input event handlers
-    mWindow.SetMouseButtonPressHandler(
-        [this](MouseButton mb, ButtonAction ba)
-        {
-            if (mb == MouseButton::Left && ba == ButtonAction::Press)
-                mWindow.SetMouseGrabEnabled(true);
-        }
-    );
-    mWindow.SetKeyPressedHandler(
-        [this](Key k, KeyAction ka)
-        {
-            // Exit
-            if(k == Key::Escape && ka == KeyAction::Release)
-                mExitHandler();
-            // Ungrab mouse
-            if(k == Key::RightControl && ka == KeyAction::Release)
-                mWindow.SetMouseGrabEnabled(false);
-            // Toggle polygon mode
-            if(k == Key::P && ka == KeyAction::Release)
-            {
-                if (mDrawMode == GL_FILL)
-                    mDrawMode = GL_POINT;
-                else if (mDrawMode == GL_POINT)
-                    mDrawMode = GL_LINE;
-                else if (mDrawMode == GL_LINE)
-                    mDrawMode = GL_FILL;
-            }
-            if(k == Key::R && ka == KeyAction::Release)
-                mRotationData.rotating = !mRotationData.rotating;
-        }
-    );
+    // Setup window and input
+    SetupWindow();
 
     // Initialize the renderer
     renderer.Init();
-    // Retrieve the shaderStore, textureStore, modelStore from the renderer
-    auto& modelStore = renderer.GetModelStore();
-    auto& shaderStore = renderer.GetShaderStore();
-    auto& textureStore = renderer.GetTextureStore();
-    // Retrieve the world from the renderer
-    auto& world = renderer.GetWorld();
 
     // Set the initial draw mode
     mDrawMode = GL_FILL;
@@ -81,55 +38,23 @@ void Game::Init()
     // Camera initial position
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
-    //
-    // Textures
-    //
-    // The JpegLoader object
-    JpegLoader jL;
-
-    // The texture map
-    std::unordered_map<std::string, std::string> textures =
-    {
-        {"ext/mahogany_wood.jpg", "mahogany_wood"},
-        {"ext/mahogany_wood_spec.jpg", "mahogany_wood_spec"},
-        {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
-        {"ext/WoodenCabin/WoodCabinSM.jpg", "house_spec"},
-    };
-
     // Load the textures
-    for (const auto& p : textures)
-    {
-        auto textureFile = FileLoad<BufferType>(p.first);
-        if (!textureFile)
-            throw std::runtime_error("Could not find file: \n" + p.first);
-        RawImage<> pb = jL.Load(*textureFile);
-        textureStore.Load(p.second, pb);
-    }
+    LoadTextures();
 
-    //
-    // Models
-    //
-    // Model loader instance
-    ModelLoader modelLoader;
-    // TODO: Add error handling
-    // Load the cube
-    auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
-    Model cube = modelLoader.Load(*cubeFile, "obj");
-    modelStore.Load("cube", std::move(cube));
-    modelStore["cube"]->diffTexId = textureStore["mahogany_wood"]->texId;
-    modelStore["cube"]->specTexId = textureStore["mahogany_wood_spec"]->texId;
+    // Load the models
+    LoadModels();
 
-    // Load teapot
-    auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
-    Model teapot = modelLoader.Load(*teapotFile, "obj");
-    modelStore.Load("teapot", std::move(teapot));
+    // Load the shaders
+    LoadShaders();
 
-    // Load house
-    auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");
-    Model house = modelLoader.Load(*houseFile, "dae");
-    modelStore.Load("house", std::move(house));
-    modelStore["house"]->diffTexId = textureStore["house_diff"]->texId;
-    modelStore["house"]->specTexId = textureStore["house_spec"]->texId;
+    // Create world objects
+    SetupWorld();
+}
+
+void Game::SetupWorld()
+{
+    // Retrieve the world from the renderer
+    auto& world = renderer.GetWorld();
 
     //
     // Normal objects
@@ -191,6 +116,55 @@ void Game::Init()
     }
     world.insert({"light", lightObjects});
     renderer.mLight = &world["light"].back();
+}
+
+void Game::SetupWindow()
+{
+    // Setup window
+    bool success = mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
+    if (!success)
+        throw std::runtime_error(GetLastGlfwError().GetDescription());
+
+    mWindow.SetShowFPS(true);
+    mWindow.SetCloseHandler(mExitHandler);
+
+    // Setup input event handlers
+    mWindow.SetMouseButtonPressHandler(
+        [this](MouseButton mb, ButtonAction ba)
+        {
+            if (mb == MouseButton::Left && ba == ButtonAction::Press)
+                mWindow.SetMouseGrabEnabled(true);
+        }
+    );
+    mWindow.SetKeyPressedHandler(
+        [this](Key k, KeyAction ka)
+        {
+            // Exit
+            if(k == Key::Escape && ka == KeyAction::Release)
+                mExitHandler();
+            // Ungrab mouse
+            if(k == Key::RightControl && ka == KeyAction::Release)
+                mWindow.SetMouseGrabEnabled(false);
+            // Toggle polygon mode
+            if(k == Key::P && ka == KeyAction::Release)
+            {
+                if (mDrawMode == GL_FILL)
+                    mDrawMode = GL_POINT;
+                else if (mDrawMode == GL_POINT)
+                    mDrawMode = GL_LINE;
+                else if (mDrawMode == GL_LINE)
+                    mDrawMode = GL_FILL;
+            }
+            if(k == Key::R && ka == KeyAction::Release)
+                mRotationData.rotating = !mRotationData.rotating;
+        }
+    );
+}
+
+void Game::LoadShaders()
+{
+    // Retrieve the shaderStore from the renderer
+    auto& shaderStore = renderer.GetShaderStore();
 
     // The shader map
     std::unordered_map<std::string, std::vector<std::pair<ShaderStore::ShaderType,std::string>>> shaders =
@@ -237,7 +211,64 @@ void Game::Init()
         if (!s)
             throw std::runtime_error("OpenGL program link error: \n" + shaderStore.GetLastLinkError());
     }
+}
 
+void Game::LoadTextures()
+{
+    // Retrieve the textureStore from the renderer
+    auto& textureStore = renderer.GetTextureStore();
+
+    // The JpegLoader object
+    JpegLoader jL;
+
+    // The texture map
+    std::unordered_map<std::string, std::string> textures =
+    {
+        {"ext/mahogany_wood.jpg", "mahogany_wood"},
+        {"ext/mahogany_wood_spec.jpg", "mahogany_wood_spec"},
+        {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
+        {"ext/WoodenCabin/WoodCabinSM.jpg", "house_spec"},
+    };
+
+    // Load the textures
+    for (const auto& p : textures)
+    {
+        auto textureFile = FileLoad<BufferType>(p.first);
+        if (!textureFile)
+            throw std::runtime_error("Could not find file: \n" + p.first);
+        RawImage<> pb = jL.Load(*textureFile);
+        textureStore.Load(p.second, pb);
+    }
+}
+
+void Game::LoadModels()
+{
+    // Retrieve the model and texture stores from the renderer
+    auto& modelStore = renderer.GetModelStore();
+    auto& textureStore = renderer.GetTextureStore();
+
+    // Model loader instance
+    ModelLoader modelLoader;
+
+    // TODO: Add error handling
+    // Load the cube
+    auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
+    Model cube = modelLoader.Load(*cubeFile, "obj");
+    modelStore.Load("cube", std::move(cube));
+    modelStore["cube"]->diffTexId = textureStore["mahogany_wood"]->texId;
+    modelStore["cube"]->specTexId = textureStore["mahogany_wood_spec"]->texId;
+
+    // Load teapot
+    auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
+    Model teapot = modelLoader.Load(*teapotFile, "obj");
+    modelStore.Load("teapot", std::move(teapot));
+
+    // Load house
+    auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");
+    Model house = modelLoader.Load(*houseFile, "dae");
+    modelStore.Load("house", std::move(house));
+    modelStore["house"]->diffTexId = textureStore["house_diff"]->texId;
+    modelStore["house"]->specTexId = textureStore["house_spec"]->texId;
 }
 
 std::vector<Camera::MoveDirection> Game::CameraMoveDirections()
@@ -263,24 +294,6 @@ std::tuple<float, float> Game::CameraLookOffset()
     );
 }
 
-void Game::CalcLightPos(Transform& t)
-{
-    auto& trans = t;
-    float increase = 0.3f;
-    if(mWindow.IsKeyPressed(Key::Kp8))
-        trans.Move(glm::vec3(0.0f, increase, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp4))
-        trans.Move(glm::vec3(increase, 0.0f, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp2))
-        trans.Move(glm::vec3(0.0f, -increase, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp6))
-        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp5))
-        trans.Move(glm::vec3(0.0f, 0.0f, increase));
-    if(mWindow.IsKeyPressed(Key::Kp0))
-        trans.Move(glm::vec3(0.0f, 0.0f, -increase));
-}
-
 void Game::Update(float dt)
 {
     (void) dt;
@@ -299,7 +312,20 @@ void Game::Update(float dt)
     mCamera.Move(CameraMoveDirections());
 
     // Update light position
-    CalcLightPos(renderer.mLight->transform);
+    auto& trans = renderer.mLight->transform;
+    float increase = 0.3f;
+    if(mWindow.IsKeyPressed(Key::Kp8))
+        trans.Move(glm::vec3(0.0f, increase, 0.0f));
+    if(mWindow.IsKeyPressed(Key::Kp4))
+        trans.Move(glm::vec3(increase, 0.0f, 0.0f));
+    if(mWindow.IsKeyPressed(Key::Kp2))
+        trans.Move(glm::vec3(0.0f, -increase, 0.0f));
+    if(mWindow.IsKeyPressed(Key::Kp6))
+        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
+    if(mWindow.IsKeyPressed(Key::Kp5))
+        trans.Move(glm::vec3(0.0f, 0.0f, increase));
+    if(mWindow.IsKeyPressed(Key::Kp0))
+        trans.Move(glm::vec3(0.0f, 0.0f, -increase));
 
     // Update cubes' rotations
     if (mRotationData.rotating)
@@ -344,4 +370,3 @@ void Game::SetExitHandler(std::function<void()> f)
 {
     mExitHandler = f;
 }
-

@@ -44,7 +44,6 @@ struct MeshDescription
 {
     GLuint vaoId;
     GLuint vboId;
-    GLuint colBufId;
     GLuint texBufId;
     GLuint eboId;
     GLuint normalBufId;

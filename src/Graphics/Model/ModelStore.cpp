@@ -19,7 +19,6 @@ void ModelStore::Clear()
             glDeleteBuffers(1, &meshDesc.normalBufId);
             glDeleteBuffers(1, &meshDesc.eboId);
             glDeleteBuffers(1, &meshDesc.texBufId);
-            glDeleteBuffers(1, &meshDesc.colBufId);
             glDeleteBuffers(1, &meshDesc.vboId);
             glDeleteVertexArrays(1, &meshDesc.vaoId);
         }
@@ -37,7 +36,6 @@ void ModelStore::Load(const std::string& name, const Model& data)
         MeshDescription meshDesc;
         auto& vaoId = meshDesc.vaoId;
         auto& vboId = meshDesc.vboId;
-        auto& colBufId = meshDesc.colBufId;
         auto& texBufId = meshDesc.texBufId;
         auto& eboId = meshDesc.eboId;
         auto& normalBufId = meshDesc.normalBufId;
@@ -45,7 +43,6 @@ void ModelStore::Load(const std::string& name, const Model& data)
 
         glGenVertexArrays(1, &vaoId);
         glGenBuffers(1, &vboId);
-        glGenBuffers(1, &colBufId);
         glGenBuffers(1, &texBufId);
         glGenBuffers(1, &eboId);
         glGenBuffers(1, &normalBufId);
@@ -78,19 +75,6 @@ void ModelStore::Load(const std::string& name, const Model& data)
             }
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            glBindBuffer(GL_ARRAY_BUFFER, colBufId);
-            {
-                glBufferData(GL_ARRAY_BUFFER,
-                    mesh.colors.size() * sizeof(GLfloat),
-                    mesh.colors.data(),
-                    GL_STATIC_DRAW
-                );
-                GLuint index = 2;
-                glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-                glEnableVertexAttribArray(index);
-            }
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
             glBindBuffer(GL_ARRAY_BUFFER, texBufId);
             {
                 glBufferData(GL_ARRAY_BUFFER,
@@ -98,7 +82,7 @@ void ModelStore::Load(const std::string& name, const Model& data)
                     mesh.texCoords.data(),
                     GL_STATIC_DRAW
                 );
-                GLuint index = 3;
+                GLuint index = 2;
                 glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
                 glEnableVertexAttribArray(index);
             }

@@ -149,6 +149,115 @@ void Renderer::Shutdown()
     mShaderStore.Clear();
 }
 
+void Renderer::GeometryPass(float interpolation)
+{
+    // Bind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer.Id());
+
+    // Clear color
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Create the projection matrix
+    glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+
+    // Get the view matrix
+    const auto& view = mView;
+
+    // Iterate through world objects by category
+    for (const auto& objCategory : mWorld)
+    {
+        // The object material category iterating through
+        const auto& type = objCategory.first;
+
+        // Use the appropriate program
+        GLuint progId = mShaderStore[type];
+        glUseProgram(progId);
+
+        // Upload projection and view matrices
+        auto projectionId = glGetUniformLocation(progId, "projection");
+        glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
+        auto viewId = glGetUniformLocation(progId, "view");
+        glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
+
+        // The actual object list
+        const auto& list = objCategory.second;
+        for (const auto& gObj : list)
+        {
+            // Calculate the model matrix
+            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
+
+            // Upload it
+            auto modelId = glGetUniformLocation(progId, "model");
+            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
+
+            // Get the model
+            ModelDescription* mdl = mModelStore[gObj.model];
+
+            if (type == "normal")
+            {
+                // Bind the needed textures
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
+                GLuint diffuseId = glGetUniformLocation(progId, "material.diffuse");
+                glUniform1i(diffuseId, 0);
+
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, mdl->specTexId);
+                GLuint specId = glGetUniformLocation(progId, "material.specular");
+                glUniform1i(specId, 1);
+            }
+
+            // Draw all its meshes
+            for (const auto& mesh : mdl->meshes)
+            {
+                glBindVertexArray(mesh.vaoId);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
+                glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+            }
+        }
+
+        glUseProgram(0);
+    }
+
+    // Unbind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::RenderQuad()
+{
+    GLfloat quadVertices[] = {
+        // Positions    // Tex Coords
+       -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+       -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+        1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+        1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    };
+
+    GLuint quadVao;
+    glGenVertexArrays(1, &quadVao);
+    glBindVertexArray(quadVao);
+    {
+        GLuint quadVbo;
+        glGenBuffers(1, &quadVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDeleteBuffers(GL_ARRAY_BUFFER, &quadVbo);
+    }
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &quadVao);
+}
+
 void Renderer::SetView(const glm::mat4& view)
 {
     mView = view;

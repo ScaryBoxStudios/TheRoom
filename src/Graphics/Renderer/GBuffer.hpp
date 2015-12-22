@@ -28,84 +28,31 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _G_BUFFER_HPP_
+#define _G_BUFFER_HPP_
 
-#include "../Model/ModelStore.hpp"
-#include "../Shader/ShaderStore.hpp"
-#include "../Texture/TextureStore.hpp"
-#include "../Scene/Transform.hpp"
-#include "GBuffer.hpp"
-#include "../../Util/WarnGuard.hpp"
+#include <glad/glad.h>
+#include <GL/gl.h>
 
-WARN_GUARD_ON
-#include <glm/glm.hpp>
-WARN_GUARD_OFF
-
-class Renderer
+class GBuffer
 {
     public:
-        /*! Initializes the renderer */
-        void Init();
+        // Constructor
+        GBuffer(unsigned int width, unsigned int height);
 
-        /*! Called when updating the game state */
-        void Update(float dt);
+        // Destructor
+        ~GBuffer();
 
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes the renderer */
-        void Shutdown();
-
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
-
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
-
-        /*! Retrieves the renderer's ShaderStore */
-        ShaderStore& GetShaderStore();
-
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        // WorldObject
-        struct WorldObject
-        {
-            Transform transform;
-            std::string model;
-        };
-
-        /*! Retrieves the renderer's World */
-        std::unordered_map<std::string, std::vector<WorldObject>>& GetWorld();
-
-        // Store light separately
-        WorldObject* mLight;
+        // Retrieves the internal GBuffer id
+        GLuint Id() const;
 
     private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
-
-        // Renders a 1x1 quad in NDC, used for framebuffer color targets
-        void RenderQuad();
-
-        // The view matrix
-        glm::mat4 mView;
-
-        // Stores the world objects
-        std::unordered_map<std::string, std::vector<WorldObject>> mWorld;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Stores the shaders and shader programs loaded in the gpu
-        ShaderStore mShaderStore;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // The GBuffer used by the deffered rendering steps
-        GBuffer mGBuffer;
+        // The GBuffer's framebuffer id
+        GLuint mGBufferId;
+        // The position, normal and albedo + specular buffer ids'
+        GLuint mPositionBufId, mNormalBufId, mAlbedoSpecBufId;
+        // The depth buffer id
+        GLuint mDepthBufId;
 };
 
-#endif // ! _RENDERER_HPP_
+#endif // ! _G_BUFFER_HPP_

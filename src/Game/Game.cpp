@@ -163,20 +163,6 @@ void Game::LoadShaders()
     std::unordered_map<std::string, std::vector<std::pair<ShaderStore::ShaderType,std::string>>> shaders =
     {
         {
-            "normal",
-            {
-                { ShaderStore::ShaderType::Vertex,   "res/normal_vert.glsl" },
-                { ShaderStore::ShaderType::Fragment, "res/normal_frag.glsl" },
-            }
-        },
-        {
-            "light",
-            {
-                { ShaderStore::ShaderType::Vertex,   "res/light_vert.glsl" },
-                { ShaderStore::ShaderType::Fragment, "res/light_frag.glsl" },
-            }
-        },
-        {
             "geometry_pass",
             {
                 { ShaderStore::ShaderType::Vertex,   "res/geometry_pass_vert.glsl" },

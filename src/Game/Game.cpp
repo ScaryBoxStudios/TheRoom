@@ -28,9 +28,6 @@ void Game::Init()
     // Initialize the renderer
     renderer.Init();
 
-    // Set the initial draw mode
-    mDrawMode = GL_FILL;
-
     // Cube rotation state
     mRotationData.degreesInc = 0.05f;
     mRotationData.rotating = false;
@@ -138,16 +135,6 @@ void Game::SetupWindow()
             // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
                 mWindow.SetMouseGrabEnabled(false);
-            // Toggle polygon mode
-            if(k == Key::P && ka == KeyAction::Release)
-            {
-                if (mDrawMode == GL_FILL)
-                    mDrawMode = GL_POINT;
-                else if (mDrawMode == GL_POINT)
-                    mDrawMode = GL_LINE;
-                else if (mDrawMode == GL_LINE)
-                    mDrawMode = GL_FILL;
-            }
             if(k == Key::R && ka == KeyAction::Release)
                 mRotationData.rotating = !mRotationData.rotating;
         }
@@ -340,9 +327,6 @@ void Game::Update(float dt)
 
 void Game::Render(float interpolation)
 {
-    // Set the polygon mode
-    glPolygonMode(GL_FRONT_AND_BACK, mDrawMode);
-
     // View calculation with camera
     auto lookOffset = mWindow.MouseGrabEnabled() ? CameraLookOffset() : std::make_tuple(0.0f, 0.0f);
     auto iCamState = mCamera.Interpolate(CameraMoveDirections(), lookOffset, interpolation);

@@ -83,9 +83,6 @@ class Game
         // The Renderer
         Renderer renderer;
 
-        // The polygon rendering mode
-        GLenum mDrawMode;
-
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();

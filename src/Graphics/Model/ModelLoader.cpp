@@ -48,6 +48,11 @@ Model ModelLoader::Load(std::vector<std::uint8_t> fileData, const char* type)
                 mData.texCoords.push_back(texCoord.x);
                 mData.texCoords.push_back(texCoord.y);
             }
+            else
+            {
+                mData.texCoords.push_back(0);
+                mData.texCoords.push_back(0);
+            }
         }
 
         // Indices

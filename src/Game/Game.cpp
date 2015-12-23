@@ -314,19 +314,19 @@ void Game::Update(float dt)
 
     // Update light position
     auto& trans = renderer.mLight->transform;
-    float increase = 0.3f;
+    float increase = 0.7f;
     if(mWindow.IsKeyPressed(Key::Kp8))
         trans.Move(glm::vec3(0.0f, increase, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp4))
-        trans.Move(glm::vec3(increase, 0.0f, 0.0f));
+        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp2))
         trans.Move(glm::vec3(0.0f, -increase, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp6))
-        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
+        trans.Move(glm::vec3(increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp5))
-        trans.Move(glm::vec3(0.0f, 0.0f, increase));
-    if(mWindow.IsKeyPressed(Key::Kp0))
         trans.Move(glm::vec3(0.0f, 0.0f, -increase));
+    if(mWindow.IsKeyPressed(Key::Kp0))
+        trans.Move(glm::vec3(0.0f, 0.0f, increase));
 
     // Update cubes' rotations
     if (mRotationData.rotating)

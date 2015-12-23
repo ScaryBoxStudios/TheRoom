@@ -93,9 +93,6 @@ class Renderer
         // Renders a 1x1 quad in NDC, used for framebuffer color targets
         void RenderQuad();
 
-        //
-        //void ForwardRender(float interpolation);
-
         // The view matrix
         glm::mat4 mView;
 

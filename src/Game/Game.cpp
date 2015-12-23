@@ -99,20 +99,13 @@ void Game::SetupWorld()
     // Light objects
     //
     std::vector<Renderer::WorldObject> lightObjects;
-    // Add teapot
-    {
-        Transform trans;
-        trans.Move(glm::vec3(0.0f, 4.0f, -5.0f));
-        trans.Scale(glm::vec3(0.5f));
-        lightObjects.push_back({trans, "teapot"});
-    }
 
     // Add cube lights
     {
         Transform trans;
         trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
-        trans.RotateY(-10.0f);
-        lightObjects.push_back({trans, "cube"});
+        trans.Scale(glm::vec3(0.3f));
+        lightObjects.push_back({trans, "teapot"});
     }
     world.insert({"light", lightObjects});
     renderer.mLight = &world["light"].back();

@@ -232,6 +232,12 @@ void Game::LoadTextures()
         RawImage<> pb = jL.Load(*textureFile);
         textureStore.Load(p.second, pb);
     }
+
+    // Add calculated textures
+    RawImage<> pb({0xFF, 0xFF, 0xFF}, {1, 1, 3});
+    textureStore.Load("white", pb);
+    RawImage<> pb2({0x00, 0x00, 0x00}, {1, 1, 3});
+    textureStore.Load("white_spec", pb2);
 }
 
 void Game::LoadModels()
@@ -255,6 +261,8 @@ void Game::LoadModels()
     auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
     Model teapot = modelLoader.Load(*teapotFile, "obj");
     modelStore.Load("teapot", std::move(teapot));
+    modelStore["teapot"]->diffTexId = textureStore["white"]->texId;
+    modelStore["teapot"]->specTexId = textureStore["white_spec"]->texId;
 
     // Load house
     auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");

@@ -46,6 +46,15 @@ class GBuffer
         // Retrieves the internal GBuffer id
         GLuint Id() const;
 
+        // Retrieves the position buffer id
+        GLuint PosId() const;
+
+        // Retrieves the normal buffer id
+        GLuint NormalId() const;
+
+        // Retrieves the albedo-specular buffer id
+        GLuint AlbedoSpecId() const;
+
     private:
         // The GBuffer's framebuffer id
         GLuint mGBufferId;

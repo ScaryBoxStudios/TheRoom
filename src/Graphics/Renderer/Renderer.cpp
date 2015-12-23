@@ -30,6 +30,9 @@ void Renderer::Init()
     // Enable the depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    // Create the GBuffer
+    mGBuffer = std::make_unique<GBuffer>(800, 600);
 }
 
 void Renderer::Update(float dt)
@@ -43,6 +46,225 @@ void Renderer::Update(float dt)
 }
 
 void Renderer::Render(float interpolation)
+{
+    GeometryPass(interpolation);
+    LightPass(interpolation);
+    CheckGLError();
+}
+
+void Renderer::Shutdown()
+{
+    // Destroy GBuffer
+    mGBuffer.reset();
+
+    // Explicitly deallocate GPU data
+    mTextureStore.Clear();
+    mModelStore.Clear();
+    mShaderStore.Clear();
+}
+
+void Renderer::GeometryPass(float interpolation)
+{
+    // Bind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
+
+    // Clear color
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Create the projection matrix
+    glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+
+    // Get the view matrix
+    const auto& view = mView;
+
+    // Use the geometry pass program
+    GLuint progId = mShaderStore["geometry_pass"];
+    glUseProgram(progId);
+
+    // Upload projection and view matrices
+    auto projectionId = glGetUniformLocation(progId, "projection");
+    glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
+    auto viewId = glGetUniformLocation(progId, "view");
+    glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
+
+    // Iterate through world objects by category
+    for (const auto& objCategory : mWorld)
+    {
+        for (const auto& gObj : objCategory.second)
+        {
+            // Calculate the model matrix
+            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
+
+            // Upload it
+            auto modelId = glGetUniformLocation(progId, "model");
+            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
+
+            // Get the model
+            ModelDescription* mdl = mModelStore[gObj.model];
+
+            // Bind the needed textures
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
+            GLuint diffuseId = glGetUniformLocation(progId, "texture_diffuse1");
+            glUniform1i(diffuseId, 0);
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, mdl->specTexId);
+            GLuint specId = glGetUniformLocation(progId, "texture_specular1");
+            glUniform1i(specId, 1);
+
+            // Draw all its meshes
+            for (const auto& mesh : mdl->meshes)
+            {
+                glBindVertexArray(mesh.vaoId);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
+                glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                glBindVertexArray(0);
+            }
+        }
+    }
+
+    glUseProgram(0);
+
+    // Unbind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::LightPass(float interpolation)
+{
+    // Clear color
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Use the light pass program
+    GLuint progId = mShaderStore["light_pass"];
+    glUseProgram(progId);
+    {
+        // Bind the data textures
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, mGBuffer->PosId());
+        GLuint gPosId = glGetUniformLocation(progId, "gPosition");
+        glUniform1i(gPosId, 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, mGBuffer->NormalId());
+        GLuint gNormId = glGetUniformLocation(progId, "gNormal");
+        glUniform1i(gNormId, 1);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, mGBuffer->AlbedoSpecId());
+        GLuint gAlbSpecId = glGetUniformLocation(progId, "gAlbedoSpec");
+        glUniform1i(gAlbSpecId, 2);
+
+        // Upload light relevant uniforms
+        // Get the view matrix
+        const auto& view = mView;
+
+        // Setup lighting position parameters
+        const glm::mat4 inverseView = glm::inverse(view);
+        const glm::vec3 viewPos = glm::vec3(inverseView[3].x, inverseView[3].y, inverseView[3].z);
+        GLint viewPosId = glGetUniformLocation(progId, "viewPos");
+        glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
+
+        // Set light's properties
+        const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
+        const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
+        glUniform3f(glGetUniformLocation(progId, "light.position"), lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);
+        glUniform3f(glGetUniformLocation(progId, "light.diffuse"),  0.5f, 0.5f, 0.5f);
+        glUniform3f(glGetUniformLocation(progId, "light.specular"), 1.0f, 1.0f, 1.0f);
+        glUniform1f(glGetUniformLocation(progId, "light.constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(progId, "light.linear"), 0.09f);
+        glUniform1f(glGetUniformLocation(progId, "light.quadratic"), 0.032f);
+
+        // Set material properties
+        glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
+
+        // Render final contents
+        RenderQuad();
+    }
+    glUseProgram(0);
+}
+
+void Renderer::RenderQuad()
+{
+    GLfloat quadPos[] =
+    {
+       -1.0f,  1.0f, 0.0f,
+       -1.0f, -1.0f, 0.0f,
+        1.0f,  1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+    };
+    GLfloat quadUV[] =
+    {
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+    };
+
+    GLuint quadVao;
+    glGenVertexArrays(1, &quadVao);
+    glBindVertexArray(quadVao);
+    {
+        GLuint quadPosVbo;
+        glGenBuffers(1, &quadPosVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, quadPosVbo);
+        {
+            glBufferData(GL_ARRAY_BUFFER, sizeof(quadPos), &quadPos, GL_STATIC_DRAW);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        GLuint quadUvVbo;
+        glGenBuffers(1, &quadUvVbo);
+        glBindBuffer(GL_ARRAY_BUFFER, quadUvVbo);
+        {
+            glBufferData(GL_ARRAY_BUFFER, sizeof(quadUV), &quadUV, GL_STATIC_DRAW);
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, quadPosVbo);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDeleteBuffers(1, &quadUvVbo);
+        glDeleteBuffers(1, &quadPosVbo);
+    }
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &quadVao);
+}
+
+void Renderer::SetView(const glm::mat4& view)
+{
+    mView = view;
+}
+
+TextureStore& Renderer::GetTextureStore()
+{
+    return mTextureStore;
+}
+
+ShaderStore& Renderer::GetShaderStore()
+{
+    return mShaderStore;
+}
+
+ModelStore& Renderer::GetModelStore()
+{
+    return mModelStore;
+}
+
+auto Renderer::GetWorld() -> std::unordered_map<std::string, std::vector<WorldObject>>&
+{
+    return mWorld;
+}
+
+/*
+void Renderer::ForwardRender(float interpolation)
 {
     // Clear color
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -140,146 +362,4 @@ void Renderer::Render(float interpolation)
     // Check for errors
     CheckGLError();
 }
-
-void Renderer::Shutdown()
-{
-    // Explicitly deallocate GPU data
-    mTextureStore.Clear();
-    mModelStore.Clear();
-    mShaderStore.Clear();
-}
-
-void Renderer::GeometryPass(float interpolation)
-{
-    // Bind the GBuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer.Id());
-
-    // Clear color
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Create the projection matrix
-    glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-
-    // Get the view matrix
-    const auto& view = mView;
-
-    // Iterate through world objects by category
-    for (const auto& objCategory : mWorld)
-    {
-        // The object material category iterating through
-        const auto& type = objCategory.first;
-
-        // Use the appropriate program
-        GLuint progId = mShaderStore[type];
-        glUseProgram(progId);
-
-        // Upload projection and view matrices
-        auto projectionId = glGetUniformLocation(progId, "projection");
-        glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
-        auto viewId = glGetUniformLocation(progId, "view");
-        glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
-
-        // The actual object list
-        const auto& list = objCategory.second;
-        for (const auto& gObj : list)
-        {
-            // Calculate the model matrix
-            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
-
-            // Upload it
-            auto modelId = glGetUniformLocation(progId, "model");
-            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
-
-            // Get the model
-            ModelDescription* mdl = mModelStore[gObj.model];
-
-            if (type == "normal")
-            {
-                // Bind the needed textures
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
-                GLuint diffuseId = glGetUniformLocation(progId, "material.diffuse");
-                glUniform1i(diffuseId, 0);
-
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, mdl->specTexId);
-                GLuint specId = glGetUniformLocation(progId, "material.specular");
-                glUniform1i(specId, 1);
-            }
-
-            // Draw all its meshes
-            for (const auto& mesh : mdl->meshes)
-            {
-                glBindVertexArray(mesh.vaoId);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
-                glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                glBindVertexArray(0);
-            }
-        }
-
-        glUseProgram(0);
-    }
-
-    // Unbind the GBuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void Renderer::RenderQuad()
-{
-    GLfloat quadVertices[] = {
-        // Positions    // Tex Coords
-       -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-       -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-        1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-        1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-    };
-
-    GLuint quadVao;
-    glGenVertexArrays(1, &quadVao);
-    glBindVertexArray(quadVao);
-    {
-        GLuint quadVbo;
-        glGenBuffers(1, &quadVbo);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDeleteBuffers(GL_ARRAY_BUFFER, &quadVbo);
-    }
-    glBindVertexArray(0);
-    glDeleteVertexArrays(1, &quadVao);
-}
-
-void Renderer::SetView(const glm::mat4& view)
-{
-    mView = view;
-}
-
-TextureStore& Renderer::GetTextureStore()
-{
-    return mTextureStore;
-}
-
-ShaderStore& Renderer::GetShaderStore()
-{
-    return mShaderStore;
-}
-
-ModelStore& Renderer::GetModelStore()
-{
-    return mModelStore;
-}
-
-auto Renderer::GetWorld() -> std::unordered_map<std::string, std::vector<WorldObject>>&
-{
-    return mWorld;
-}
-
+*/

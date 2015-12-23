@@ -31,6 +31,7 @@
 #ifndef _RENDERER_HPP_
 #define _RENDERER_HPP_
 
+#include <memory>
 #include "../Model/ModelStore.hpp"
 #include "../Shader/ShaderStore.hpp"
 #include "../Texture/TextureStore.hpp"
@@ -86,8 +87,14 @@ class Renderer
         // Performs the geometry pass rendering step
         void GeometryPass(float interpolation);
 
+        // Performs the light pass rendering step
+        void LightPass(float interpolation);
+
         // Renders a 1x1 quad in NDC, used for framebuffer color targets
         void RenderQuad();
+
+        //
+        //void ForwardRender(float interpolation);
 
         // The view matrix
         glm::mat4 mView;
@@ -105,7 +112,7 @@ class Renderer
         TextureStore mTextureStore;
 
         // The GBuffer used by the deffered rendering steps
-        GBuffer mGBuffer;
+        std::unique_ptr<GBuffer> mGBuffer;
 };
 
 #endif // ! _RENDERER_HPP_

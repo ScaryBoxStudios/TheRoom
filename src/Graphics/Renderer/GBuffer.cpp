@@ -62,3 +62,18 @@ GLuint GBuffer::Id() const
 {
     return mGBufferId;
 }
+
+GLuint GBuffer::PosId() const
+{
+    return mPositionBufId;
+}
+
+GLuint GBuffer::NormalId() const
+{
+    return mNormalBufId;
+}
+
+GLuint GBuffer::AlbedoSpecId() const
+{
+    return mAlbedoSpecBufId;
+}

@@ -175,6 +175,20 @@ void Game::LoadShaders()
                 { ShaderStore::ShaderType::Vertex,   "res/light_vert.glsl" },
                 { ShaderStore::ShaderType::Fragment, "res/light_frag.glsl" },
             }
+        },
+        {
+            "geometry_pass",
+            {
+                { ShaderStore::ShaderType::Vertex,   "res/geometry_pass_vert.glsl" },
+                { ShaderStore::ShaderType::Fragment, "res/geometry_pass_frag.glsl" },
+            }
+        },
+        {
+            "light_pass",
+            {
+                { ShaderStore::ShaderType::Vertex,   "res/light_pass_vert.glsl" },
+                { ShaderStore::ShaderType::Fragment, "res/light_pass_frag.glsl" },
+            }
         }
     };
 

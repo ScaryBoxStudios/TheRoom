@@ -27,6 +27,9 @@ void Renderer::Init()
     // Set the clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    // Enable face culling
+    glEnable(GL_CULL_FACE);
+
     // Enable the depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);

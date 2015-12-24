@@ -4,8 +4,7 @@
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Graphics/Image/Jpeg/JpegLoader.hpp"
-#include "../Graphics/Image/Png/Png.hpp"
+#include "../Graphics/Image/ImageLoader.hpp"
 #include "../Graphics/Model/ModelLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
@@ -198,25 +197,22 @@ void Game::LoadTextures()
     // Retrieve the textureStore from the renderer
     auto& textureStore = renderer.GetTextureStore();
 
-    // The JpegLoader object
-    JpegLoader jL;
+    // The ImageLoader object
+    ImageLoader imageLoader;
 
     // The texture map
     std::unordered_map<std::string, std::string> textures =
     {
-        {"ext/mahogany_wood.jpg", "mahogany_wood"},
-        {"ext/mahogany_wood_spec.jpg", "mahogany_wood_spec"},
+        {"ext/mahogany_wood.jpg",            "mahogany_wood"},
+        {"ext/mahogany_wood_spec.jpg",       "mahogany_wood_spec"},
         {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
-        {"ext/WoodenCabin/WoodCabinSM.jpg", "house_spec"},
+        {"ext/WoodenCabin/WoodCabinSM.jpg",  "house_spec"},
     };
 
     // Load the textures
     for (const auto& p : textures)
     {
-        auto textureFile = FileLoad<BufferType>(p.first);
-        if (!textureFile)
-            throw std::runtime_error("Could not find file: \n" + p.first);
-        RawImage<> pb = jL.Load(*textureFile);
+        RawImage<> pb = imageLoader.LoadFile(p.first);
         textureStore.Load(p.second, pb);
     }
 

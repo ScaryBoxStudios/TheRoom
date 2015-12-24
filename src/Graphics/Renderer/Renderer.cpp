@@ -2,6 +2,8 @@
 #include <sstream>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include "../Image/ImageLoader.hpp"
+
 WARN_GUARD_ON
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -36,6 +38,20 @@ void Renderer::Init()
 
     // Create the GBuffer
     mGBuffer = std::make_unique<GBuffer>(800, 600);
+
+    // Load the skybox
+    mSkybox = std::make_unique<Skybox>();
+    ImageLoader imLoader;
+    mSkybox->Load(
+        {
+            { Skybox::Target::Right,  imLoader.LoadFile("ext/Skybox/right.jpg")  },
+            { Skybox::Target::Left,   imLoader.LoadFile("ext/Skybox/left.jpg")   },
+            { Skybox::Target::Top,    imLoader.LoadFile("ext/Skybox/top.jpg")    },
+            { Skybox::Target::Bottom, imLoader.LoadFile("ext/Skybox/bottom.jpg") },
+            { Skybox::Target::Back,   imLoader.LoadFile("ext/Skybox/back.jpg")   },
+            { Skybox::Target::Front,  imLoader.LoadFile("ext/Skybox/front.jpg")  }
+        }
+    );
 }
 
 void Renderer::Update(float dt)
@@ -50,13 +66,39 @@ void Renderer::Update(float dt)
 
 void Renderer::Render(float interpolation)
 {
-    GeometryPass(interpolation);
+    // Clear color
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Bind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
+    {
+        // Clear the current framebuffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Render the skybox
+        mSkybox->Render(glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f), mView);
+
+        // Make the GeometryPass
+        GeometryPass(interpolation);
+    }
+    // Unbind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Clear default framebuffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Make the LightPass
     LightPass(interpolation);
+
+    // Check for OpenGL errors
     CheckGLError();
 }
 
 void Renderer::Shutdown()
 {
+    // Destroy Skybox
+    mSkybox.reset();
+
     // Destroy GBuffer
     mGBuffer.reset();
 
@@ -68,12 +110,6 @@ void Renderer::Shutdown()
 
 void Renderer::GeometryPass(float interpolation)
 {
-    // Bind the GBuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
-
-    // Clear color
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Create the projection matrix
     glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 
@@ -129,16 +165,10 @@ void Renderer::GeometryPass(float interpolation)
     }
 
     glUseProgram(0);
-
-    // Unbind the GBuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::LightPass(float interpolation)
 {
-    // Clear color
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Use the light pass program
     GLuint progId = mShaderStore["light_pass"];
     glUseProgram(progId);

@@ -28,92 +28,49 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _SKYBOX_HPP_
+#define _SKYBOX_HPP_
 
-#include <memory>
-#include "../Model/ModelStore.hpp"
-#include "../Shader/ShaderStore.hpp"
-#include "../Texture/TextureStore.hpp"
-#include "../Scene/Transform.hpp"
-#include "GBuffer.hpp"
-#include "Skybox.hpp"
-
+#include <unordered_map>
+#include <glad/glad.h>
+#include <GL/gl.h>
+#include "../Image/RawImage.hpp"
 #include "../../Util/WarnGuard.hpp"
+
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-class Renderer
+class Skybox
 {
     public:
-        /*! Initializes the renderer */
-        void Init();
-
-        /*! Called when updating the game state */
-        void Update(float dt);
-
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes the renderer */
-        void Shutdown();
-
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
-
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
-
-        /*! Retrieves the renderer's ShaderStore */
-        ShaderStore& GetShaderStore();
-
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        // WorldObject
-        struct WorldObject
+        // The face of the Skybox
+        enum class Target
         {
-            Transform transform;
-            std::string model;
+            Right  = GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+            Left   = GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+            Top    = GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+            Bottom = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            Back   = GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+            Front  = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
         };
 
-        /*! Retrieves the renderer's World */
-        std::unordered_map<std::string, std::vector<WorldObject>>& GetWorld();
+        // Constructor
+        Skybox();
 
-        // Store light separately
-        WorldObject* mLight;
+        // Destructor
+        ~Skybox();
+
+        // Loads the given image data to the current Skybox
+        void Load(const std::unordered_map<Target, RawImage<>>& images);
+
+        // Renders the current Skybox
+        void Render(const glm::mat4& projection, const glm::mat4& view);
 
     private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
-
-        // Performs the light pass rendering step
-        void LightPass(float interpolation);
-
-        // Renders a 1x1 quad in NDC, used for framebuffer color targets
-        void RenderQuad();
-
-        // The view matrix
-        glm::mat4 mView;
-
-        // Stores the world objects
-        std::unordered_map<std::string, std::vector<WorldObject>> mWorld;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Stores the shaders and shader programs loaded in the gpu
-        ShaderStore mShaderStore;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // The GBuffer used by the deffered rendering steps
-        std::unique_ptr<GBuffer> mGBuffer;
-
-        // The root Skybox used
-        std::unique_ptr<Skybox> mSkybox;
+        GLuint mVao, mVbo;
+        GLuint mVShader, mFShader, mProgram;
+        GLuint mTextureId;
 };
 
-#endif // ! _RENDERER_HPP_
+#endif // ! _SKYBOX_HPP_

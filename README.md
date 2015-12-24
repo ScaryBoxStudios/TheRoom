@@ -27,11 +27,12 @@ Credits
 -------
 Written and maintained by: 
 * "Agorgianitis Loukas" <agorglouk@gmail.com>
+* "Vlachakis Dimitris" <dimitrisvlh@gmail.com>
 
 Licensing
 ---------
 Read [LICENSE](LICENSE.md)  
 
-Copyright (C) 2015 Agorgianitis Loukas <agorglouk@gmail.com>  
+Copyright (C) 2015 Agorgianitis Loukas <agorglouk@gmail.com>, Vlachakis Dimitris <dimitrisvlh@gmail.com>
 All rights reserved.
 

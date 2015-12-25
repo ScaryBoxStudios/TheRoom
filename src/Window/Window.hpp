@@ -82,6 +82,12 @@ class Window
         /// Retrieves the window title
         const std::string& GetTitle() const;
 
+        /// Retrieves the window width (client area) in pixels
+        int GetWidth() const;
+
+        /// Retrieves the window height (client area) in pixels
+        int GetHeight() const;
+
         /// Sets the position changed callback handler
         void SetPositionChangedHandler(PositionChangedCb cb);
 

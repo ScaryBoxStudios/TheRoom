@@ -101,6 +101,20 @@ const std::string& Window::GetTitle() const
     return mTitle;
 }
 
+int Window::GetWidth() const
+{
+    int width;
+    glfwGetWindowSize(mWindow, &width, nullptr);
+    return width;
+}
+
+int Window::GetHeight() const
+{
+    int height;
+    glfwGetWindowSize(mWindow, nullptr, &height);
+    return height;
+}
+
 void Window::SetPositionChangedHandler(PositionChangedCb cb)
 {
     mPosCb = cb;

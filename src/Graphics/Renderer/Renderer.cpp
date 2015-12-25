@@ -24,8 +24,12 @@ static void CheckGLError()
     }
 }
 
-void Renderer::Init()
+void Renderer::Init(int width, int height)
 {
+    // Store the screen size
+    mScreenWidth = width;
+    mScreenHeight = height;
+
     // Set the clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -36,8 +40,15 @@ void Renderer::Init()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    // Create the projection matrix
+    mProjection = glm::perspective(
+        45.0f,
+        static_cast<float>(mScreenWidth) / mScreenHeight,
+        0.1f, 100.0f
+    );
+
     // Create the GBuffer
-    mGBuffer = std::make_unique<GBuffer>(800, 600);
+    mGBuffer = std::make_unique<GBuffer>(mScreenWidth, mScreenHeight);
 
     // Load the skybox
     mSkybox = std::make_unique<Skybox>();
@@ -84,13 +95,11 @@ void Renderer::Render(float interpolation)
     // Make the LightPass
     LightPass(interpolation);
 
-    int width = 800;
-    int height = 600;
     // Setup forward render context
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer->Id());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, width, height,
-                      0, 0, width, height,
+    glBlitFramebuffer(0, 0, mScreenWidth, mScreenHeight,
+                      0, 0, mScreenWidth, mScreenHeight,
                       GL_DEPTH_BUFFER_BIT,
                       GL_NEAREST);
     // Check for OpenGL errors
@@ -100,7 +109,7 @@ void Renderer::Render(float interpolation)
     // Forward rendering block
     {
         // Render the skybox
-        mSkybox->Render(glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f), mView);
+        mSkybox->Render(mProjection, mView);
     }
 }
 
@@ -120,8 +129,6 @@ void Renderer::Shutdown()
 
 void Renderer::GeometryPass(float interpolation)
 {
-    // Create the projection matrix
-    glm::mat4 projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 
     // Get the view matrix
     const auto& view = mView;
@@ -132,7 +139,7 @@ void Renderer::GeometryPass(float interpolation)
 
     // Upload projection and view matrices
     auto projectionId = glGetUniformLocation(progId, "projection");
-    glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(mProjection));
     auto viewId = glGetUniformLocation(progId, "view");
     glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
 

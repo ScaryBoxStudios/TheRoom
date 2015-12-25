@@ -25,7 +25,7 @@ void Game::Init()
     SetupWindow();
 
     // Initialize the renderer
-    renderer.Init();
+    renderer.Init(800, 600);
 
     // Cube rotation state
     mRotationData.degreesInc = 0.05f;

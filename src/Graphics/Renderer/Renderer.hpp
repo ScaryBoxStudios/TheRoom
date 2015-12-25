@@ -48,7 +48,7 @@ class Renderer
 {
     public:
         /*! Initializes the renderer */
-        void Init();
+        void Init(int width, int height);
 
         /*! Called when updating the game state */
         void Update(float dt);
@@ -94,8 +94,14 @@ class Renderer
         // Renders a 1x1 quad in NDC, used for framebuffer color targets
         void RenderQuad();
 
+        // The projection matrix
+        glm::mat4 mProjection;
+
         // The view matrix
         glm::mat4 mView;
+
+        // The screen size
+        int mScreenWidth, mScreenHeight;
 
         // Stores the world objects
         std::unordered_map<std::string, std::vector<WorldObject>> mWorld;

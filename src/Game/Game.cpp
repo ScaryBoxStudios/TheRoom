@@ -232,44 +232,36 @@ void Game::LoadModels()
     // Model loader instance
     ModelLoader modelLoader;
 
-    // Load the cube
-    auto cubeFile = FileLoad<BufferType>("ext/Cube/cube.obj");
-    if(!cubeFile)
-        throw std::runtime_error("Couldn't load file (ext/Cube/cube.obj)");
+    struct ModelData
+    {
+        std::string
+            filepath,
+            extension,
+            name,
+            diffName,
+            specName;
+    };
 
-    Model cube = modelLoader.Load(*cubeFile, "obj");
-    if(cube.meshes.size() == 0)
-        throw std::runtime_error("Couldn't load model (ext/Cube/cube.obj)");
+    std::vector<ModelData> models = {
+        {"ext/Cube/cube.obj",               "obj", "cube",   "mahogany_wood", "mahogany_wood_spec"} // Cube
+    ,   {"ext/teapot.obj",                  "obj", "teapot", "white",         "white_spec"}         // Teapot
+    ,   {"ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  "house_diff",    "house_spec"}         // House
+    };
 
-    modelStore.Load("cube", std::move(cube));
-    modelStore["cube"]->diffTexId = textureStore["mahogany_wood"]->texId;
-    modelStore["cube"]->specTexId = textureStore["mahogany_wood_spec"]->texId;
+    for(auto& m : models)
+    {
+        auto file = FileLoad<BufferType>(m.filepath);
+        if(!file)
+            throw std::runtime_error("Couldn't load file (" + m.filepath + ")");
 
-    // Load teapot
-    auto teapotFile = FileLoad<BufferType>("ext/teapot.obj");
-    if(!teapotFile)
-        throw std::runtime_error("Couldn't load file (ext/teapot.obj)");
+        Model model = modelLoader.Load(*file, m.extension.c_str());
+        if(model.meshes.size() == 0)
+            throw std::runtime_error("Couldn't load model (" + m.filepath + ")");
 
-    Model teapot = modelLoader.Load(*teapotFile, "obj");
-    if(teapot.meshes.size() == 0)
-        throw std::runtime_error("Couldn't load model (ext/teapot.obj)");
-
-    modelStore.Load("teapot", std::move(teapot));
-    modelStore["teapot"]->diffTexId = textureStore["white"]->texId;
-    modelStore["teapot"]->specTexId = textureStore["white_spec"]->texId;
-
-    // Load house
-    auto houseFile = FileLoad<BufferType>("ext/WoodenCabin/WoodenCabin.dae");
-    if(!houseFile)
-        throw std::runtime_error("Couldn't load file (ext/WoodenCabin/WoodenCabin.dae)");
-
-    Model house = modelLoader.Load(*houseFile, "dae");
-    if(house.meshes.size() == 0)
-        throw std::runtime_error("Couldn't load model (ext/WoodenCabin/WoodenCabin.dae)");
-
-    modelStore.Load("house", std::move(house));
-    modelStore["house"]->diffTexId = textureStore["house_diff"]->texId;
-    modelStore["house"]->specTexId = textureStore["house_spec"]->texId;
+        modelStore.Load(m.name, std::move(model));
+        modelStore[m.name]->diffTexId = textureStore[m.diffName]->texId;
+        modelStore[m.name]->specTexId = textureStore[m.specName]->texId;
+    }
 }
 
 std::vector<Camera::MoveDirection> Game::CameraMoveDirections()

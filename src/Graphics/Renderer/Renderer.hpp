@@ -78,8 +78,15 @@ class Renderer
             std::string model;
         };
 
+        // World Object Categories
+        enum class WorldObjCategory
+        {
+            Normal,
+            Light
+        };
+
         /*! Retrieves the renderer's World */
-        std::unordered_map<std::string, std::vector<WorldObject>>& GetWorld();
+        std::unordered_map<WorldObjCategory, std::vector<WorldObject>>& GetWorld();
 
         // Store light separately
         WorldObject* mLight;
@@ -104,7 +111,7 @@ class Renderer
         int mScreenWidth, mScreenHeight;
 
         // Stores the world objects
-        std::unordered_map<std::string, std::vector<WorldObject>> mWorld;
+        std::unordered_map<WorldObjCategory, std::vector<WorldObject>> mWorld;
 
         // Stores the models loaded in the gpu
         ModelStore mModelStore;

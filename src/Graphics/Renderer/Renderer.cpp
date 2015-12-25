@@ -289,7 +289,7 @@ ModelStore& Renderer::GetModelStore()
     return mModelStore;
 }
 
-auto Renderer::GetWorld() -> std::unordered_map<std::string, std::vector<WorldObject>>&
+auto Renderer::GetWorld() -> std::unordered_map<WorldObjCategory, std::vector<WorldObject>>&
 {
     return mWorld;
 }

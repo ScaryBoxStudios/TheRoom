@@ -89,7 +89,7 @@ void Game::SetupWorld()
         trans.Scale(glm::vec3(0.3f));
         normalObjects.push_back({trans, "house"});
     }
-    world.insert({"normal", normalObjects});
+    world.insert({Renderer::WorldObjCategory::Normal, normalObjects});
 
     //
     // Light objects
@@ -103,8 +103,8 @@ void Game::SetupWorld()
         trans.Scale(glm::vec3(0.3f));
         lightObjects.push_back({trans, "teapot"});
     }
-    world.insert({"light", lightObjects});
-    renderer.mLight = &world["light"].back();
+    world.insert({Renderer::WorldObjCategory::Light, lightObjects});
+    renderer.mLight = &world[Renderer::WorldObjCategory::Normal].back();
 }
 
 void Game::SetupWindow()
@@ -323,10 +323,16 @@ void Game::Update(float dt)
     // Update cubes' rotations
     if (mRotationData.rotating)
     {
-        for (auto& p : renderer.GetWorld())
-            if (p.first == "normal")
-                for (auto& gObj : p.second)
-                    gObj.transform.RotateY(mRotationData.degreesInc);
+        for(auto& p : renderer.GetWorld())
+        {
+            switch(p.first)
+            {
+                case Renderer::WorldObjCategory::Normal:
+                    for(auto& gObj : p.second)
+                        gObj.transform.RotateY(mRotationData.degreesInc);
+                    break;
+            }
+        }
     }
 }
 

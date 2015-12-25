@@ -32,13 +32,21 @@
 #define _MESH_HPP_
 
 #include <vector>
+#include <array>
 #include <cstdint>
+
+#include <glad\glad.h>
+
+struct MeshData
+{
+    GLfloat vx, vy, vz, // Vertices
+            nx, ny, nz, // Normals
+            tx, ty;     // TexCoords
+};
 
 struct Mesh
 {
-    std::vector<float> vertices;
-    std::vector<float> normals;
-    std::vector<float> texCoords;
+    std::vector<MeshData> data;
     std::vector<uint32_t> indices;
 };
 

@@ -29,30 +29,34 @@ Model ModelLoader::Load(std::vector<std::uint8_t> fileData, const char* type)
         Mesh mData;
         for (std::uint32_t i = 0; i < mesh->mNumVertices; ++i)
         {
+            MeshData meshData;
+
             // Vertices
             const aiVector3D& vert = mesh->mVertices[i];
-            mData.vertices.push_back(vert.x);
-            mData.vertices.push_back(vert.y);
-            mData.vertices.push_back(vert.z);
+            meshData.vx = vert.x;
+            meshData.vy = vert.y;
+            meshData.vz = vert.z;
 
             // Normals
             const aiVector3D& norm = mesh->mNormals[i];
-            mData.normals.push_back(norm.x);
-            mData.normals.push_back(norm.y);
-            mData.normals.push_back(norm.z);
+            meshData.nx = norm.x;
+            meshData.ny = norm.y;
+            meshData.nz = norm.z;
 
             // Texture coordinates
             if (mesh->mTextureCoords[0])
             {
                 const aiVector3D& texCoord = mesh->mTextureCoords[0][i];
-                mData.texCoords.push_back(texCoord.x);
-                mData.texCoords.push_back(texCoord.y);
+                meshData.tx = texCoord.x;
+                meshData.ty = texCoord.y;
             }
             else
             {
-                mData.texCoords.push_back(0);
-                mData.texCoords.push_back(0);
+                meshData.tx = 0;
+                meshData.ty = 0;
             }
+
+            mData.data.push_back(meshData);
         }
 
         // Indices

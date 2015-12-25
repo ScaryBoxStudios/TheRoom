@@ -16,9 +16,7 @@ void ModelStore::Clear()
         auto& modelDesc = p.second;
         for (auto& meshDesc : modelDesc.meshes)
         {
-            glDeleteBuffers(1, &meshDesc.normalBufId);
             glDeleteBuffers(1, &meshDesc.eboId);
-            glDeleteBuffers(1, &meshDesc.texBufId);
             glDeleteBuffers(1, &meshDesc.vboId);
             glDeleteVertexArrays(1, &meshDesc.vaoId);
         }
@@ -36,55 +34,34 @@ void ModelStore::Load(const std::string& name, const Model& data)
         MeshDescription meshDesc;
         auto& vaoId = meshDesc.vaoId;
         auto& vboId = meshDesc.vboId;
-        auto& texBufId = meshDesc.texBufId;
         auto& eboId = meshDesc.eboId;
-        auto& normalBufId = meshDesc.normalBufId;
         auto& numIndices = meshDesc.numIndices;
 
         glGenVertexArrays(1, &vaoId);
         glGenBuffers(1, &vboId);
-        glGenBuffers(1, &texBufId);
         glGenBuffers(1, &eboId);
-        glGenBuffers(1, &normalBufId);
 
         glBindVertexArray(vaoId);
         {
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             {
                 glBufferData(GL_ARRAY_BUFFER,
-                    mesh.vertices.size() * sizeof(GLfloat),
-                    mesh.vertices.data(),
+                    mesh.data.size() * sizeof(MeshData),
+                    mesh.data.data(),
                     GL_STATIC_DRAW
                 );
-                GLuint index = 0;
-                glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-                glEnableVertexAttribArray(index);
-            }
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-            glBindBuffer(GL_ARRAY_BUFFER, normalBufId);
-            {
-                glBufferData(GL_ARRAY_BUFFER,
-                    mesh.normals.size() * sizeof(GLfloat),
-                    mesh.normals.data(),
-                    GL_STATIC_DRAW
-                );
-                GLuint index = 1;
-                glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-                glEnableVertexAttribArray(index);
-            }
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+                // Vertices
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData), (GLvoid*)(offsetof(MeshData, vx)));
+                glEnableVertexAttribArray(0);
 
-            glBindBuffer(GL_ARRAY_BUFFER, texBufId);
-            {
-                glBufferData(GL_ARRAY_BUFFER,
-                    mesh.texCoords.size() * sizeof(GLfloat),
-                    mesh.texCoords.data(),
-                    GL_STATIC_DRAW
-                );
-                GLuint index = 2;
-                glVertexAttribPointer(index, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-                glEnableVertexAttribArray(index);
+                // Normals
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData), (GLvoid*)(offsetof(MeshData, nx)));
+                glEnableVertexAttribArray(1);
+
+                // TexCoords
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshData), (GLvoid*)(offsetof(MeshData, tx)));
+                glEnableVertexAttribArray(2);
             }
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 

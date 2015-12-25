@@ -57,7 +57,8 @@ uniform mat4 view;
 
 void main()
 {
-    gl_Position =   projection * view * vec4(position, 1.0);
+    vec4 pos = projection * view * vec4(position, 1.0);
+    gl_Position = pos.xyww;
     TexCoords = position;
 }
 )foo";
@@ -141,6 +142,7 @@ void Skybox::Load(const std::unordered_map<Target, RawImage<>>& images)
 
 void Skybox::Render(const glm::mat4& projection, const glm::mat4& view)
 {
+    glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
     glUseProgram(mProgram);
     {
@@ -160,4 +162,5 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view)
     }
     glUseProgram(0);
     glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
 }

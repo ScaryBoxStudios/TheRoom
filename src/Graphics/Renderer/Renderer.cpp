@@ -66,17 +66,11 @@ void Renderer::Update(float dt)
 
 void Renderer::Render(float interpolation)
 {
-    // Clear color
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // Bind the GBuffer
     glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
     {
         // Clear the current framebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Render the skybox
-        mSkybox->Render(glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f), mView);
 
         // Make the GeometryPass
         GeometryPass(interpolation);
@@ -90,8 +84,24 @@ void Renderer::Render(float interpolation)
     // Make the LightPass
     LightPass(interpolation);
 
+    int width = 800;
+    int height = 600;
+    // Setup forward render context
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer->Id());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, width, height,
+                      0, 0, width, height,
+                      GL_DEPTH_BUFFER_BIT,
+                      GL_NEAREST);
     // Check for OpenGL errors
     CheckGLError();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Forward rendering block
+    {
+        // Render the skybox
+        mSkybox->Render(glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f), mView);
+    }
 }
 
 void Renderer::Shutdown()

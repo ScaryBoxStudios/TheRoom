@@ -35,6 +35,7 @@
 #include "../Model/ModelStore.hpp"
 #include "../Shader/ShaderStore.hpp"
 #include "../Texture/TextureStore.hpp"
+#include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
 #include "GBuffer.hpp"
 #include "Skybox.hpp"
@@ -71,25 +72,8 @@ class Renderer
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
 
-        // WorldObject
-        struct WorldObject
-        {
-            Transform transform;
-            std::string model;
-        };
-
-        // World Object Categories
-        enum class WorldObjCategory
-        {
-            Normal,
-            Light
-        };
-
         /*! Retrieves the renderer's World */
-        std::unordered_map<WorldObjCategory, std::vector<WorldObject>>& GetWorld();
-
-        // Store light separately
-        WorldObject* mLight;
+        Scene& GetScene();
 
     private:
         // Performs the geometry pass rendering step
@@ -111,7 +95,7 @@ class Renderer
         int mScreenWidth, mScreenHeight;
 
         // Stores the world objects
-        std::unordered_map<WorldObjCategory, std::vector<WorldObject>> mWorld;
+        Scene mScene;
 
         // Stores the models loaded in the gpu
         ModelStore mModelStore;

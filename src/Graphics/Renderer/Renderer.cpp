@@ -70,9 +70,8 @@ void Renderer::Update(float dt)
     (void) dt;
 
     // Update interpolation variables
-    for (auto& p : mWorld)
-        for (auto& gObj : p.second)
-            gObj.transform.Update();
+    for (auto& obj : mScene.GetObjects())
+        obj.second.transform.Update();
 }
 
 void Renderer::Render(float interpolation)
@@ -144,19 +143,19 @@ void Renderer::GeometryPass(float interpolation)
     glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
 
     // Iterate through world objects by category
-    for (const auto& objCategory : mWorld)
+    for (const auto& objCategory : mScene.GetCategories())
     {
         for (const auto& gObj : objCategory.second)
         {
             // Calculate the model matrix
-            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
+            glm::mat4 model = gObj->second.transform.GetInterpolated(interpolation);
 
             // Upload it
             auto modelId = glGetUniformLocation(progId, "model");
             glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
 
             // Get the model
-            ModelDescription* mdl = mModelStore[gObj.model];
+            ModelDescription* mdl = mModelStore[gObj->second.model];
 
             // Bind the needed textures
             glActiveTexture(GL_TEXTURE0);
@@ -217,7 +216,10 @@ void Renderer::LightPass(float interpolation)
         glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 
         // Set light's properties
-        const glm::mat4& lTrans = mLight->transform.GetInterpolated(interpolation);
+        auto& categories = mScene.GetCategories();
+        auto lightIt = categories.find(SceneObjCategory::Light);
+
+        const glm::mat4& lTrans = lightIt->second[0]->second.transform.GetInterpolated(interpolation);
         const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
         glUniform3f(glGetUniformLocation(progId, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);
@@ -289,7 +291,7 @@ ModelStore& Renderer::GetModelStore()
     return mModelStore;
 }
 
-auto Renderer::GetWorld() -> std::unordered_map<WorldObjCategory, std::vector<WorldObject>>&
+Scene& Renderer::GetScene()
 {
-    return mWorld;
+    return mScene;
 }

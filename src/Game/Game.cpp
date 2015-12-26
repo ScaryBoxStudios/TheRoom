@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include <algorithm>
 #include "../Window/GlfwError.hpp"
 #include "../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -8,6 +9,8 @@ WARN_GUARD_ON
 #include "../Graphics/Model/ModelLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
+
+#include "../Graphics/Scene/Scene.hpp"
 
 ///==============================================================
 ///= Game
@@ -50,12 +53,11 @@ void Game::Init()
 void Game::SetupWorld()
 {
     // Retrieve the world from the renderer
-    auto& world = renderer.GetWorld();
+    auto& scene = renderer.GetScene();
 
     //
     // Normal objects
     //
-    std::vector<Renderer::WorldObject> normalObjects;
     // Create various Cube instances in the world
     std::vector<glm::vec3> cubePositions = {
         glm::vec3(0.0f, 0.0f, 0.0f),
@@ -71,40 +73,34 @@ void Game::SetupWorld()
     };
     for (std::size_t i = 0; i < cubePositions.size(); ++i)
     {
+        const std::string name = "cube" + std::to_string(i);
+        scene.AddObject(name, "cube", SceneObjCategory::Normal);
+
         const auto& pos = cubePositions[i];
 
-        Transform trans;
-        trans.Move(pos);
-        trans.Scale(glm::vec3(2.0f));
-        trans.RotateX(20.0f * i);
-        trans.RotateY(7.0f * i);
-        trans.RotateZ(10.0f * i);
-        normalObjects.push_back({trans, "cube"});
+        scene.Move(name, pos);
+        scene.Scale(name, glm::vec3(2.0f));
+        scene.RotateX(name, 20.0f * i);
+        scene.RotateY(name, 7.0f * i);
+        scene.RotateZ(name, 10.0f * i);
     }
 
     // Add house
     {
-        Transform trans;
-        trans.Move(glm::vec3(0.0f, -10.0f, -40.0f));
-        trans.Scale(glm::vec3(0.3f));
-        normalObjects.push_back({trans, "house"});
+        scene.AddObject("house", "house", SceneObjCategory::Normal);
+        scene.Move("house", glm::vec3(0.0f, -10.0f, -40.0f));
+        scene.Scale("house", glm::vec3(0.3f));
     }
-    world.insert({Renderer::WorldObjCategory::Normal, normalObjects});
 
     //
     // Light objects
     //
-    std::vector<Renderer::WorldObject> lightObjects;
-
     // Add cube lights
     {
-        Transform trans;
-        trans.Move(glm::vec3(4.0f, 0.0f, 0.0f));
-        trans.Scale(glm::vec3(0.3f));
-        lightObjects.push_back({trans, "teapot"});
+        scene.AddObject("teapot", "teapot", SceneObjCategory::Light);
+        scene.Move("teapot", glm::vec3(4.0f, 0.0f, 0.0f));
+        scene.Scale("teapot", glm::vec3(0.3f));
     }
-    world.insert({Renderer::WorldObjCategory::Light, lightObjects});
-    renderer.mLight = &world[Renderer::WorldObjCategory::Normal].back();
 }
 
 void Game::SetupWindow()
@@ -305,31 +301,30 @@ void Game::Update(float dt)
     mCamera.Move(CameraMoveDirections());
 
     // Update light position
-    auto& trans = renderer.mLight->transform;
+    auto& scene = renderer.GetScene();
     float increase = 0.7f;
     if(mWindow.IsKeyPressed(Key::Kp8))
-        trans.Move(glm::vec3(0.0f, increase, 0.0f));
+        scene.Move("teapot", glm::vec3(0.0f, increase, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp4))
-        trans.Move(glm::vec3(-increase, 0.0f, 0.0f));
+        scene.Move("teapot", glm::vec3(-increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp2))
-        trans.Move(glm::vec3(0.0f, -increase, 0.0f));
+        scene.Move("teapot", glm::vec3(0.0f, -increase, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp6))
-        trans.Move(glm::vec3(increase, 0.0f, 0.0f));
+        scene.Move("teapot", glm::vec3(increase, 0.0f, 0.0f));
     if(mWindow.IsKeyPressed(Key::Kp5))
-        trans.Move(glm::vec3(0.0f, 0.0f, -increase));
+        scene.Move("teapot", glm::vec3(0.0f, 0.0f, -increase));
     if(mWindow.IsKeyPressed(Key::Kp0))
-        trans.Move(glm::vec3(0.0f, 0.0f, increase));
+        scene.Move("teapot", glm::vec3(0.0f, 0.0f, increase));
 
     // Update cubes' rotations
     if (mRotationData.rotating)
     {
-        for(auto& p : renderer.GetWorld())
+        for(auto& p : scene.GetObjects())
         {
-            switch(p.first)
+            switch(p.second.category)
             {
-                case Renderer::WorldObjCategory::Normal:
-                    for(auto& gObj : p.second)
-                        gObj.transform.RotateY(mRotationData.degreesInc);
+                case SceneObjCategory::Normal:
+                    scene.RotateY(p.first, mRotationData.degreesInc);
                     break;
             }
         }

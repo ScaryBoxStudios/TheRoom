@@ -8,6 +8,7 @@ void Scene::AddObject(
     const std::string& name,
     const std::string& modelName,
     SceneObjCategory category,
+    const glm::vec3& pos,
     const std::string& parent /* = "" */ )
 {
     // Check if object with that name already exists
@@ -19,6 +20,7 @@ void Scene::AddObject(
     newObj.model = modelName;
     newObj.category = category;
     newObj.parent = parent;
+    newObj.transform.Move(pos);
 
     // Add the new object to scene map
     mObjects[name] = newObj;

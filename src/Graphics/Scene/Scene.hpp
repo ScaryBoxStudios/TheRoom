@@ -51,6 +51,7 @@ class Scene
             const std::string& name,         /// Object's name, unique for every scene object
             const std::string& modelName,    /// Model's name, can be the same for many objects
             SceneObjCategory category,       /// Object's category
+            const glm::vec3& pos,            /// Object's starting position
             const std::string& parent = ""); /// Parent object's name (optional)
 
         /// Removes an object from the scene

@@ -73,12 +73,11 @@ void Game::SetupWorld()
     };
     for (std::size_t i = 0; i < cubePositions.size(); ++i)
     {
-        const std::string name = "cube" + std::to_string(i);
-        scene.AddObject(name, "cube", SceneObjCategory::Normal);
-
         const auto& pos = cubePositions[i];
 
-        scene.Move(name, pos);
+        const std::string name = "cube" + std::to_string(i);
+        scene.AddObject(name, "cube", SceneObjCategory::Normal, pos);
+
         scene.Scale(name, glm::vec3(2.0f));
         scene.RotateX(name, 20.0f * i);
         scene.RotateY(name, 7.0f * i);
@@ -87,8 +86,7 @@ void Game::SetupWorld()
 
     // Add house
     {
-        scene.AddObject("house", "house", SceneObjCategory::Normal);
-        scene.Move("house", glm::vec3(0.0f, -10.0f, -40.0f));
+        scene.AddObject("house", "house", SceneObjCategory::Normal, glm::vec3(0.0f, -10.0f, -40.0f));
         scene.Scale("house", glm::vec3(0.3f));
     }
 
@@ -97,8 +95,7 @@ void Game::SetupWorld()
     //
     // Add cube lights
     {
-        scene.AddObject("teapot", "teapot", SceneObjCategory::Light);
-        scene.Move("teapot", glm::vec3(4.0f, 0.0f, 0.0f));
+        scene.AddObject("teapot", "teapot", SceneObjCategory::Light, glm::vec3(4.0f, 0.0f, 0.0f));
         scene.Scale("teapot", glm::vec3(0.3f));
     }
 }

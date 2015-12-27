@@ -42,7 +42,8 @@ namespace std
         using argument_type = T;
         using underlying_type = typename std::underlying_type<argument_type>::type;
         using result_type = typename std::hash<underlying_type>::result_type;
-        result_type operator()(const argument_type& arg, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr) const
+        template <typename U = T, typename std::enable_if<std::is_enum<U>::value, int>::type = 0>
+        result_type operator()(const argument_type& arg) const
         {
             std::hash<underlying_type> hasher;
             return hasher(static_cast<underlying_type>(arg));

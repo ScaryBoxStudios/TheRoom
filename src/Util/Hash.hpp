@@ -28,50 +28,26 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SKYBOX_HPP_
-#define _SKYBOX_HPP_
+#ifndef _HASH_FIX_HPP_
+#define _HASH_FIX_HPP_
 
-#include <unordered_map>
-#include <glad/glad.h>
-#include <GL/gl.h>
-#include "../Image/RawImage.hpp"
-#include "../../Util/WarnGuard.hpp"
-#include "../../Util/Hash.hpp"
+#include <type_traits>
+#include <functional>
 
-WARN_GUARD_ON
-#include <glm/glm.hpp>
-WARN_GUARD_OFF
-
-class Skybox
+namespace std
 {
-    public:
-        // The face of the Skybox
-        enum class Target
+    template<typename T>
+    struct hash
+    {
+        using argument_type = T;
+        using underlying_type = typename std::underlying_type<argument_type>::type;
+        using result_type = typename std::hash<underlying_type>::result_type;
+        result_type operator()(const argument_type& arg, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr) const
         {
-            Right  = GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-            Left   = GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-            Top    = GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-            Bottom = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-            Back   = GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-            Front  = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
-        };
+            std::hash<underlying_type> hasher;
+            return hasher(static_cast<underlying_type>(arg));
+        }
+    };
+}
 
-        // Constructor
-        Skybox();
-
-        // Destructor
-        ~Skybox();
-
-        // Loads the given image data to the current Skybox
-        void Load(const std::unordered_map<Target, RawImage<>>& images);
-
-        // Renders the current Skybox
-        void Render(const glm::mat4& projection, const glm::mat4& view);
-
-    private:
-        GLuint mVao, mVbo;
-        GLuint mVShader, mFShader, mProgram;
-        GLuint mTextureId;
-};
-
-#endif // ! _SKYBOX_HPP_
+#endif // ! _HASH_FIX_HPP_

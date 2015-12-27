@@ -35,6 +35,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include "../../Util/Hash.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON

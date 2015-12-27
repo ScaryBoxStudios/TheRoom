@@ -35,7 +35,7 @@
 #include <array>
 #include <cstdint>
 
-#include <glad\glad.h>
+#include <glad/glad.h>
 
 struct MeshData
 {

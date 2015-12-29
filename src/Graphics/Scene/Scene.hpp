@@ -31,69 +31,58 @@
 #ifndef _SCENE_HPP_
 #define _SCENE_HPP_
 
-#include <map>
-#include <unordered_map>
-#include <vector>
 #include <string>
-#include "../../Util/Hash.hpp"
-
-#include "../../Util/WarnGuard.hpp"
-WARN_GUARD_ON
-#include <glm/glm.hpp>
-WARN_GUARD_OFF
-
-#include "SceneObject.hpp"
+#include <map>
+#include <memory>
+#include "SceneNode.hpp"
 
 class Scene
 {
+    //                               UUID               Unique Ptr to node
+    using NodeBank        = std::map<std::string,       std::unique_ptr<SceneNode>>;
+    //                               Category           Nodes that belong in that category
+    using NodeCategoryMap = std::map<SceneNodeCategory, std::vector<SceneNode*>>;
+
     public:
-        /// Adds new object to scene
-        void AddObject(
-            const std::string& name,         /// Object's name, unique for every scene object
-            const std::string& modelName,    /// Model's name, can be the same for many objects
-            SceneObjCategory category,       /// Object's category
-            const glm::vec3& pos,            /// Object's starting position
-            const std::string& parent = ""); /// Parent object's name (optional)
+        /// Constructor
+        Scene();
 
-        /// Removes an object from the scene
-        void RemoveObject(const std::string& name);
+        /// Creates node and adds it to NodeBank
+        SceneNode* CreateNode(
+            const std::string& model,
+            const std::string& uuid,
+            SceneNodeCategory category,
+            const glm::vec3& pos,
+            bool isCulled = false);
 
-        /// Attach a child to a parent
-        void AttachObject(const std::string& child, const std::string& parent);
+        /// Attach child to parent
+        void AttachToParent(SceneNode* child, const std::string& parentUuid);
 
-        /// Detach a child from a parent
-        void DetachObject(const std::string& child, const std::string& parent);
+        /// Detach child from parent
+        void DetachFromParent(const std::string& childUuid, const std::string& parentUuid);
 
-        /// Moves relatively to the current position
-        void Move(const std::string& objName, const glm::vec3& pos);
+        /// Move the node and optionally its children too
+        void Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren = false);
 
-        /// Rotates relatively to the current X rotation
-        void RotateX(const std::string& objName, float angle);
+        /// Rotate the node and optionally its children
+        void Rotate(const std::string& uuid, RotationAxis axis, float angle, bool rotateChildren = false);
 
-        /// Rotates relatively to the current Y rotation
-        void RotateY(const std::string& objName, float angle);
+        /// Scale the node and optionally its children too
+        void Scale(const std::string& uuid, const glm::vec3& scale, bool scaleChildren = false);
 
-        /// Rotates relatively to the current Z rotation
-        void RotateZ(const std::string& objName, float angle);
+        /// Get all nodes in their container
+        const NodeBank& GetNodes() const;
 
-        /// Scales relatively to the current scale
-        void Scale(const std::string& objName, const glm::vec3& scale);
-
-        /// Get scene's objects
-        std::map<std::string, SceneObject>& GetObjects();
-
-        /// Get category map for renderer
-        std::unordered_map<SceneObjCategory, std::vector<std::map<std::string, SceneObject>::iterator>>&
-            GetCategories();
+        /// Get all nodes in a useful category map
+        const NodeCategoryMap& GetCategories() const;
 
     private:
-        std::map<std::string, SceneObject> mObjects; /// Scene's objects
+        SceneNode* mRootNode;        /// Scene's root node
+        NodeBank mNodes;             /// All nodes
+        NodeCategoryMap mCategories; /// A map to find nodes by category
 
-        // TODO: Find a better way to sort objects by category
-        // Problem: The problem is that scene owns the data but many other modules
-        // need them in different formats. For example renderer wants them sorted
-        // by category
-        std::unordered_map<SceneObjCategory, std::vector<std::map<std::string, SceneObject>::iterator>> mCategories;
+        /// Finds the node with the given uuid
+        inline SceneNode* FindNodeByUuid(const std::string& uuid);
 }; // ! Scene
 
 #endif // ! _SCENE_HPP_

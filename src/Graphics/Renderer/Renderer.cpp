@@ -70,8 +70,8 @@ void Renderer::Update(float dt)
     (void) dt;
 
     // Update interpolation variables
-    for (auto& obj : mScene.GetObjects())
-        obj.second.transform.Update();
+    for (auto& obj : mScene.GetNodes())
+        obj.second->GetTransformation().Update();
 }
 
 void Renderer::Render(float interpolation)
@@ -148,14 +148,14 @@ void Renderer::GeometryPass(float interpolation)
         for (const auto& gObj : objCategory.second)
         {
             // Calculate the model matrix
-            glm::mat4 model = gObj->second.transform.GetInterpolated(interpolation);
+            glm::mat4 model = gObj->GetTransformation().GetInterpolated(interpolation);
 
             // Upload it
             auto modelId = glGetUniformLocation(progId, "model");
             glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
 
             // Get the model
-            ModelDescription* mdl = mModelStore[gObj->second.model];
+            ModelDescription* mdl = mModelStore[gObj->GetModel()];
 
             // Bind the needed textures
             glActiveTexture(GL_TEXTURE0);
@@ -217,9 +217,9 @@ void Renderer::LightPass(float interpolation)
 
         // Set light's properties
         auto& categories = mScene.GetCategories();
-        auto lightIt = categories.find(SceneObjCategory::Light);
+        auto lightIt = categories.find(SceneNodeCategory::Light);
 
-        const glm::mat4& lTrans = lightIt->second[0]->second.transform.GetInterpolated(interpolation);
+        const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
         const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
         glUniform3f(glGetUniformLocation(progId, "light.position"), lightPos.x, lightPos.y, lightPos.z);
         glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);

@@ -76,17 +76,17 @@ void Game::SetupWorld()
         const auto& pos = cubePositions[i];
 
         const std::string name = "cube" + std::to_string(i);
-        scene.AddObject(name, "cube", SceneObjCategory::Normal, pos);
+        scene.CreateNode("cube", name, SceneNodeCategory::Normal, pos);
 
         scene.Scale(name, glm::vec3(2.0f));
-        scene.RotateX(name, 20.0f * i);
-        scene.RotateY(name, 7.0f * i);
-        scene.RotateZ(name, 10.0f * i);
+        scene.Rotate(name, RotationAxis::X, 20.0f * i);
+        scene.Rotate(name, RotationAxis::Y, 7.0f * i);
+        scene.Rotate(name, RotationAxis::Z, 10.0f * i);
     }
 
     // Add house
     {
-        scene.AddObject("house", "house", SceneObjCategory::Normal, glm::vec3(0.0f, -10.0f, -40.0f));
+        scene.CreateNode("house", "house", SceneNodeCategory::Normal, glm::vec3(0.0f, -10.0f, -40.0f));
         scene.Scale("house", glm::vec3(0.3f));
     }
 
@@ -95,7 +95,7 @@ void Game::SetupWorld()
     //
     // Add cube lights
     {
-        scene.AddObject("teapot", "teapot", SceneObjCategory::Light, glm::vec3(4.0f, 0.0f, 0.0f));
+        scene.CreateNode("teapot", "teapot", SceneNodeCategory::Light, glm::vec3(4.0f, 0.0f, 0.0f));
         scene.Scale("teapot", glm::vec3(0.3f));
     }
 }
@@ -316,12 +316,12 @@ void Game::Update(float dt)
     // Update cubes' rotations
     if (mRotationData.rotating)
     {
-        for(auto& p : scene.GetObjects())
+        for(auto& p : scene.GetNodes())
         {
-            switch(p.second.category)
+            switch(p.second->GetCategory())
             {
-                case SceneObjCategory::Normal:
-                    scene.RotateY(p.first, mRotationData.degreesInc);
+                case SceneNodeCategory::Normal:
+                    scene.Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
                     break;
             }
         }

@@ -39,7 +39,7 @@ class ModelLoader
 {
     public:
         // Parses model file data into memory structs
-        Model Load(std::vector<std::uint8_t> fileData, const char* type);
+        Model Load(const std::vector<std::uint8_t>& fileData, const char* type);
 };
 
 #endif // ! _MODELLOADER_HPP_

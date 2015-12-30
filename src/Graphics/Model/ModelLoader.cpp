@@ -4,7 +4,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-Model ModelLoader::Load(std::vector<std::uint8_t> fileData, const char* type)
+Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* type)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFileFromMemory(

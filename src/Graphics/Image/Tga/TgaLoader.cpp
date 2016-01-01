@@ -79,6 +79,14 @@ auto TgaLoader::Load(BufferType fileData) -> RawImage<BufferType>
     // Remove trailing data from buffer
     fileData.erase(std::begin(fileData) + width * height * pixelSz, std::end(fileData));
 
+    // Convert BGR to RGB
+    for (std::size_t i = 0; i < width * height * pixelSz; i += 3)
+    {
+        auto tmp = fileData[i];
+        fileData[i] = fileData[i + 2];
+        fileData[i + 2] = tmp;
+    }
+
     // Create the ImageProperties structure for the RawImage returned
     ImageProperties imProps;
     imProps.width = width;

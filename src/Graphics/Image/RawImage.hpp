@@ -46,6 +46,10 @@ class RawImage
 {
     public:
         RawImage(Buffer buf, ImageProperties props);
+        RawImage(const RawImage& other) = default;
+        RawImage& operator=(const RawImage& other) = default;
+        RawImage(RawImage&& other) = default;
+        RawImage& operator=(RawImage&& other) = default;
         const std::uint8_t* Data() const;
         const ImageProperties& GetProperties() const;
     private:

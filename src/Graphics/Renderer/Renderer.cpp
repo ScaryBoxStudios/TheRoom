@@ -63,6 +63,10 @@ void Renderer::Init(int width, int height)
             { Skybox::Target::Front,  imLoader.LoadFile("ext/Skybox/front.jpg")  }
         }
     );
+
+    // Initialize the TextRenderer
+    mTextRenderer.Init(mScreenWidth, mScreenHeight);
+    mTextRenderer.GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
 }
 
 void Renderer::Update(float dt)
@@ -109,11 +113,17 @@ void Renderer::Render(float interpolation)
     {
         // Render the skybox
         mSkybox->Render(mProjection, mView);
+
+        // Render sample text
+        mTextRenderer.RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
     }
 }
 
 void Renderer::Shutdown()
 {
+    // Shutdown TextRenderer
+    mTextRenderer.Shutdown();
+
     // Destroy Skybox
     mSkybox.reset();
 
@@ -128,7 +138,6 @@ void Renderer::Shutdown()
 
 void Renderer::GeometryPass(float interpolation)
 {
-
     // Get the view matrix
     const auto& view = mView;
 

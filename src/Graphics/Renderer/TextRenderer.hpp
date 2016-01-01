@@ -28,93 +28,46 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _TEXT_RENDERER_HPP_
+#define _TEXT_RENDERER_HPP_
 
-#include <memory>
-#include "../Model/ModelStore.hpp"
-#include "../Shader/ShaderStore.hpp"
-#include "../Texture/TextureStore.hpp"
-#include "../Scene/Scene.hpp"
-#include "../Scene/Transform.hpp"
-#include "GBuffer.hpp"
-#include "Skybox.hpp"
-#include "TextRenderer.hpp"
+#include <string>
+#include <glad/glad.h>
+#include <GL/gl.h>
+#include "../Text/FontStore.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-class Renderer
+class TextRenderer
 {
     public:
         /*! Initializes the renderer */
         void Init(int width, int height);
 
-        /*! Called when updating the game state */
-        void Update(float dt);
-
         /*! Called when rendering the current frame */
-        void Render(float interpolation);
+        void RenderText(const std::string& text, float x, float y, glm::vec3 color, const std::string& font);
 
         /*! Deinitializes the renderer */
         void Shutdown();
 
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
-
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
-
-        /*! Retrieves the renderer's ShaderStore */
-        ShaderStore& GetShaderStore();
-
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        /*! Retrieves the renderer's World */
-        Scene& GetScene();
+        /*! Retrieves the internal FontStore instance */
+        FontStore& GetFontStore();
 
     private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
+        // The fontstore instance
+        FontStore mFontStore;
 
-        // Performs the light pass rendering step
-        void LightPass(float interpolation);
-
-        // Renders a 1x1 quad in NDC, used for framebuffer color targets
-        void RenderQuad();
-
-        // The projection matrix
+        // The orho matrix used when rendering
         glm::mat4 mProjection;
 
-        // The view matrix
-        glm::mat4 mView;
+        // The rendering quad info
+        GLuint mVao, mVbo;
 
-        // The screen size
-        int mScreenWidth, mScreenHeight;
-
-        // Stores the world objects
-        Scene mScene;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Stores the shaders and shader programs loaded in the gpu
-        ShaderStore mShaderStore;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // The GBuffer used by the deffered rendering steps
-        std::unique_ptr<GBuffer> mGBuffer;
-
-        // The root Skybox used
-        std::unique_ptr<Skybox> mSkybox;
-
-        // The text rendering utility
-        TextRenderer mTextRenderer;
+        // The font renderer OpenGL program
+        GLuint mVShader, mFShader, mProgram;
 };
 
-#endif // ! _RENDERER_HPP_
+#endif // ! _TEXT_RENDERER_HPP_

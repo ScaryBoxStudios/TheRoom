@@ -28,93 +28,58 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _FONT_HPP_
+#define _FONT_HPP_
 
-#include <memory>
-#include "../Model/ModelStore.hpp"
-#include "../Shader/ShaderStore.hpp"
-#include "../Texture/TextureStore.hpp"
-#include "../Scene/Scene.hpp"
-#include "../Scene/Transform.hpp"
-#include "GBuffer.hpp"
-#include "Skybox.hpp"
-#include "TextRenderer.hpp"
+#include <map>
+#include <vector>
+#include <cstdint>
+#include <glad/glad.h>
+#include <GL/gl.h>
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-class Renderer
+class Font
 {
     public:
-        /*! Initializes the renderer */
-        void Init(int width, int height);
+        // Glyph
+        struct Glyph
+        {
+            GLuint texId;
+            glm::ivec2 size;
+            glm::ivec2 bearing;
+            long advance;
+        };
 
-        /*! Called when updating the game state */
-        void Update(float dt);
+        // Constructor
+        Font();
 
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
+        // Destuctor
+        ~Font();
 
-        /*! Deinitializes the renderer */
-        void Shutdown();
+        // Disable copy construction and copy assignment
+        Font(const Font& other) = delete;
+        Font& operator=(const Font& other) = delete;
 
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
+        // Enable move construction
+        Font(Font&& other) = default;
 
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
+        // Loads current font from memory file
+        using BufferType = std::vector<std::uint8_t>;
+        void Load(const BufferType& fontData);
 
-        /*! Retrieves the renderer's ShaderStore */
-        ShaderStore& GetShaderStore();
+        // Retrieves Glyph from the loaded font set
+        const Glyph* operator[](const char c) const;
 
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        /*! Retrieves the renderer's World */
-        Scene& GetScene();
+        // Unloads the loaded font data
+        void Destroy();
 
     private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
-
-        // Performs the light pass rendering step
-        void LightPass(float interpolation);
-
-        // Renders a 1x1 quad in NDC, used for framebuffer color targets
-        void RenderQuad();
-
-        // The projection matrix
-        glm::mat4 mProjection;
-
-        // The view matrix
-        glm::mat4 mView;
-
-        // The screen size
-        int mScreenWidth, mScreenHeight;
-
-        // Stores the world objects
-        Scene mScene;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Stores the shaders and shader programs loaded in the gpu
-        ShaderStore mShaderStore;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // The GBuffer used by the deffered rendering steps
-        std::unique_ptr<GBuffer> mGBuffer;
-
-        // The root Skybox used
-        std::unique_ptr<Skybox> mSkybox;
-
-        // The text rendering utility
-        TextRenderer mTextRenderer;
+        // Stores the loaded Glyph data
+        std::map<char, Glyph> mGlyphs;
 };
 
-#endif // ! _RENDERER_HPP_
+#endif // ! _FONT_HPP_

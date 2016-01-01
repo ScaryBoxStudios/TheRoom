@@ -90,6 +90,12 @@ void Game::SetupWorld()
         scene.Scale("house", glm::vec3(0.3f));
     }
 
+    // Add well
+    {
+        scene.CreateNode("well", "well", SceneNodeCategory::Normal, glm::vec3(0.0f, -5.0f, -10.0f));
+        scene.Scale("well", glm::vec3(2.0f));
+    }
+
     //
     // Light objects
     //
@@ -200,6 +206,8 @@ void Game::LoadTextures()
         {"ext/mahogany_wood_spec.jpg",       "mahogany_wood_spec"},
         {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
         {"ext/WoodenCabin/WoodCabinSM.jpg",  "house_spec"},
+        {"ext/Dungeon/maps/Wall1_T.tga",     "well_diff"},
+        {"ext/Dungeon/maps/Wall1_B.tga",     "well_spec"}
     };
 
     // Load the textures
@@ -239,6 +247,7 @@ void Game::LoadModels()
         {"ext/Cube/cube.obj",               "obj", "cube",   "mahogany_wood", "mahogany_wood_spec"} // Cube
     ,   {"ext/teapot.obj",                  "obj", "teapot", "white",         "white_spec"}         // Teapot
     ,   {"ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  "house_diff",    "house_spec"}         // House
+    ,   {"ext/Dungeon/Well.obj",            "obj", "well",   "well_diff",     "well_spec"}          // Well
     };
 
     for(auto& m : models)

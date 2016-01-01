@@ -6,6 +6,7 @@
 WARN_GUARD_ON
 #include "Png/Png.hpp"
 #include "Jpeg/JpegLoader.hpp"
+#include "Tga/TgaLoader.hpp"
 WARN_GUARD_OFF
 
 auto ImageLoader::Load(const Buffer& buf, const std::string& hint) -> RawImage<Buffer>
@@ -14,6 +15,11 @@ auto ImageLoader::Load(const Buffer& buf, const std::string& hint) -> RawImage<B
     {
         JpegLoader jpegLoader;
         return jpegLoader.Load(buf);
+    }
+    else if (hint == "tga")
+    {
+        TgaLoader tgaLoader;
+        return tgaLoader.Load(buf);
     }
     return RawImage<>({}, {0,0,0});
 }

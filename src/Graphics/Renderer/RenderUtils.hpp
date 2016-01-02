@@ -28,93 +28,10 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _RENDER_UTILS_HPP_
+#define _RENDER_UTILS_HPP_
 
-#include <memory>
-#include "../Model/ModelStore.hpp"
-#include "../Shader/ShaderStore.hpp"
-#include "../Texture/TextureStore.hpp"
-#include "../Scene/Scene.hpp"
-#include "../Scene/Transform.hpp"
-#include "GBuffer.hpp"
-#include "Skybox.hpp"
-#include "TextRenderer.hpp"
+// Renders a 1x1 quad in NDC, used for framebuffer color targets
+void RenderQuad();
 
-#include "../../Util/WarnGuard.hpp"
-WARN_GUARD_ON
-#include <glm/glm.hpp>
-WARN_GUARD_OFF
-
-class Renderer
-{
-    public:
-        /*! Initializes the renderer */
-        void Init(int width, int height);
-
-        /*! Called when updating the game state */
-        void Update(float dt);
-
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes the renderer */
-        void Shutdown();
-
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
-
-        /*! Sets the skybox */
-        void SetSkybox(const Skybox* s);
-
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
-
-        /*! Retrieves the renderer's ShaderStore */
-        ShaderStore& GetShaderStore();
-
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        /*! Retrieves the renderer's World */
-        Scene& GetScene();
-
-    private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
-
-        // Performs the light pass rendering step
-        void LightPass(float interpolation);
-
-        // The projection matrix
-        glm::mat4 mProjection;
-
-        // The view matrix
-        glm::mat4 mView;
-
-        // The screen size
-        int mScreenWidth, mScreenHeight;
-
-        // Stores the world objects
-        Scene mScene;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Stores the shaders and shader programs loaded in the gpu
-        ShaderStore mShaderStore;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // The GBuffer used by the deffered rendering steps
-        std::unique_ptr<GBuffer> mGBuffer;
-
-        // The root Skybox used
-        const Skybox* mSkybox;
-
-        // The text rendering utility
-        TextRenderer mTextRenderer;
-};
-
-#endif // ! _RENDERER_HPP_
+#endif // ! _RENDER_UTILS_HPP_

@@ -1,28 +1,13 @@
 #include "Renderer.hpp"
-#include <sstream>
 #include <GL/gl.h>
-#include <GL/glu.h>
 #include "RenderUtils.hpp"
+#include "../Util/GLUtils.hpp"
 
 WARN_GUARD_ON
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
 
-///==============================================================
-///= GL Helpers
-///==============================================================
-static void CheckGLError()
-{
-    GLenum errVal = glGetError();
-    if (errVal != GL_NO_ERROR)
-    {
-        std::stringstream ss;
-        ss << "OpenGL Error! Code: " << errVal;
-        const char* desc = reinterpret_cast<const char*>(gluErrorString(errVal));
-        throw std::runtime_error(std::string("OpenGL error: \n") + desc);
-    }
-}
 
 void Renderer::Init(int width, int height)
 {

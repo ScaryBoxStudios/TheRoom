@@ -193,7 +193,7 @@ void Game::LoadShaders()
             std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
             GLuint sId = shaderStore.LoadShader(shaderSrc, f.first);
             if (sId == 0)
-                throw std::runtime_error("Shader compilation error: \n" + shaderStore.GetLastCompileError());
+                throw std::runtime_error("Shader compilation error: \n" + shaderStore.GetLastError());
             // Insert loaded shader id to temp map
             shaderIds.insert({f.first, sId});
         }
@@ -202,7 +202,7 @@ void Game::LoadShaders()
             shaderIds[ShaderStore::ShaderType::Vertex],
             shaderIds[ShaderStore::ShaderType::Fragment]);
         if (!s)
-            throw std::runtime_error("OpenGL program link error: \n" + shaderStore.GetLastLinkError());
+            throw std::runtime_error("OpenGL program link error: \n" + shaderStore.GetLastError());
     }
 }
 

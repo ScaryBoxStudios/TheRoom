@@ -1,4 +1,5 @@
 #include "ShaderStore.hpp"
+#include "../Util/GLUtils.hpp"
 
 ShaderStore::ShaderStore()
 {
@@ -31,18 +32,9 @@ GLuint ShaderStore::LoadShader(const std::string& shaderSrc, ShaderType type)
     glCompileShader(shaderId);
 
     // Check compilation result
-    GLint compileStatus;
-    glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compileStatus);
-    if (compileStatus == GL_FALSE)
+    mLastError = GetLastCompileError(shaderId);
+    if (mLastError != "")
     {
-        GLint logLength;
-        glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength != 0)
-        {
-            std::vector<GLchar> buf(logLength, 0);
-            glGetShaderInfoLog(shaderId, logLength, 0, buf.data());
-            mLastCompileError = std::string(std::begin(buf), std::end(buf));
-        }
         glDeleteShader(shaderId);
         return 0;
     }
@@ -61,18 +53,9 @@ bool ShaderStore::LinkProgram(const std::string& name, GLuint vertShId, GLuint f
     glLinkProgram(progId);
 
     // Check link result
-    GLint linkStatus;
-    glGetProgramiv(progId, GL_LINK_STATUS, &linkStatus);
-    if (linkStatus == GL_FALSE)
+    mLastError = GetLastLinkError(progId);
+    if (mLastError != "")
     {
-        GLint logLength;
-        glGetShaderiv(progId, GL_INFO_LOG_LENGTH, &logLength);
-        if (logLength != 0)
-        {
-            std::vector<GLchar> buf(logLength, 0);
-            glGetShaderInfoLog(progId, logLength, 0, buf.data());
-            mLastLinkError = std::string(std::begin(buf), std::end(buf));
-        }
         glDeleteProgram(progId);
         return false;
     }
@@ -91,13 +74,8 @@ GLuint ShaderStore::operator[](const std::string& name)
         return it->second;
 }
 
-const std::string& ShaderStore::GetLastCompileError() const
+const std::string& ShaderStore::GetLastError() const
 {
-    return mLastCompileError;
-}
-
-const std::string& ShaderStore::GetLastLinkError() const
-{
-    return mLastLinkError;
+    return mLastError;
 }
 

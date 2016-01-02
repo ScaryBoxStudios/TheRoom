@@ -28,62 +28,21 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SHADERSTORE_HPP_
-#define _SHADERSTORE_HPP_
+#ifndef _GL_UTILS_HPP_
+#define _GL_UTILS_HPP_
 
 #include <string>
-#include <vector>
-#include <unordered_map>
 #include <glad/glad.h>
 #include <GL/gl.h>
+#include <GL/glu.h>
 
-class ShaderStore
-{
-    public:
-        enum class ShaderType
-        {
-            Vertex = GL_VERTEX_SHADER,
-            Fragment = GL_FRAGMENT_SHADER
-        };
+// Throws std::runtime_error with the last OpenGL error that occurred
+void CheckGLError();
 
-        // Constructor
-        ShaderStore();
+// Returns the last error string in the given shader compilation try or ""
+std::string GetLastCompileError(GLuint shaderId);
 
-        // Destructor
-        ~ShaderStore();
+// Returns the last error string in the given program linking try or ""
+std::string GetLastLinkError(GLuint progId);
 
-        // Disable copy construction
-        ShaderStore(const ShaderStore& other) = delete;
-        ShaderStore& operator=(const ShaderStore& other) = delete;
-
-        // Enable move construction
-        ShaderStore(ShaderStore&& other) = default;
-        ShaderStore& operator=(ShaderStore&& other) = default;
-
-        // Compiles given shader from source
-        GLuint LoadShader(const std::string& shaderSrc, ShaderType type);
-
-        // Links the given shaders in a program
-        bool LinkProgram(const std::string& name, GLuint vertShId, GLuint fragShId);
-
-        // Retrieves the program id with the given name
-        GLuint operator[](const std::string& name);
-
-        // Unloads the loaded shaders and programs from the store
-        void Clear();
-
-        // Retrieves the last error occured
-        const std::string& GetLastError() const;
-
-    private:
-        // Stored shaders
-        std::vector<GLuint> mShaders;
-
-        // Stored programs
-        std::unordered_map<std::string, GLuint> mPrograms;
-
-        // Error state
-        std::string mLastError;
-};
-
-#endif // ! _SHADERSTORE_HPP_
+#endif // ! _GL_UTILS_HPP_

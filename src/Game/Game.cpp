@@ -10,8 +10,6 @@ WARN_GUARD_ON
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 
-#include "../Graphics/Scene/Scene.hpp"
-
 ///==============================================================
 ///= Game
 ///==============================================================
@@ -49,6 +47,9 @@ void Game::Init()
     // Create world objects
     SetupWorld();
 
+    // Pass the current scene to renderer
+    renderer.SetScene(&mScene);
+
     // Load the skybox
     mSkybox = std::make_unique<Skybox>();
     ImageLoader imLoader;
@@ -67,8 +68,7 @@ void Game::Init()
 
 void Game::SetupWorld()
 {
-    // Retrieve the world from the renderer
-    auto& scene = renderer.GetScene();
+    auto& scene = mScene;
 
     //
     // Normal objects
@@ -335,7 +335,7 @@ void Game::Update(float dt)
     mCamera.Move(CameraMoveDirections());
 
     // Update light position
-    auto& scene = renderer.GetScene();
+    auto& scene = mScene;
     float increase = 0.7f;
     if(mWindow.IsKeyPressed(Key::Kp8))
         scene.Move("teapot", glm::vec3(0.0f, increase, 0.0f));

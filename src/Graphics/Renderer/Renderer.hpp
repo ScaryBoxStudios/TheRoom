@@ -32,14 +32,14 @@
 #define _RENDERER_HPP_
 
 #include <memory>
+#include "GBuffer.hpp"
+#include "Skybox.hpp"
+#include "TextRenderer.hpp"
 #include "../Model/ModelStore.hpp"
 #include "../Shader/ShaderStore.hpp"
 #include "../Texture/TextureStore.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
-#include "GBuffer.hpp"
-#include "Skybox.hpp"
-#include "TextRenderer.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -67,6 +67,9 @@ class Renderer
         /*! Sets the skybox */
         void SetSkybox(const Skybox* s);
 
+        /*! Sets the current rendering scene */
+        void SetScene(const Scene* scene);
+
         /*! Retrieves the renderer's TextureStore */
         TextureStore& GetTextureStore();
 
@@ -75,9 +78,6 @@ class Renderer
 
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
-
-        /*! Retrieves the renderer's World */
-        Scene& GetScene();
 
     private:
         // Performs the geometry pass rendering step
@@ -95,8 +95,8 @@ class Renderer
         // The screen size
         int mScreenWidth, mScreenHeight;
 
-        // Stores the world objects
-        Scene mScene;
+        // Currently rendering scene
+        const Scene* mScene;
 
         // Stores the models loaded in the gpu
         ModelStore mModelStore;

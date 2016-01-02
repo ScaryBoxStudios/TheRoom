@@ -63,7 +63,7 @@ void Renderer::Update(float dt)
     (void) dt;
 
     // Update interpolation variables
-    for (auto& obj : mScene.GetNodes())
+    for (auto& obj : mScene->GetNodes())
         obj.second->GetTransformation().Update();
 }
 
@@ -139,7 +139,7 @@ void Renderer::GeometryPass(float interpolation)
     glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
 
     // Iterate through world objects by category
-    for (const auto& objCategory : mScene.GetCategories())
+    for (const auto& objCategory : mScene->GetCategories())
     {
         for (const auto& gObj : objCategory.second)
         {
@@ -223,7 +223,7 @@ void Renderer::LightPass(float interpolation)
         glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 
         // Set light's properties
-        auto& categories = mScene.GetCategories();
+        auto& categories = mScene->GetCategories();
         auto lightIt = categories.find(SceneNodeCategory::Light);
 
         const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
@@ -250,6 +250,11 @@ void Renderer::SetSkybox(const Skybox* skybox)
     mSkybox = skybox;
 }
 
+void Renderer::SetScene(const Scene* scene)
+{
+    mScene = scene;
+}
+
 void Renderer::SetView(const glm::mat4& view)
 {
     mView = view;
@@ -270,7 +275,3 @@ ModelStore& Renderer::GetModelStore()
     return mModelStore;
 }
 
-Scene& Renderer::GetScene()
-{
-    return mScene;
-}

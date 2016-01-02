@@ -37,6 +37,7 @@
 #include "../Graphics/Util/Camera.hpp"
 #include "../Graphics/Renderer/Renderer.hpp"
 #include "../Graphics/Renderer/Skybox.hpp"
+#include "../Graphics/Scene/Scene.hpp"
 
 class Game
 {
@@ -83,6 +84,9 @@ class Game
 
         // The Renderer
         Renderer renderer;
+
+        // The Scene
+        Scene mScene;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

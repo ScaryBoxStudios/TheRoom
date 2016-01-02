@@ -140,7 +140,7 @@ void Skybox::Load(const std::unordered_map<Target, RawImage<>>& images)
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
-void Skybox::Render(const glm::mat4& projection, const glm::mat4& view)
+void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
 {
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);

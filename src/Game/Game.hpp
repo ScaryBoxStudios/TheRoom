@@ -36,6 +36,7 @@
 #include "../Window/Window.hpp"
 #include "../Graphics/Util/Camera.hpp"
 #include "../Graphics/Renderer/Renderer.hpp"
+#include "../Graphics/Renderer/Skybox.hpp"
 
 class Game
 {
@@ -87,6 +88,9 @@ class Game
         std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();
         Camera mCamera;
+
+        // The skybox used
+        std::unique_ptr<Skybox> mSkybox;
 
         // The data needed for rotating the cubes
         struct RotationData

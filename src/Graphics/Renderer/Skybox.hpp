@@ -66,7 +66,7 @@ class Skybox
         void Load(const std::unordered_map<Target, RawImage<>>& images);
 
         // Renders the current Skybox
-        void Render(const glm::mat4& projection, const glm::mat4& view);
+        void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
     private:
         GLuint mVao, mVbo;

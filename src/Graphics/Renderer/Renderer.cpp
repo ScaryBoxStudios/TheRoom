@@ -26,6 +26,9 @@ static void CheckGLError()
 
 void Renderer::Init(int width, int height)
 {
+    // Skybox is initially unset
+    mSkybox = nullptr;
+
     // Store the screen size
     mScreenWidth = width;
     mScreenHeight = height;
@@ -49,20 +52,6 @@ void Renderer::Init(int width, int height)
 
     // Create the GBuffer
     mGBuffer = std::make_unique<GBuffer>(mScreenWidth, mScreenHeight);
-
-    // Load the skybox
-    mSkybox = std::make_unique<Skybox>();
-    ImageLoader imLoader;
-    mSkybox->Load(
-        {
-            { Skybox::Target::Right,  imLoader.LoadFile("ext/Skybox/right.jpg")  },
-            { Skybox::Target::Left,   imLoader.LoadFile("ext/Skybox/left.jpg")   },
-            { Skybox::Target::Top,    imLoader.LoadFile("ext/Skybox/top.jpg")    },
-            { Skybox::Target::Bottom, imLoader.LoadFile("ext/Skybox/bottom.jpg") },
-            { Skybox::Target::Back,   imLoader.LoadFile("ext/Skybox/back.jpg")   },
-            { Skybox::Target::Front,  imLoader.LoadFile("ext/Skybox/front.jpg")  }
-        }
-    );
 
     // Initialize the TextRenderer
     mTextRenderer.Init(mScreenWidth, mScreenHeight);
@@ -112,7 +101,8 @@ void Renderer::Render(float interpolation)
     // Forward rendering block
     {
         // Render the skybox
-        mSkybox->Render(mProjection, mView);
+        if (mSkybox)
+            mSkybox->Render(mProjection, mView);
 
         // Render sample text
         mTextRenderer.RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
@@ -123,9 +113,6 @@ void Renderer::Shutdown()
 {
     // Shutdown TextRenderer
     mTextRenderer.Shutdown();
-
-    // Destroy Skybox
-    mSkybox.reset();
 
     // Destroy GBuffer
     mGBuffer.reset();
@@ -289,6 +276,11 @@ void Renderer::RenderQuad()
     }
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &quadVao);
+}
+
+void Renderer::SetSkybox(const Skybox* skybox)
+{
+    mSkybox = skybox;
 }
 
 void Renderer::SetView(const glm::mat4& view)

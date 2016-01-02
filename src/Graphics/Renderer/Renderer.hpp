@@ -64,6 +64,9 @@ class Renderer
         /*! Sets the view matrix */
         void SetView(const glm::mat4& view);
 
+        /*! Sets the skybox */
+        void SetSkybox(const Skybox* s);
+
         /*! Retrieves the renderer's TextureStore */
         TextureStore& GetTextureStore();
 
@@ -111,7 +114,7 @@ class Renderer
         std::unique_ptr<GBuffer> mGBuffer;
 
         // The root Skybox used
-        std::unique_ptr<Skybox> mSkybox;
+        const Skybox* mSkybox;
 
         // The text rendering utility
         TextRenderer mTextRenderer;

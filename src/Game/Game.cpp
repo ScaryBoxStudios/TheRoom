@@ -48,6 +48,21 @@ void Game::Init()
 
     // Create world objects
     SetupWorld();
+
+    // Load the skybox
+    mSkybox = std::make_unique<Skybox>();
+    ImageLoader imLoader;
+    mSkybox->Load(
+        {
+            { Skybox::Target::Right,  imLoader.LoadFile("ext/Skybox/right.jpg")  },
+            { Skybox::Target::Left,   imLoader.LoadFile("ext/Skybox/left.jpg")   },
+            { Skybox::Target::Top,    imLoader.LoadFile("ext/Skybox/top.jpg")    },
+            { Skybox::Target::Bottom, imLoader.LoadFile("ext/Skybox/bottom.jpg") },
+            { Skybox::Target::Back,   imLoader.LoadFile("ext/Skybox/back.jpg")   },
+            { Skybox::Target::Front,  imLoader.LoadFile("ext/Skybox/front.jpg")  }
+        }
+    );
+    renderer.SetSkybox(mSkybox.get());
 }
 
 void Game::SetupWorld()
@@ -369,6 +384,9 @@ void Game::Render(float interpolation)
 
 void Game::Shutdown()
 {
+    // Destroy Skybox
+    mSkybox.reset();
+
     // Renderer
     renderer.Shutdown();
 

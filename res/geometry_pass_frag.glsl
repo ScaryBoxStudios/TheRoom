@@ -8,8 +8,15 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec2 UVCoords;
 
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_specular1;
+struct Material
+{
+    vec3 diffuseColor;
+    sampler2D diffuseTexture;
+    float specularColor;
+    sampler2D specularTexture;
+};
+
+uniform Material material;
 
 void main(void)
 {
@@ -18,8 +25,8 @@ void main(void)
     // Also store the per-fragment normals into the gbuffer
     gNormal = normalize(Normal);
     // And the diffuse per-fragment color
-    gAlbedoSpec.rgb = texture(texture_diffuse1, UVCoords).rgb;
+    gAlbedoSpec.rgb = material.diffuseColor + texture(material.diffuseTexture, UVCoords).rgb;
     // Store specular intensity in gAlbedoSpec's alpha component
-    gAlbedoSpec.a = texture(texture_specular1, UVCoords).r;
+    gAlbedoSpec.a = material.specularColor + texture(material.specularTexture, UVCoords).r;
 }
 

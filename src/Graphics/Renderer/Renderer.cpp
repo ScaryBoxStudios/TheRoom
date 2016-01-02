@@ -166,16 +166,27 @@ void Renderer::GeometryPass(float interpolation)
             // Get the model
             ModelDescription* mdl = mModelStore[gObj->GetModel()];
 
-            // Bind the needed textures
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, mdl->diffTexId);
-            GLuint diffuseId = glGetUniformLocation(progId, "texture_diffuse1");
-            glUniform1i(diffuseId, 0);
+            //
+            // Upload material parameters
+            //
+            // Diffuse
+            const glm::vec3& diffCol = mdl->material.diffuseColor;
+            glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
+            if (mdl->material.usesDiffTex)
+            {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, mdl->material.diffuseTexId);
+                glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
+            }
 
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, mdl->specTexId);
-            GLuint specId = glGetUniformLocation(progId, "texture_specular1");
-            glUniform1i(specId, 1);
+            // Specular
+            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), mdl->material.specularColor);
+            if (mdl->material.usesSpecTex)
+            {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, mdl->material.specularTexId);
+                glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
+            }
 
             // Draw all its meshes
             for (const auto& mesh : mdl->meshes)

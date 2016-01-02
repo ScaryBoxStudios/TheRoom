@@ -28,63 +28,28 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MODELSTORE_HPP_
-#define _MODELSTORE_HPP_
+#ifndef _MATERIAL_HPP_
+#define _MATERIAL_HPP_
 
-#include <string>
-#include <vector>
-#include <unordered_map>
 #include <glad/glad.h>
 #include <GL/gl.h>
-#include <GL/glu.h>
-#include "Model.hpp"
-#include "Material.hpp"
 
-// MeshDescription
-struct MeshDescription
+#include "../../Util/WarnGuard.hpp"
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+WARN_GUARD_OFF
+
+struct Material
 {
-    GLuint vaoId;
-    GLuint vboId;
-    GLuint eboId;
-    GLsizei numIndices;
+    // Diffuse properties
+    glm::vec3 diffuseColor = glm::vec3(0x00);
+    GLuint diffuseTexId;
+    bool usesDiffTex = false; // Indicates that diffuse texture is set
+
+    // Specular properties
+    GLfloat specularColor = 0.0f;
+    GLuint specularTexId;
+    bool usesSpecTex = false; // Indicates that specular texture is set
 };
 
-// ModelDescription
-struct ModelDescription
-{
-    std::vector<MeshDescription> meshes;
-    Material material;
-};
-
-// ModelStore
-class ModelStore
-{
-    public:
-        // Constructor
-        ModelStore();
-
-        // Destructor
-        ~ModelStore();
-
-        // Disable copy construction
-        ModelStore(const ModelStore& other) = delete;
-        ModelStore& operator=(const ModelStore& other) = delete;
-
-        // Enable move construction
-        ModelStore(ModelStore&& other) = default;
-        ModelStore& operator=(ModelStore&& other) = default;
-
-        // Loads given data into the GPU
-        void Load(const std::string& name, const Model& data);
-
-        // Retrieves pointer a loaded model object
-        ModelDescription* operator[](const std::string& name);
-
-        // Unloads the stored models in the store
-        void Clear();
-
-    private:
-        std::unordered_map<std::string, ModelDescription> mModels;
-};
-
-#endif // ! _MODELSTORE_HPP_
+#endif // ! _MATERIAL_HPP_

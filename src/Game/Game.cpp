@@ -216,12 +216,6 @@ void Game::LoadTextures()
         RawImage<> pb = imageLoader.LoadFile(p.first);
         textureStore.Load(p.second, pb);
     }
-
-    // Add calculated textures
-    RawImage<> pb({0xFF, 0xFF, 0xFF}, {1, 1, 3});
-    textureStore.Load("white", pb);
-    RawImage<> pb2({0x00, 0x00, 0x00}, {1, 1, 3});
-    textureStore.Load("white_spec", pb2);
 }
 
 void Game::LoadModels()
@@ -235,19 +229,39 @@ void Game::LoadModels()
 
     struct ModelData
     {
-        std::string
-            filepath,
-            extension,
-            name,
-            diffName,
-            specName;
+        std::string filepath;
+        std::string extension;
+        std::string name;
+        Material& material;
     };
 
+    // Create materials
+    Material mahogany;
+    mahogany.diffuseTexId = textureStore["mahogany_wood"]->texId;
+    mahogany.specularTexId = textureStore["mahogany_wood_spec"]->texId;
+    mahogany.usesDiffTex = true;
+    mahogany.usesSpecTex = true;
+
+    Material white;
+    white.diffuseColor = glm::vec3(0xFF);
+
+    Material house;
+    house.diffuseTexId = textureStore["house_diff"]->texId;
+    house.specularTexId = textureStore["house_spec"]->texId;
+    house.usesDiffTex = true;
+    house.usesSpecTex = true;
+
+    Material well;
+    well.diffuseTexId = textureStore["well_diff"]->texId;
+    well.specularTexId = textureStore["well_spec"]->texId;
+    well.usesDiffTex = true;
+    well.usesSpecTex = true;
+
     std::vector<ModelData> models = {
-        {"ext/Cube/cube.obj",               "obj", "cube",   "mahogany_wood", "mahogany_wood_spec"} // Cube
-    ,   {"ext/teapot.obj",                  "obj", "teapot", "white",         "white_spec"}         // Teapot
-    ,   {"ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  "house_diff",    "house_spec"}         // House
-    ,   {"ext/Dungeon/Well.obj",            "obj", "well",   "well_diff",     "well_spec"}          // Well
+        { "ext/Cube/cube.obj",               "obj", "cube",   mahogany } // Cube
+    ,   { "ext/teapot.obj",                  "obj", "teapot", white    } // Teapot
+    ,   { "ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  house    } // House
+    ,   { "ext/Dungeon/Well.obj",            "obj", "well",   well     } // Well
     };
 
     for(auto& m : models)
@@ -261,8 +275,7 @@ void Game::LoadModels()
             throw std::runtime_error("Couldn't load model (" + m.filepath + ")");
 
         modelStore.Load(m.name, std::move(model));
-        modelStore[m.name]->diffTexId = textureStore[m.diffName]->texId;
-        modelStore[m.name]->specTexId = textureStore[m.specName]->texId;
+        modelStore[m.name]->material = m.material;
     }
 }
 

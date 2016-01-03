@@ -32,9 +32,11 @@
 #define _SKYBOX_HPP_
 
 #include <unordered_map>
+#include <memory>
 #include <glad/glad.h>
 #include <GL/gl.h>
 #include "../Image/RawImage.hpp"
+#include "../Shader/Shader.hpp"
 #include "../../Util/WarnGuard.hpp"
 #include "../../Util/Hash.hpp"
 
@@ -70,8 +72,8 @@ class Skybox
 
     private:
         GLuint mVao, mVbo;
-        GLuint mVShader, mFShader, mProgram;
         GLuint mTextureId;
+        std::unique_ptr<ShaderProgram> mProgram;
 };
 
 #endif // ! _SKYBOX_HPP_

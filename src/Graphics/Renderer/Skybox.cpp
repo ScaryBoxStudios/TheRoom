@@ -78,19 +78,9 @@ void main()
 
 Skybox::Skybox()
 {
-    mProgram = glCreateProgram();
-
-    mVShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(mVShader, 1, &vShader, 0);
-    glCompileShader(mVShader);
-    glAttachShader(mProgram, mVShader);
-
-    mFShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(mFShader, 1, &fShader, 0);
-    glCompileShader(mFShader);
-    glAttachShader(mProgram, mFShader);
-
-    glLinkProgram(mProgram);
+    Shader vert(vShader, Shader::Type::Vertex);
+    Shader frag(fShader, Shader::Type::Fragment);
+    mProgram = std::make_unique<ShaderProgram>(vert.Id(), frag.Id());
 
     glGenVertexArrays(1, &mVao);
     glBindVertexArray(mVao);
@@ -115,10 +105,6 @@ Skybox::~Skybox()
 
     glDeleteBuffers(1, &mVbo);
     glDeleteVertexArrays(1, &mVao);
-
-    glDeleteShader(mFShader);
-    glDeleteShader(mVShader);
-    glDeleteProgram(mProgram);
 }
 
 void Skybox::Load(const std::unordered_map<Target, RawImage<>>& images)
@@ -144,15 +130,15 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
 {
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
-    glUseProgram(mProgram);
+    glUseProgram(mProgram->Id());
     {
         // Remove any translation component of the view matrix
         glm::mat4 ntView = glm::mat4(glm::mat3(view));
-        glUniformMatrix4fv(glGetUniformLocation(mProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        glUniformMatrix4fv(glGetUniformLocation(mProgram, "view"), 1, GL_FALSE, glm::value_ptr(ntView));
+        glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "view"), 1, GL_FALSE, glm::value_ptr(ntView));
 
         glActiveTexture(GL_TEXTURE0);
-        glUniform1i(glGetUniformLocation(mProgram, "skybox"), 0);
+        glUniform1i(glGetUniformLocation(mProgram->Id(), "skybox"), 0);
 
         glBindVertexArray(mVao);
         glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);

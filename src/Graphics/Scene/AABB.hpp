@@ -28,64 +28,30 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MODELSTORE_HPP_
-#define _MODELSTORE_HPP_
+#ifndef _AABB_HPP_
+#define _AABB_HPP_
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <glad/glad.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "Model.hpp"
-#include "Material.hpp"
+#include "../../Util/WarnGuard.hpp"
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+WARN_GUARD_OFF
 
-// MeshDescription
-struct MeshDescription
-{
-    GLuint vaoId;
-    GLuint vboId;
-    GLuint eboId;
-    GLsizei numIndices;
-};
-
-// ModelDescription
-struct ModelDescription
-{
-    std::vector<MeshDescription> meshes;
-    Material material;
-    AABB boundingBox;
-};
-
-// ModelStore
-class ModelStore
+class AABB
 {
     public:
-        // Constructor
-        ModelStore();
-
-        // Destructor
-        ~ModelStore();
-
-        // Disable copy construction
-        ModelStore(const ModelStore& other) = delete;
-        ModelStore& operator=(const ModelStore& other) = delete;
-
-        // Enable move construction
-        ModelStore(ModelStore&& other) = default;
-        ModelStore& operator=(ModelStore&& other) = default;
-
-        // Loads given data into the GPU
-        void Load(const std::string& name, const Model& data);
-
-        // Retrieves pointer a loaded model object
-        ModelDescription* operator[](const std::string& name);
-
-        // Unloads the stored models in the store
-        void Clear();
+        AABB();
+        AABB(glm::vec3 minPoint, glm::vec3 maxPoint);
+        float MinX() const;
+        float MaxX() const;
+        float MinY() const;
+        float MaxY() const;
+        float MinZ() const;
+        float MaxZ() const;
 
     private:
-        std::unordered_map<std::string, ModelDescription> mModels;
+        // In order x y z
+        glm::vec3 minPoint;
+        glm::vec3 maxPoint;
 };
 
-#endif // ! _MODELSTORE_HPP_
+#endif // ! _AABB_HPP_

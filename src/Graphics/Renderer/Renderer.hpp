@@ -35,6 +35,7 @@
 #include "GBuffer.hpp"
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
+#include "AABBRenderer.hpp"
 #include "../Model/ModelStore.hpp"
 #include "../Texture/TextureStore.hpp"
 #include "../Scene/Scene.hpp"
@@ -111,6 +112,9 @@ class Renderer
 
         // The text rendering utility
         TextRenderer mTextRenderer;
+
+        // The AABB rendering utility
+        AABBRenderer mAABBRenderer;
 };
 
 #endif // ! _RENDERER_HPP_

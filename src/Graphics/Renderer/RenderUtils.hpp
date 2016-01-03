@@ -31,7 +31,12 @@
 #ifndef _RENDER_UTILS_HPP_
 #define _RENDER_UTILS_HPP_
 
+#include "../Scene/AABB.hpp"
+
 // Renders a 1x1 quad in NDC, used for framebuffer color targets
 void RenderQuad();
+
+// Renders a AABB in model space
+void RenderBox(const AABB& aabb);
 
 #endif // ! _RENDER_UTILS_HPP_

@@ -28,64 +28,49 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MODELSTORE_HPP_
-#define _MODELSTORE_HPP_
+#ifndef _AABB_RENDERER_HPP_
+#define _AABB_RENDERER_HPP_
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <glad/glad.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "Model.hpp"
-#include "Material.hpp"
+#include <memory>
+#include "../Model/ModelStore.hpp"
+#include "../Shader/Shader.hpp"
+#include "../Scene/Scene.hpp"
 
-// MeshDescription
-struct MeshDescription
-{
-    GLuint vaoId;
-    GLuint vboId;
-    GLuint eboId;
-    GLsizei numIndices;
-};
+#include "../../Util/WarnGuard.hpp"
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+WARN_GUARD_OFF
 
-// ModelDescription
-struct ModelDescription
-{
-    std::vector<MeshDescription> meshes;
-    Material material;
-    AABB boundingBox;
-};
-
-// ModelStore
-class ModelStore
+class AABBRenderer
 {
     public:
-        // Constructor
-        ModelStore();
+        // Initializes the renderer state
+        void Init();
 
-        // Destructor
-        ~ModelStore();
+        // Renders AABBs in the given scene
+        void Render(float interpolation);
 
-        // Disable copy construction
-        ModelStore(const ModelStore& other) = delete;
-        ModelStore& operator=(const ModelStore& other) = delete;
+        // Deinitializes the renderer state
+        void Shutdown();
 
-        // Enable move construction
-        ModelStore(ModelStore&& other) = default;
-        ModelStore& operator=(ModelStore&& other) = default;
+        // Sets the ModelStore to retrieve the model data
+        void SetModelStore(ModelStore* modelStore);
 
-        // Loads given data into the GPU
-        void Load(const std::string& name, const Model& data);
+        // Sets the scene to process
+        void SetScene(const Scene* scene);
 
-        // Retrieves pointer a loaded model object
-        ModelDescription* operator[](const std::string& name);
+        // Sets the projection matrix
+        void SetProjection(const glm::mat4& projection);
 
-        // Unloads the stored models in the store
-        void Clear();
+        // Sets the view matrix
+        void SetView(const glm::mat4& view);
 
     private:
-        std::unordered_map<std::string, ModelDescription> mModels;
+        const Scene* mScene;
+        ModelStore* mModelStore;
+        glm::mat4 mProjection;
+        glm::mat4 mView;
+        std::unique_ptr<ShaderProgram> mProgram;
 };
 
-#endif // ! _MODELSTORE_HPP_
+#endif // ! _AABB_RENDERER_HPP_

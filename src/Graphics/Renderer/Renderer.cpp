@@ -45,6 +45,11 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Initialize the TextRenderer
     mTextRenderer.Init(mScreenWidth, mScreenHeight);
     mTextRenderer.GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
+
+    // Initialize the AABBRenderer
+    mAABBRenderer.Init();
+    mAABBRenderer.SetModelStore(&mModelStore);
+    mAABBRenderer.SetProjection(mProjection);
 }
 
 void Renderer::Update(float dt)
@@ -93,6 +98,8 @@ void Renderer::Render(float interpolation)
         if (mSkybox)
             mSkybox->Render(mProjection, mView);
 
+        mAABBRenderer.Render(interpolation);
+
         // Render sample text
         mTextRenderer.RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
     }
@@ -100,6 +107,9 @@ void Renderer::Render(float interpolation)
 
 void Renderer::Shutdown()
 {
+    // Shutdown the AABBRenderer
+    mAABBRenderer.Shutdown();
+
     // Shutdown TextRenderer
     mTextRenderer.Shutdown();
 
@@ -241,11 +251,13 @@ void Renderer::SetSkybox(const Skybox* skybox)
 void Renderer::SetScene(const Scene* scene)
 {
     mScene = scene;
+    mAABBRenderer.SetScene(scene);
 }
 
 void Renderer::SetView(const glm::mat4& view)
 {
     mView = view;
+    mAABBRenderer.SetView(view);
 }
 
 TextureStore& Renderer::GetTextureStore()

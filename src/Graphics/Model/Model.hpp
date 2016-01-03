@@ -34,10 +34,12 @@
 #include <string>
 #include <vector>
 #include "Mesh.hpp"
+#include "../Scene/AABB.hpp"
 
 struct Model
 {
     std::vector<Mesh> meshes;
+    AABB boundingBox;
 };
 
 #endif // ! _MODEL_HPP_

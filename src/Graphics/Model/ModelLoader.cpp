@@ -22,11 +22,15 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         return Model();
 
-    auto processMesh = [](aiMesh* mesh, const aiScene* scene) -> Mesh
+    // Used for creating the boundingBox
+    glm::vec3 minPoint, maxPoint;
+
+    auto processMesh = [&minPoint, &maxPoint](aiMesh* mesh, const aiScene* scene) -> Mesh
     {
         (void) scene;
 
         Mesh mData;
+
         for (std::uint32_t i = 0; i < mesh->mNumVertices; ++i)
         {
             MeshData meshData;
@@ -55,6 +59,21 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
                 meshData.tx = 0;
                 meshData.ty = 0;
             }
+
+            // AABB minPoint
+            if (vert.x < minPoint.x)
+                minPoint.x = vert.x;
+            if (vert.y < minPoint.y)
+                minPoint.y = vert.y;
+            if (vert.z < minPoint.z)
+                minPoint.z = vert.z;
+            // AABB maxPoint
+            if (vert.x > maxPoint.x)
+                maxPoint.x = vert.x;
+            if (vert.y > maxPoint.y)
+                maxPoint.y = vert.y;
+            if (vert.z > maxPoint.z)
+                maxPoint.z = vert.z;
 
             mData.data.push_back(meshData);
         }
@@ -113,6 +132,8 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
         return model;
     };
 
-    return processNode(scene->mRootNode, scene);
+    Model model = processNode(scene->mRootNode, scene);
+    model.boundingBox = AABB(minPoint, maxPoint);
+    return model;
 }
 

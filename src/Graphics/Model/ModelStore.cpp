@@ -81,6 +81,7 @@ void ModelStore::Load(const std::string& name, const Model& data)
         modelDesc.meshes.push_back(meshDesc);
     }
 
+    modelDesc.boundingBox = data.boundingBox;
     mModels.insert({name, modelDesc});
 }
 

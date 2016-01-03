@@ -1,1 +1,12 @@
 ext\ filter=lfs diff=lfs merge=lfs -text
+
+# Enforce LF line endings
+* text eol=lf
+*.hpp text
+*.cpp text
+*.cc text
+*.cxx text
+*.h text
+*.c text
+*.m text
+*.mm text

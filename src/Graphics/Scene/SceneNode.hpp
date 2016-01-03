@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include "Transform.hpp"
+#include "AABB.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -65,6 +66,7 @@ class SceneNode
             const std::string& model,
             const std::string& uuid,
             SceneNodeCategory category,
+            AABB localAABB,
             bool isCulled = false,
             SceneNode* parent = nullptr);
 
@@ -95,9 +97,12 @@ class SceneNode
         /// Get UUID
         const std::string& GetUUID() const;
 
+        /// Get AABB
+        const AABB& GetAABB() const;
+
         /// Get culled
         bool IsCulled() const;
-        
+
         /// Get a list with children nodes
         const ChildrenList& GetChildren() const;
 
@@ -106,6 +111,7 @@ class SceneNode
         Transform mTransform;        /// Node's current transformation
         SceneNodeCategory mCategory; /// Node's category
         std::string mUuid;           /// Node's unique id
+        AABB mAABB;                  /// Node's AABB
         bool mCulled;                /// Is the node culled?
 
         SceneNode* mParent;          /// Node's parent object

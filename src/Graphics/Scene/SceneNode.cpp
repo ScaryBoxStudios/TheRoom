@@ -8,11 +8,13 @@ SceneNode::SceneNode(
     const std::string& model,
     const std::string& uuid,
     SceneNodeCategory category,
+    AABB localAABB,
     bool isCulled /* = false */,
     SceneNode* parent /* = nullptr */)
     : mModel(model)
-    , mUuid(uuid)
     , mCategory(category)
+    , mUuid(uuid)
+    , mAABB(localAABB)
     , mCulled(isCulled)
     , mParent(parent)
 {
@@ -106,6 +108,11 @@ SceneNodeCategory SceneNode::GetCategory() const
 const std::string& SceneNode::GetUUID() const
 {
     return mUuid;
+}
+
+const AABB& SceneNode::GetAABB() const
+{
+    return mAABB;
 }
 
 bool SceneNode::IsCulled() const

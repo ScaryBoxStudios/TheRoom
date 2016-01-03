@@ -53,6 +53,7 @@ class Scene
             const std::string& uuid,
             SceneNodeCategory category,
             const glm::vec3& pos,
+            const AABB& initAABB,
             bool isCulled = false);
 
         /// Attach child to parent

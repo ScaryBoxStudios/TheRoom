@@ -53,9 +53,6 @@ class AABBRenderer
         // Deinitializes the renderer state
         void Shutdown();
 
-        // Sets the ModelStore to retrieve the model data
-        void SetModelStore(ModelStore* modelStore);
-
         // Sets the scene to process
         void SetScene(const Scene* scene);
 
@@ -67,7 +64,6 @@ class AABBRenderer
 
     private:
         const Scene* mScene;
-        ModelStore* mModelStore;
         glm::mat4 mProjection;
         glm::mat4 mView;
         std::unique_ptr<ShaderProgram> mProgram;

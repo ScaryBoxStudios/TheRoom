@@ -52,11 +52,8 @@ void AABBRenderer::Render(float interpolation)
             glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "projection"), 1, GL_FALSE, glm::value_ptr(mProjection));
             glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "view"), 1, GL_FALSE, glm::value_ptr(mView));
 
-            // Get the model
-            ModelDescription* mdl = (*mModelStore)[gObj->GetModel()];
-
             // Draw the AABB
-            RenderBox(mdl->boundingBox);
+            RenderBox(gObj->GetAABB());
         }
     }
     glUseProgram(0);
@@ -71,11 +68,6 @@ void AABBRenderer::Shutdown()
 void AABBRenderer::SetScene(const Scene* scene)
 {
     mScene = scene;
-}
-
-void AABBRenderer::SetModelStore(ModelStore* modelStore)
-{
-    mModelStore = modelStore;
 }
 
 void AABBRenderer::SetProjection(const glm::mat4& projection)

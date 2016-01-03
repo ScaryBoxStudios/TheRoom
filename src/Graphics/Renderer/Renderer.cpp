@@ -48,7 +48,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Initialize the AABBRenderer
     mAABBRenderer.Init();
-    mAABBRenderer.SetModelStore(&mModelStore);
     mAABBRenderer.SetProjection(mProjection);
 }
 

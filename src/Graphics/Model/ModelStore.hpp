@@ -54,7 +54,7 @@ struct ModelDescription
 {
     std::vector<MeshDescription> meshes;
     Material material;
-    AABB boundingBox;
+    AABB localAABB;
 };
 
 // ModelStore

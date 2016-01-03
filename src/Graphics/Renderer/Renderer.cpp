@@ -9,10 +9,14 @@ WARN_GUARD_ON
 WARN_GUARD_OFF
 
 
-void Renderer::Init(int width, int height)
+void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId)
 {
     // Skybox is initially unset
     mSkybox = nullptr;
+
+    // Store the needed program id's
+    mGeometryPassProgId = gPassProgId;
+    mLightingPassProgId = lPassProgId;
 
     // Store the screen size
     mScreenWidth = width;
@@ -105,7 +109,6 @@ void Renderer::Shutdown()
     // Explicitly deallocate GPU data
     mTextureStore.Clear();
     mModelStore.Clear();
-    mShaderStore.Clear();
 }
 
 void Renderer::GeometryPass(float interpolation)
@@ -114,7 +117,7 @@ void Renderer::GeometryPass(float interpolation)
     const auto& view = mView;
 
     // Use the geometry pass program
-    GLuint progId = mShaderStore["geometry_pass"];
+    GLuint progId = mGeometryPassProgId;
     glUseProgram(progId);
 
     // Upload projection and view matrices
@@ -178,7 +181,7 @@ void Renderer::GeometryPass(float interpolation)
 void Renderer::LightPass(float interpolation)
 {
     // Use the light pass program
-    GLuint progId = mShaderStore["light_pass"];
+    GLuint progId = mLightingPassProgId;
     glUseProgram(progId);
     {
         // Bind the data textures
@@ -248,11 +251,6 @@ void Renderer::SetView(const glm::mat4& view)
 TextureStore& Renderer::GetTextureStore()
 {
     return mTextureStore;
-}
-
-ShaderStore& Renderer::GetShaderStore()
-{
-    return mShaderStore;
 }
 
 ModelStore& Renderer::GetModelStore()

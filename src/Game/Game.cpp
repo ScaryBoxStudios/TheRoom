@@ -25,9 +25,6 @@ void Game::Init()
     // Setup window and input
     SetupWindow();
 
-    // Initialize the renderer
-    renderer.Init(mWindow.GetWidth(), mWindow.GetHeight());
-
     // Cube rotation state
     mRotationData.degreesInc = 0.05f;
     mRotationData.rotating = false;
@@ -46,6 +43,14 @@ void Game::Init()
 
     // Create world objects
     SetupWorld();
+
+    // Initialize the renderer
+    renderer.Init(
+        mWindow.GetWidth(),
+        mWindow.GetHeight(),
+        mShaderPrograms.at("geometry_pass").Id(),
+        mShaderPrograms.at("light_pass").Id()
+    );
 
     // Pass the current scene to renderer
     renderer.SetScene(&mScene);
@@ -156,53 +161,53 @@ void Game::SetupWindow()
 
 void Game::LoadShaders()
 {
-    // Retrieve the shaderStore from the renderer
-    auto& shaderStore = renderer.GetShaderStore();
-
     // The shader map
-    std::unordered_map<std::string, std::vector<std::pair<ShaderStore::ShaderType,std::string>>> shaders =
+    std::unordered_map<std::string, std::vector<std::pair<Shader::Type, std::string>>> shadersLoc =
     {
         {
             "geometry_pass",
             {
-                { ShaderStore::ShaderType::Vertex,   "res/geometry_pass_vert.glsl" },
-                { ShaderStore::ShaderType::Fragment, "res/geometry_pass_frag.glsl" },
+                { Shader::Type::Vertex,   "res/geometry_pass_vert.glsl" },
+                { Shader::Type::Fragment, "res/geometry_pass_frag.glsl" },
             }
         },
         {
             "light_pass",
             {
-                { ShaderStore::ShaderType::Vertex,   "res/light_pass_vert.glsl" },
-                { ShaderStore::ShaderType::Fragment, "res/light_pass_frag.glsl" },
+                { Shader::Type::Vertex,   "res/light_pass_vert.glsl" },
+                { Shader::Type::Fragment, "res/light_pass_frag.glsl" },
             }
         }
     };
 
     // Load shaders
-    for (const auto& p : shaders)
+    for (const auto& p : shadersLoc)
     {
-        // Will temporarily store the id's of the compiled shaders
-        std::unordered_map<ShaderStore::ShaderType, GLuint> shaderIds;
+        // Will temporarily store the the compiled shaders
+        std::unordered_map<Shader::Type, Shader> shaders;
         for (const auto& f : p.second)
         {
             // Load file
             auto shaderFile = FileLoad<BufferType>(f.second);
             if (!shaderFile)
                 throw std::runtime_error("Could not find shader file: \n" + f.second);
+
             // Convert it to std::string containter
             std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
-            GLuint sId = shaderStore.LoadShader(shaderSrc, f.first);
-            if (sId == 0)
-                throw std::runtime_error("Shader compilation error: \n" + shaderStore.GetLastError());
+
+            // Create shader from source
+            Shader shader(shaderSrc, f.first);
+
             // Insert loaded shader id to temp map
-            shaderIds.insert({f.first, sId});
+            shaders.emplace(f.first, std::move(shader));
         }
+
         // Fetch vert and frag shader id's from temp map and link
-        bool s = shaderStore.LinkProgram(p.first,
-            shaderIds[ShaderStore::ShaderType::Vertex],
-            shaderIds[ShaderStore::ShaderType::Fragment]);
-        if (!s)
-            throw std::runtime_error("OpenGL program link error: \n" + shaderStore.GetLastError());
+        ShaderProgram program(
+            shaders.at(Shader::Type::Vertex).Id(),
+            shaders.at(Shader::Type::Fragment).Id()
+        );
+        mShaderPrograms.emplace(p.first, std::move(program));
     }
 }
 

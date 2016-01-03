@@ -36,7 +36,6 @@
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "../Model/ModelStore.hpp"
-#include "../Shader/ShaderStore.hpp"
 #include "../Texture/TextureStore.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
@@ -50,7 +49,7 @@ class Renderer
 {
     public:
         /*! Initializes the renderer */
-        void Init(int width, int height);
+        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
 
         /*! Called when updating the game state */
         void Update(float dt);
@@ -72,9 +71,6 @@ class Renderer
 
         /*! Retrieves the renderer's TextureStore */
         TextureStore& GetTextureStore();
-
-        /*! Retrieves the renderer's ShaderStore */
-        ShaderStore& GetShaderStore();
 
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
@@ -101,8 +97,8 @@ class Renderer
         // Stores the models loaded in the gpu
         ModelStore mModelStore;
 
-        // Stores the shaders and shader programs loaded in the gpu
-        ShaderStore mShaderStore;
+        // Shader programIds of the geometry pass and the lighting pass
+        GLuint mGeometryPassProgId, mLightingPassProgId;
 
         // Stores the textures loaded in the gpu
         TextureStore mTextureStore;

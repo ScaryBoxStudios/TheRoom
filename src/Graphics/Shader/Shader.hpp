@@ -28,62 +28,67 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SHADERSTORE_HPP_
-#define _SHADERSTORE_HPP_
+#ifndef _SHADER_HPP_
+#define _SHADER_HPP_
 
 #include <string>
-#include <vector>
-#include <unordered_map>
+#include <stdexcept>
 #include <glad/glad.h>
 #include <GL/gl.h>
 
-class ShaderStore
+class Shader
 {
     public:
-        enum class ShaderType
+        // The shader type being created
+        enum class Type
         {
             Vertex = GL_VERTEX_SHADER,
             Fragment = GL_FRAGMENT_SHADER
         };
 
-        // Constructor
-        ShaderStore();
+        // Constructor, throws std::runtime_error if source fails to compile
+        Shader(const std::string& source, Type type);
 
         // Destructor
-        ~ShaderStore();
+        ~Shader();
 
         // Disable copy construction
-        ShaderStore(const ShaderStore& other) = delete;
-        ShaderStore& operator=(const ShaderStore& other) = delete;
+        Shader(const Shader& other) = delete;
+        Shader& operator=(const Shader& other) = delete;
 
         // Enable move construction
-        ShaderStore(ShaderStore&& other) = default;
-        ShaderStore& operator=(ShaderStore&& other) = default;
+        Shader(Shader&& other);
+        Shader& operator=(Shader&& other);
 
-        // Compiles given shader from source
-        GLuint LoadShader(const std::string& shaderSrc, ShaderType type);
-
-        // Links the given shaders in a program
-        bool LinkProgram(const std::string& name, GLuint vertShId, GLuint fragShId);
-
-        // Retrieves the program id with the given name
-        GLuint operator[](const std::string& name);
-
-        // Unloads the loaded shaders and programs from the store
-        void Clear();
-
-        // Retrieves the last error occured
-        const std::string& GetLastError() const;
+        // Retrieves internal id
+        GLuint Id() const;
 
     private:
-        // Stored shaders
-        std::vector<GLuint> mShaders;
-
-        // Stored programs
-        std::unordered_map<std::string, GLuint> mPrograms;
-
-        // Error state
-        std::string mLastError;
+        GLuint mId;
 };
 
-#endif // ! _SHADERSTORE_HPP_
+class ShaderProgram
+{
+    public:
+        // Constructor, throws std::runtime_error if program fails to link
+        ShaderProgram(GLuint vertShId, GLuint fragShId);
+
+        // Destructor
+        ~ShaderProgram();
+
+        // Disable copy construction
+        ShaderProgram(const ShaderProgram& other) = delete;
+        ShaderProgram& operator=(const ShaderProgram& other) = delete;
+
+        // Enable move construction
+        ShaderProgram(ShaderProgram&& other);
+        ShaderProgram& operator=(ShaderProgram&& other);
+
+        // Retrieves internal id
+        GLuint Id() const;
+
+    private:
+        GLuint mId;
+};
+
+#endif // ! _SHADER_HPP_

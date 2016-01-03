@@ -38,6 +38,7 @@
 #include "../Graphics/Renderer/Renderer.hpp"
 #include "../Graphics/Renderer/Skybox.hpp"
 #include "../Graphics/Scene/Scene.hpp"
+#include "../Graphics/Shader/Shader.hpp"
 
 class Game
 {
@@ -87,6 +88,9 @@ class Game
 
         // The Scene
         Scene mScene;
+
+        // The loaded ShaderProgram(s)
+        std::unordered_map<std::string, ShaderProgram> mShaderPrograms;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

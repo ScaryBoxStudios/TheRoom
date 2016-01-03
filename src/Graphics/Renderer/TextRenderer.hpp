@@ -32,9 +32,11 @@
 #define _TEXT_RENDERER_HPP_
 
 #include <string>
+#include <memory>
 #include <glad/glad.h>
 #include <GL/gl.h>
 #include "../Text/FontStore.hpp"
+#include "../Shader/Shader.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -67,7 +69,7 @@ class TextRenderer
         GLuint mVao, mVbo;
 
         // The font renderer OpenGL program
-        GLuint mVShader, mFShader, mProgram;
+        std::unique_ptr<ShaderProgram> mProgram;
 };
 
 #endif // ! _TEXT_RENDERER_HPP_

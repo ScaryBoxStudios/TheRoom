@@ -40,19 +40,9 @@ void TextRenderer::Init(int width, int height)
     mProjection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
 
     // Setup the text rendering program
-    mProgram = glCreateProgram();
-
-    mVShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(mVShader, 1, &textVertexSh, 0);
-    glCompileShader(mVShader);
-    glAttachShader(mProgram, mVShader);
-
-    mFShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(mFShader, 1, &textFragSh, 0);
-    glCompileShader(mFShader);
-    glAttachShader(mProgram, mFShader);
-
-    glLinkProgram(mProgram);
+    Shader vShader(textVertexSh, Shader::Type::Vertex);
+    Shader fShader(textFragSh, Shader::Type::Fragment);
+    mProgram = std::make_unique<ShaderProgram>(vShader.Id(), fShader.Id());
 
     // Setup the rendering quad
     glGenVertexArrays(1, &mVao);
@@ -85,10 +75,10 @@ void TextRenderer::RenderText(const std::string& text, float x, float y, glm::ve
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glUseProgram(mProgram);
-    glUniformMatrix4fv(glGetUniformLocation(mProgram, "projection"), 1, GL_FALSE, glm::value_ptr(mProjection));
-    glUniform3f(glGetUniformLocation(mProgram, "textColor"), color.x, color.y, color.z);
-    glUniform1i(glGetUniformLocation(mProgram, "text"), 0);
+    glUseProgram(mProgram->Id());
+    glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "projection"), 1, GL_FALSE, glm::value_ptr(mProjection));
+    glUniform3f(glGetUniformLocation(mProgram->Id(), "textColor"), color.x, color.y, color.z);
+    glUniform1i(glGetUniformLocation(mProgram->Id(), "text"), 0);
 
     glBindVertexArray(mVao);
     glActiveTexture(GL_TEXTURE0);
@@ -140,10 +130,6 @@ void TextRenderer::Shutdown()
 {
     glDeleteBuffers(1, &mVbo);
     glDeleteVertexArrays(1, &mVao);
-
-    glDeleteShader(mFShader);
-    glDeleteShader(mVShader);
-    glDeleteProgram(mProgram);
 }
 
 FontStore& TextRenderer::GetFontStore()

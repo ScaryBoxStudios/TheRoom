@@ -97,8 +97,8 @@ void Game::SetupWorld()
 
         const std::string name = "cube" + std::to_string(i);
         const auto& initAABB = renderer.GetModelStore()["cube"]->localAABB;
-        scene.CreateNode("cube", name, SceneNodeCategory::Normal, pos, initAABB);
-
+        scene.CreateNode("cube", name, SceneNodeCategory::Normal, initAABB);
+        scene.Move(name, pos);
         scene.Scale(name, glm::vec3(2.0f));
         scene.Rotate(name, RotationAxis::X, 20.0f * i);
         scene.Rotate(name, RotationAxis::Y, 7.0f * i);
@@ -108,14 +108,16 @@ void Game::SetupWorld()
     // Add house
     {
         const auto& initAABB = renderer.GetModelStore()["house"]->localAABB;
-        scene.CreateNode("house", "house", SceneNodeCategory::Normal, glm::vec3(0.0f, -10.0f, -40.0f), initAABB);
+        scene.CreateNode("house", "house", SceneNodeCategory::Normal, initAABB);
+        scene.Move("house", glm::vec3(0.0f, -10.0f, -40.0f));
         scene.Scale("house", glm::vec3(0.3f));
     }
 
     // Add well
     {
         const auto& initAABB = renderer.GetModelStore()["well"]->localAABB;
-        scene.CreateNode("well", "well", SceneNodeCategory::Normal, glm::vec3(0.0f, -5.0f, -10.0f), initAABB);
+        scene.CreateNode("well", "well", SceneNodeCategory::Normal, initAABB);
+        scene.Move("well", glm::vec3(0.0f, -5.0f, -10.0f));
         scene.Scale("well", glm::vec3(2.0f));
     }
 
@@ -125,7 +127,8 @@ void Game::SetupWorld()
     // Add cube lights
     {
         const auto& initAABB = renderer.GetModelStore()["teapot"]->localAABB;
-        scene.CreateNode("teapot", "teapot", SceneNodeCategory::Light, glm::vec3(4.0f, 0.0f, 0.0f), initAABB);
+        scene.CreateNode("teapot", "teapot", SceneNodeCategory::Light, initAABB);
+        scene.Move("teapot", glm::vec3(4.0f, 0.0f, 0.0f));
         scene.Scale("teapot", glm::vec3(0.3f));
     }
 }

@@ -16,16 +16,12 @@ SceneNode* Scene::CreateNode(
     const std::string& model,
     const std::string& uuid,
     SceneNodeCategory category,
-    const glm::vec3& pos,
     const AABB& initAABB,
     bool isCulled /* = false */)
 {
     // Create node
     std::unique_ptr<SceneNode> ptr =
         std::make_unique<SceneNode>(model, uuid, category, initAABB, isCulled);
-
-    // Move to given position
-    ptr->Move(pos, false);
 
     // Save it to category map
     mCategories[category].push_back(ptr.get());

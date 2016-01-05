@@ -31,6 +31,7 @@
 #ifndef _AABB_HPP_
 #define _AABB_HPP_
 
+#include "Transform.hpp"
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -47,11 +48,19 @@ class AABB
         float MaxY() const;
         float MinZ() const;
         float MaxZ() const;
+        glm::vec3 MinPoint() const;
+        glm::vec3 MaxPoint() const;
+        void Move(const glm::vec3& offset);
+        void Scale(const glm::vec3& factor);
+        void RotateX(float angle);
+        void RotateY(float angle);
+        void RotateZ(float angle);
+        void Update();
 
     private:
-        // In order x y z
-        glm::vec3 minPoint;
-        glm::vec3 maxPoint;
+        glm::vec3 localMin, cachedMin;
+        glm::vec3 localMax, cachedMax;
+        Transform transform;
 };
 
 #endif // ! _AABB_HPP_

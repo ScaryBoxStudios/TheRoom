@@ -98,7 +98,7 @@ class SceneNode
         const std::string& GetUUID() const;
 
         /// Get AABB
-        const AABB& GetAABB() const;
+        AABB& GetAABB();
 
         /// Get culled
         bool IsCulled() const;

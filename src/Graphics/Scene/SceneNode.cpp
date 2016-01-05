@@ -54,6 +54,9 @@ void SceneNode::Move(const glm::vec3& pos, bool moveChildren /* = false */)
     // Move this node
     mTransform.Move(pos);
 
+    // Translate bounding box
+    mAABB.Move(pos);
+
     // Move children (if necessary)
     if(moveChildren)
         MoveChildren(pos);
@@ -66,12 +69,15 @@ void SceneNode::Rotate(RotationAxis axis, float angle, bool rotateChildren /* = 
     {
         case RotationAxis::X:
             mTransform.RotateX(angle);
+            mAABB.RotateX(angle);
             break;
         case  RotationAxis::Y:
             mTransform.RotateY(angle);
+            mAABB.RotateY(angle);
             break;
         case RotationAxis::Z:
             mTransform.RotateZ(angle);
+            mAABB.RotateZ(angle);
             break;
     }
 
@@ -84,6 +90,9 @@ void SceneNode::Scale(const glm::vec3& scale, bool scaleChildren /* = false */)
 {
     // Scale this node
     mTransform.Scale(scale);
+
+    // Scale bounding box
+    mAABB.Scale(scale);
 
     // Scale children (if necessary)
     if(scaleChildren)
@@ -110,7 +119,7 @@ const std::string& SceneNode::GetUUID() const
     return mUuid;
 }
 
-const AABB& SceneNode::GetAABB() const
+AABB& SceneNode::GetAABB()
 {
     return mAABB;
 }

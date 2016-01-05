@@ -12,11 +12,10 @@ layout(location=0) in vec3 position;
 
 uniform mat4 projection;
 uniform mat4 view;
-uniform mat4 model;
 
 void main(void)
 {
-    gl_Position = projection * view * model * vec4(position, 1.0f);
+    gl_Position = projection * view * vec4(position, 1.0f);
 }
 )foo";
 
@@ -39,16 +38,14 @@ void AABBRenderer::Init()
 
 void AABBRenderer::Render(float interpolation)
 {
+    (void) interpolation;
+
     glUseProgram(mProgram->Id());
     for (const auto& objCategory : mScene->GetCategories())
     {
         for (const auto& gObj : objCategory.second)
         {
-            // Calculate the model matrix
-            glm::mat4 model = gObj->GetTransformation().GetInterpolated(interpolation);
-
             // Upload model, projection and view matrices
-            glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "model"), 1, GL_FALSE, glm::value_ptr(model));
             glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "projection"), 1, GL_FALSE, glm::value_ptr(mProjection));
             glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "view"), 1, GL_FALSE, glm::value_ptr(mView));
 

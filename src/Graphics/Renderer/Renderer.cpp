@@ -57,7 +57,10 @@ void Renderer::Update(float dt)
 
     // Update interpolation variables
     for (auto& obj : mScene->GetNodes())
+    {
         obj.second->GetTransformation().Update();
+        obj.second->GetAABB().Update();
+    }
 }
 
 void Renderer::Render(float interpolation)

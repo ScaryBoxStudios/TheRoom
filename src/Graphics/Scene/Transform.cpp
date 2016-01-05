@@ -3,7 +3,7 @@
 
 Transform::Transform() :
     mParent(nullptr),
-    mTransform(),
+    mTransform(glm::mat4()),
     mPosition(0.0f),
     mYaw(0.0f),
     mPitch(0.0f),

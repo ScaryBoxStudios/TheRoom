@@ -41,6 +41,11 @@ const glm::vec3& Transform::GetScale() const
     return mScale;
 }
 
+const glm::vec3 Transform::GetRotation() const
+{
+    return glm::vec3(mRoll, mPitch, mYaw);
+}
+
 void Transform::Move(const glm::vec3& pos)
 {
     mPosition += pos * mScale;

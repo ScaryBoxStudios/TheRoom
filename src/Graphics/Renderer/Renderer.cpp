@@ -62,7 +62,7 @@ void Renderer::Update(float dt)
         trans.Update();
 
         AABB& aabb = obj.second->GetAABB();
-        aabb.Update(trans.GetPosition(), trans.GetScale());
+        aabb.Update(trans.GetPosition(), trans.GetScale(), trans.GetRotation());
     }
 }
 

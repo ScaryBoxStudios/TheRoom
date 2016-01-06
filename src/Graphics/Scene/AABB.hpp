@@ -54,7 +54,7 @@ class AABB
         glm::vec3 MinPoint() const;
         glm::vec3 MaxPoint() const;
 
-        void Update(const glm::vec3& transl, const glm::vec3& scale);
+        void Update(const glm::vec3& transl, const glm::vec3& scale, const glm::vec3& rotation);
 
     private:
         glm::vec3 localMin, cachedMin;

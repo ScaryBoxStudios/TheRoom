@@ -69,9 +69,6 @@ class Transform
         // Scales relatively to the current scale
         void Scale(const glm::vec3& scale);
 
-        // Sets the parent transformation
-        void SetParent(Transform* par);
-
         // Updates the interpolation state variables
         void Update();
 
@@ -79,9 +76,6 @@ class Transform
         glm::mat4 GetInterpolated(float interpolation) const;
 
     private:
-        // Parent node transformation
-        Transform* mParent;
-
         // Current cached transformation matrix
         glm::mat4 mTransform;
 

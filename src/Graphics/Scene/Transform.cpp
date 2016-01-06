@@ -2,7 +2,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 Transform::Transform() :
-    mParent(nullptr),
     mTransform(glm::mat4()),
     mPosition(0.0f),
     mYaw(0.0f),
@@ -15,8 +14,6 @@ Transform::Transform() :
 
 const glm::mat4& Transform::Get() const
 {
-    //if (mParent != nullptr) // TODO
-    //    mTransform = mTransform * mParent->Get();
     return mTransform;
 }
 
@@ -74,10 +71,5 @@ void Transform::Scale(const glm::vec3& scale)
 {
     mScale *= scale;
     mTransform = glm::scale(mTransform, scale);
-}
-
-void Transform::SetParent(Transform* par)
-{
-    mParent = par;
 }
 

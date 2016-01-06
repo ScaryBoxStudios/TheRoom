@@ -48,6 +48,9 @@ class Transform
         // Retrieves the current local position vector
         const glm::vec3& GetPosition() const;
 
+        // Retrieves the current local scaling vector
+        const glm::vec3& GetScale() const;
+
         // Moves relatively to the current position
         void Move(const glm::vec3& pos);
 

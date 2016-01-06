@@ -36,9 +36,14 @@ const glm::vec3& Transform::GetPosition() const
     return mPosition;
 }
 
+const glm::vec3& Transform::GetScale() const
+{
+    return mScale;
+}
+
 void Transform::Move(const glm::vec3& pos)
 {
-    mPosition += pos;
+    mPosition += pos * mScale;
     mTransform = glm::translate(mTransform, pos);
 }
 
@@ -62,7 +67,7 @@ void Transform::RotateZ(float angle)
 
 void Transform::Scale(const glm::vec3& scale)
 {
-    mScale += scale;
+    mScale *= scale;
     mTransform = glm::scale(mTransform, scale);
 }
 

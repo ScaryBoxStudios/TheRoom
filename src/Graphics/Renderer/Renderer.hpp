@@ -76,6 +76,9 @@ class Renderer
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
 
+        /*! Toggles showing the AABBs */
+        void ToggleShowAABBs();
+
     private:
         // Performs the geometry pass rendering step
         void GeometryPass(float interpolation);
@@ -115,6 +118,9 @@ class Renderer
 
         // The AABB rendering utility
         AABBRenderer mAABBRenderer;
+
+        // When flag on AABBs are shown
+        bool mShowAABBs;
 };
 
 #endif // ! _RENDERER_HPP_

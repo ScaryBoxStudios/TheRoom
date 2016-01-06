@@ -160,6 +160,8 @@ void Game::SetupWindow()
             // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
                 mWindow.SetMouseGrabEnabled(false);
+            if(k == Key::B && ka == KeyAction::Release)
+                renderer.ToggleShowAABBs();
             if(k == Key::R && ka == KeyAction::Release)
                 mRotationData.rotating = !mRotationData.rotating;
         }

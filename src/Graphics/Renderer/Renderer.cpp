@@ -49,6 +49,9 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Initialize the AABBRenderer
     mAABBRenderer.Init();
     mAABBRenderer.SetProjection(mProjection);
+
+    // Do not show AABBs by default
+    mShowAABBs = false;
 }
 
 void Renderer::Update(float dt)
@@ -103,7 +106,9 @@ void Renderer::Render(float interpolation)
         if (mSkybox)
             mSkybox->Render(mProjection, mView);
 
-        mAABBRenderer.Render(interpolation);
+        // Render the AABBs if enabled
+        if (mShowAABBs)
+            mAABBRenderer.Render(interpolation);
 
         // Render sample text
         mTextRenderer.RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
@@ -263,6 +268,11 @@ void Renderer::SetView(const glm::mat4& view)
 {
     mView = view;
     mAABBRenderer.SetView(view);
+}
+
+void Renderer::ToggleShowAABBs()
+{
+    mShowAABBs = !mShowAABBs;
 }
 
 TextureStore& Renderer::GetTextureStore()

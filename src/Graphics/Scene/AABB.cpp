@@ -26,30 +26,12 @@ float AABB::MaxZ() const { return MaxPoint().z; }
 glm::vec3 AABB::MinPoint() const { return cachedMin; }
 glm::vec3 AABB::MaxPoint() const { return cachedMax; }
 
-void AABB::Move(const glm::vec3& offset)
+void AABB::Update(const glm::vec3& transl, const glm::vec3& scale)
 {
-    transform.Move(offset);
-}
+    glm::mat4 transform = glm::mat4();
+    transform = glm::translate(transform, transl);
+    transform = glm::scale(transform, scale);
 
-void AABB::Scale(const glm::vec3& factor)
-{
-    transform.Scale(factor);
-}
-
-void AABB::RotateX(float angle)
-{
-}
-
-void AABB::RotateY(float angle)
-{
-}
-
-void AABB::RotateZ(float angle)
-{
-}
-
-void AABB::Update()
-{
-    cachedMin = glm::vec3(transform.Get() * glm::vec4(localMin, 1));
-    cachedMax = glm::vec3(transform.Get() * glm::vec4(localMax, 1));
+    cachedMin = glm::vec3(transform * glm::vec4(localMin, 1.0f));
+    cachedMax = glm::vec3(transform * glm::vec4(localMax, 1.0f));
 }

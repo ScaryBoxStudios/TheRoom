@@ -58,8 +58,11 @@ void Renderer::Update(float dt)
     // Update interpolation variables
     for (auto& obj : mScene->GetNodes())
     {
-        obj.second->GetTransformation().Update();
-        obj.second->GetAABB().Update();
+        Transform& trans = obj.second->GetTransformation();
+        trans.Update();
+
+        AABB& aabb = obj.second->GetAABB();
+        aabb.Update(trans.GetPosition(), trans.GetScale());
     }
 }
 

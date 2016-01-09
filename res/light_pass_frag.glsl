@@ -121,6 +121,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Mat
     return (ambient + diffuse + specular);
 }
 
+uniform DirLight dirLight;
+
 void main(void)
 {
     // Retrieve data from GBuffer
@@ -130,7 +132,7 @@ void main(void)
     float Specular = texture(gAlbedoSpec, UVCoords).a;
 
     // Calculate the fragment light space position
-    vec3 FragPosLightSpace = vec3(lightSpaceMatrix * vec4(FragPos, 1.0));
+    vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
 
     // Fill material struct
     Material material;
@@ -143,11 +145,6 @@ void main(void)
     vec3 viewDir = normalize(viewPos - FragPos);
 
     // Phase 1: Directional lighting
-    DirLight dirLight;
-    dirLight.direction = vec3(-0.2f, -1.0f, -0.3f);
-    dirLight.ambient = vec3(0.05f);
-    dirLight.diffuse = vec3(0.4f);
-    dirLight.specular = vec3(0.5f);
     vec3 result = CalcDirLight(dirLight, norm, viewDir, material);
 
     // Phase 2: Point lights

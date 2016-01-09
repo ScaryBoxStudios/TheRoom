@@ -55,6 +55,9 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(width, height);
     mShadowRenderer.SetModelStore(&mModelStore);
+
+    // Set directional light position
+    mDirLightPos = glm::vec3(-0.2f, -1.0f, -0.3f);
 }
 
 void Renderer::Update(float dt)
@@ -80,10 +83,9 @@ void Renderer::Render(float interpolation)
         mShadowRenderer.SetScene(mScene);
 
         // Set light's properties
-        auto lightIt  = mScene->GetCategories().find(SceneNodeCategory::Light);
-        const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
-        const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-        mShadowRenderer.SetLightPos(lightPos);
+        mShadowRenderer.SetLightPos(mDirLightPos);
+
+        // Render depth map
         mShadowRenderer.Render(interpolation);
     }
 
@@ -253,10 +255,15 @@ void Renderer::LightPass(float interpolation)
         GLint viewPosId = glGetUniformLocation(progId, "viewPos");
         glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 
+        // Set directional light properties
+        glUniform3f(glGetUniformLocation(progId, "dirLight.direction"), mDirLightPos.x, mDirLightPos.y, mDirLightPos.z);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.specular"), 0.5f, 0.5f, 0.5f);
+
         // Set light's properties
         auto& categories = mScene->GetCategories();
         auto lightIt = categories.find(SceneNodeCategory::Light);
-
         const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
         const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
         glUniform3f(glGetUniformLocation(progId, "light.position"), lightPos.x, lightPos.y, lightPos.z);
@@ -272,7 +279,7 @@ void Renderer::LightPass(float interpolation)
 
         // Calculate light space matrix
         glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-        glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(1.0));
+        glm::mat4 lightView = glm::lookAt(mDirLightPos, glm::vec3(0.0f), glm::vec3(1.0));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
         glUniformMatrix4fv(glGetUniformLocation(progId, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 

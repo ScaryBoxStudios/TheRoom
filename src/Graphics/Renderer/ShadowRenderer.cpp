@@ -69,7 +69,13 @@ void ShadowRenderer::Shutdown()
 void ShadowRenderer::Render(float interpolation)
 {
     glCullFace(GL_FRONT);
+
+    // Store previous viewport and set the new one
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport);
     glViewport(0, 0, mWidth, mHeight);
+
+    // Bind shadow map fbo
     glBindFramebuffer(GL_FRAMEBUFFER, mDepthMapFboId);
         glClear(GL_DEPTH_BUFFER_BIT);
         glUseProgram(mProgram->Id());
@@ -110,6 +116,10 @@ void ShadowRenderer::Render(float interpolation)
 
         glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Restore viewport
+    glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+
     glCullFace(GL_BACK);
 }
 

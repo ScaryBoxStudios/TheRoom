@@ -68,6 +68,7 @@ void ShadowRenderer::Shutdown()
 
 void ShadowRenderer::Render(float interpolation)
 {
+    glCullFace(GL_FRONT);
     glViewport(0, 0, mWidth, mHeight);
     glBindFramebuffer(GL_FRAMEBUFFER, mDepthMapFboId);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -109,6 +110,7 @@ void ShadowRenderer::Render(float interpolation)
 
         glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glCullFace(GL_BACK);
 }
 
 void ShadowRenderer::SetScene(const Scene* scene)

@@ -8,7 +8,7 @@ Camera::Camera()
     mState.yaw = -90.0f;
     mState.pitch = 0.0f;
 
-    mProperties.movementSpeed = 0.3f;
+    mProperties.movementSpeed = 1.0f;
     mProperties.sensitivity = 0.05f;
     mProperties.pitchLim = 90.0f;
 }

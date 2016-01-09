@@ -67,6 +67,9 @@ class ShadowRenderer
         // Retrieves the depth map Id
         GLuint DepthMapId() const;
 
+        // Retrieves the currently used light space matrix
+        const glm::mat4& GetLightViewMatrix() const;
+
     private:
         int mWidth, mHeight;
 
@@ -75,6 +78,7 @@ class ShadowRenderer
         std::unique_ptr<ShaderProgram> mProgram;
 
         glm::vec3 mLightPos;
+        glm::mat4 mLightViewMatrix;
         const Scene* mScene;
         ModelStore* mModelStore;
 };

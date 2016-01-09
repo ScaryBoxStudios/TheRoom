@@ -277,11 +277,12 @@ void Renderer::LightPass(float interpolation)
         // Set material properties
         glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
 
-        // Calculate light space matrix
-        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
-        glm::mat4 lightView = glm::lookAt(mDirLightPos, glm::vec3(0.0f), glm::vec3(1.0));
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-        glUniformMatrix4fv(glGetUniformLocation(progId, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
+        // Pass the light space matrix
+        glUniformMatrix4fv(
+            glGetUniformLocation(progId, "lightSpaceMatrix"),
+            1, GL_FALSE,
+            glm::value_ptr(mShadowRenderer.GetLightViewMatrix())
+        );
 
         // Render final contents
         RenderQuad();

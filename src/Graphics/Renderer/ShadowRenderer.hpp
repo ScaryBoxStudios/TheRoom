@@ -28,103 +28,52 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _SHADOW_RENDERER_HPP_
+#define _SHADOW_RENDERER_HPP_
 
 #include <memory>
-#include "GBuffer.hpp"
-#include "Skybox.hpp"
-#include "TextRenderer.hpp"
-#include "AABBRenderer.hpp"
-#include "ShadowRenderer.hpp"
-#include "../Model/ModelStore.hpp"
-#include "../Texture/TextureStore.hpp"
+#include <glad/glad.h>
+#include <GL/gl.h>
+#include "../Shader/Shader.hpp"
 #include "../Scene/Scene.hpp"
-#include "../Scene/Transform.hpp"
+#include "../Model/ModelStore.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-class Renderer
+class ShadowRenderer
 {
     public:
-        /*! Initializes the renderer */
-        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
+        // Initializes the renderer state
+        void Init(unsigned int width, unsigned int height);
 
-        /*! Called when updating the game state */
-        void Update(float dt);
-
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes the renderer */
+        // Deinitializes the renderer state
         void Shutdown();
 
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
+        // Renders the scene from the light's view in the depth buffer
+        void Render(float interpolation);
 
-        /*! Sets the skybox */
-        void SetSkybox(const Skybox* s);
-
-        /*! Sets the current rendering scene */
+        // Sets the scene to process
         void SetScene(const Scene* scene);
 
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
+        // Sets the model store to retrieve the Model data for the scene
+        void SetModelStore(ModelStore* modelStore);
 
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        /*! Toggles showing the AABBs */
-        void ToggleShowAABBs();
+        // Sets the light properties
+        void SetLightPos(const glm::vec3& lightPos);
 
     private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
+        int mWidth, mHeight;
 
-        // Performs the light pass rendering step
-        void LightPass(float interpolation);
+        GLuint mDepthMapId;
+        GLuint mDepthMapFboId;
+        std::unique_ptr<ShaderProgram> mProgram;
 
-        // The projection matrix
-        glm::mat4 mProjection;
-
-        // The view matrix
-        glm::mat4 mView;
-
-        // The screen size
-        int mScreenWidth, mScreenHeight;
-
-        // Currently rendering scene
+        glm::vec3 mLightPos;
         const Scene* mScene;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Shader programIds of the geometry pass and the lighting pass
-        GLuint mGeometryPassProgId, mLightingPassProgId;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // The GBuffer used by the deffered rendering steps
-        std::unique_ptr<GBuffer> mGBuffer;
-
-        // The root Skybox used
-        const Skybox* mSkybox;
-
-        // The text rendering utility
-        TextRenderer mTextRenderer;
-
-        // The AABB rendering utility
-        AABBRenderer mAABBRenderer;
-
-        // The shadow map rendering utility
-        ShadowRenderer mShadowRenderer;
-
-        // When flag on AABBs are shown
-        bool mShowAABBs;
+        ModelStore* mModelStore;
 };
 
-#endif // ! _RENDERER_HPP_
+#endif // ! _SHADOW_RENDERER_HPP_

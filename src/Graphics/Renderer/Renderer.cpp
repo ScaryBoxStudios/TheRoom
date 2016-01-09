@@ -49,9 +49,12 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Initialize the AABBRenderer
     mAABBRenderer.Init();
     mAABBRenderer.SetProjection(mProjection);
-
     // Do not show AABBs by default
     mShowAABBs = false;
+
+    // Initialize the ShadowRenderer
+    mShadowRenderer.Init(width, height);
+    mShadowRenderer.SetModelStore(&mModelStore);
 }
 
 void Renderer::Update(float dt)
@@ -71,6 +74,19 @@ void Renderer::Update(float dt)
 
 void Renderer::Render(float interpolation)
 {
+    // Render the shadow map
+    {
+        // Set the rendering scene
+        mShadowRenderer.SetScene(mScene);
+
+        // Set light's properties
+        auto lightIt  = mScene->GetCategories().find(SceneNodeCategory::Light);
+        const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
+        const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
+        mShadowRenderer.SetLightPos(lightPos);
+        mShadowRenderer.Render(interpolation);
+    }
+
     // Bind the GBuffer
     glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
     {
@@ -117,6 +133,9 @@ void Renderer::Render(float interpolation)
 
 void Renderer::Shutdown()
 {
+    // Shutdown the ShadowRenderer
+    mShadowRenderer.Shutdown();
+
     // Shutdown the AABBRenderer
     mAABBRenderer.Shutdown();
 

@@ -8,6 +8,9 @@ uniform sampler2D gAlbedoSpec;
 uniform float shininess;
 uniform vec3 viewPos;
 
+uniform mat4 lightSpaceMatrix;
+uniform sampler2D shadowMap;
+
 struct Material
 {
     vec3 diffuse;
@@ -125,6 +128,9 @@ void main(void)
     vec3 Normal = texture(gNormal, UVCoords).rgb;
     vec3 Diffuse = texture(gAlbedoSpec, UVCoords).rgb;
     float Specular = texture(gAlbedoSpec, UVCoords).a;
+
+    // Calculate the fragment light space position
+    vec3 FragPosLightSpace = vec3(lightSpaceMatrix * vec4(FragPos, 1.0));
 
     // Fill material struct
     Material material;

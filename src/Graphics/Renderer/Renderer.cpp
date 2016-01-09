@@ -239,6 +239,10 @@ void Renderer::LightPass(float interpolation)
         GLuint gAlbSpecId = glGetUniformLocation(progId, "gAlbedoSpec");
         glUniform1i(gAlbSpecId, 2);
 
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
+        glUniform1i(glGetUniformLocation(progId, "shadowMap"), 3);
+
         // Upload light relevant uniforms
         // Get the view matrix
         const auto& view = mView;
@@ -265,6 +269,12 @@ void Renderer::LightPass(float interpolation)
 
         // Set material properties
         glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
+
+        // Calculate light space matrix
+        glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 1.0f, 7.5f);
+        glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(1.0));
+        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+        glUniformMatrix4fv(glGetUniformLocation(progId, "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
 
         // Render final contents
         RenderQuad();

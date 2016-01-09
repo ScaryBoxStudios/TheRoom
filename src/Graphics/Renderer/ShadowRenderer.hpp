@@ -64,6 +64,9 @@ class ShadowRenderer
         // Sets the light properties
         void SetLightPos(const glm::vec3& lightPos);
 
+        // Retrieves the depth map Id
+        GLuint DepthMapId() const;
+
     private:
         int mWidth, mHeight;
 

@@ -125,3 +125,8 @@ void ShadowRenderer::SetLightPos(const glm::vec3& lightPos)
 {
     mLightPos = lightPos;
 }
+
+GLuint ShadowRenderer::DepthMapId() const
+{
+    return mDepthMapId;
+}

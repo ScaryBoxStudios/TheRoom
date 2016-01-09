@@ -369,12 +369,8 @@ void Game::Update(float dt)
     {
         for(auto& p : scene.GetNodes())
         {
-            switch(p.second->GetCategory())
-            {
-                case SceneNodeCategory::Normal:
-                    scene.Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
-                    break;
-            }
+            if (p.first.substr(0, 4) == "cube")
+                scene.Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
         }
     }
 }

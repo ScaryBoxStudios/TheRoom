@@ -77,7 +77,6 @@ class ShadowRenderer
         GLuint mDepthMapFboId;
         std::unique_ptr<ShaderProgram> mProgram;
 
-        glm::vec3 mLightPos;
         glm::mat4 mLightViewMatrix;
         const Scene* mScene;
         ModelStore* mModelStore;

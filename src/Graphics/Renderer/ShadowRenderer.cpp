@@ -57,17 +57,6 @@ void ShadowRenderer::Init(unsigned int width, unsigned int height)
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Set the light position
-    glm::vec3 lightPos = glm::vec3(0.5f, 2.0f, 2.0f);
-
-    // Calculate light space matrix
-    float orthoSz = 100.0f;
-    float nearPlane = 1.0f;
-    float farPlane = 75.0f;
-    glm::mat4 lightProjection = glm::ortho(-orthoSz, orthoSz, -orthoSz, orthoSz, nearPlane, farPlane);
-    glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(1.0f));
-    mLightViewMatrix = lightProjection * lightView;
-
     // Check if framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         throw std::runtime_error("OpenGL: Framebuffer incomplete!");
@@ -141,7 +130,13 @@ void ShadowRenderer::SetModelStore(ModelStore* modelStore)
 
 void ShadowRenderer::SetLightPos(const glm::vec3& lightPos)
 {
-    mLightPos = lightPos;
+    // Calculate light space matrix
+    float orthoSz = 100.0f;
+    float nearPlane = 1.0f;
+    float farPlane = 75.0f;
+    glm::mat4 lightProjection = glm::ortho(-orthoSz, orthoSz, -orthoSz, orthoSz, nearPlane, farPlane);
+    glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(1.0f));
+    mLightViewMatrix = lightProjection * lightView;
 }
 
 GLuint ShadowRenderer::DepthMapId() const

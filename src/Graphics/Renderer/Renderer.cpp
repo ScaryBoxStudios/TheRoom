@@ -57,7 +57,7 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mShadowRenderer.SetModelStore(&mModelStore);
 
     // Set directional light position
-    mDirLightPos = glm::vec3(-0.2f, -1.0f, -0.3f);
+    mLightDir = glm::vec3(-0.3f, -0.5f, -0.5f);
 }
 
 void Renderer::Update(float dt)
@@ -83,7 +83,7 @@ void Renderer::Render(float interpolation)
         mShadowRenderer.SetScene(mScene);
 
         // Set light's properties
-        mShadowRenderer.SetLightPos(mDirLightPos);
+        mShadowRenderer.SetLightPos(-mLightDir);
 
         // Render depth map
         mShadowRenderer.Render(interpolation);
@@ -256,7 +256,7 @@ void Renderer::LightPass(float interpolation)
         glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 
         // Set directional light properties
-        glUniform3f(glGetUniformLocation(progId, "dirLight.direction"), mDirLightPos.x, mDirLightPos.y, mDirLightPos.z);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.direction"), mLightDir.x, mLightDir.y, mLightDir.z);
         glUniform3f(glGetUniformLocation(progId, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
         glUniform3f(glGetUniformLocation(progId, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
         glUniform3f(glGetUniformLocation(progId, "dirLight.specular"), 0.5f, 0.5f, 0.5f);

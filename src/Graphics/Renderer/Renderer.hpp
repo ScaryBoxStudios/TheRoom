@@ -99,8 +99,8 @@ class Renderer
         // Currently rendering scene
         const Scene* mScene;
 
-        // Directional light position
-        glm::vec3 mDirLightPos;
+        // Global light direction
+        glm::vec3 mLightDir;
 
         // Stores the models loaded in the gpu
         ModelStore mModelStore;

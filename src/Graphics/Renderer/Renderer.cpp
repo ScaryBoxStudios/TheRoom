@@ -36,7 +36,7 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mProjection = glm::perspective(
         45.0f,
         static_cast<float>(mScreenWidth) / mScreenHeight,
-        0.1f, 100.0f
+        0.1f, 300.0f
     );
 
     // Create the GBuffer

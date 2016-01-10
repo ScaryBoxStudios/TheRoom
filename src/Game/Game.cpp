@@ -125,8 +125,8 @@ void Game::SetupWorld()
     {
         const auto& initAABB = renderer.GetModelStore()["cube"]->localAABB;
         scene.CreateNode("cube", "plane", SceneNodeCategory::Normal, initAABB);
-        scene.Move("plane", glm::vec3(0.0f, -11.0f, 0.0f));
-        scene.Scale("plane", glm::vec3(150.0f, 0.1f, 150.0f));
+        scene.Move("plane", glm::vec3(0.0f, -11.0f, -40.0f));
+        scene.Scale("plane", glm::vec3(75.0f, 0.1f, 75.0f));
     }
 
     //

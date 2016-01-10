@@ -53,7 +53,7 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mShowAABBs = false;
 
     // Initialize the ShadowRenderer
-    mShadowRenderer.Init(1024, 1024);
+    mShadowRenderer.Init(8096, 8096);
     mShadowRenderer.SetModelStore(&mModelStore);
 
     // Set directional light position

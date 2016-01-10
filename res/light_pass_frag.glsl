@@ -58,7 +58,7 @@ struct SpotLight
     vec3 specular;
 };
 
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material)
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow)
 {
     vec3 lightDir = normalize(-light.direction);
     // Diffuse shading
@@ -68,7 +68,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // Combine results
     vec3 ambient  = light.ambient  * material.diffuse;
-    vec3 diffuse  = light.diffuse  * diff * material.diffuse;
+    vec3 diffuse  = light.diffuse  * diff * material.diffuse * (1.0 - shadow);
     vec3 specular = light.specular * spec * material.specular;
     return (ambient + diffuse + specular);
 }
@@ -121,6 +121,28 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Mat
     return (ambient + diffuse + specular);
 }
 
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // Perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+
+    // When the projected coord is further than the light's far plane
+    if (projCoords.z > 1.0)
+        return 0.0;
+
+    // Transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // Get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r;
+    // Get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // Check whether current frag pos is in shadow
+    float bias = 0.005;
+    float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+}
+
 uniform DirLight dirLight;
 
 void main(void)
@@ -144,8 +166,11 @@ void main(void)
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
 
+    // Calculate fragment shadow
+    float shadow = ShadowCalculation(FragPosLightSpace);
+
     // Phase 1: Directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir, material);
+    vec3 result = CalcDirLight(dirLight, norm, viewDir, material, shadow);
 
     // Phase 2: Point lights
     result += CalcPointLight(light, norm, FragPos, viewDir, material);
@@ -154,4 +179,5 @@ void main(void)
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir, material);
 
     color = vec4(result, 1.0f);
+    //color = vec4(texture(shadowMap, UVCoords).r);
 }

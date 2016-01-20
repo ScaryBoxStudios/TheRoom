@@ -37,7 +37,7 @@
 #include "TextRenderer.hpp"
 #include "AABBRenderer.hpp"
 #include "ShadowRenderer.hpp"
-#include "../Model/ModelStore.hpp"
+#include "../Geometry/ModelStore.hpp"
 #include "../Texture/TextureStore.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"

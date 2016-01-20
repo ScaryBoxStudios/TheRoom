@@ -36,7 +36,7 @@
 #include <GL/gl.h>
 #include "../Shader/Shader.hpp"
 #include "../Scene/Scene.hpp"
-#include "../Model/ModelStore.hpp"
+#include "../Geometry/ModelStore.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON

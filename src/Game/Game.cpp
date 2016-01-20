@@ -6,7 +6,7 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Graphics/Image/ImageLoader.hpp"
-#include "../Graphics/Model/ModelLoader.hpp"
+#include "../Graphics/Geometry/ModelLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 

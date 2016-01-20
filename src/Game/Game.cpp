@@ -1,6 +1,5 @@
 #include "Game.hpp"
 #include <algorithm>
-#include "../Window/GlfwError.hpp"
 #include "../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -22,6 +21,9 @@ Game::Game()
 
 void Game::Init()
 {
+    // Initialize the engine instance
+    mEngine.Init();
+
     // Setup window and input
     SetupWindow();
 
@@ -38,27 +40,16 @@ void Game::Init()
     // Load the models
     LoadModels();
 
-    // Load the shaders
-    LoadShaders();
-
     // Create world objects
     SetupWorld();
 
-    // Initialize the renderer
-    renderer.Init(
-        mWindow.GetWidth(),
-        mWindow.GetHeight(),
-        mShaderPrograms.at("geometry_pass").Id(),
-        mShaderPrograms.at("light_pass").Id()
-    );
-
     // Pass the current scene to renderer
-    renderer.SetScene(&mScene);
+    mEngine.GetRenderer().SetScene(&mScene);
 
     // Load the skybox
-    mSkybox = std::make_unique<Skybox>();
+    auto skybox = std::make_unique<Skybox>();
     ImageLoader imLoader;
-    mSkybox->Load(
+    skybox->Load(
         {
             { Skybox::Target::Right,  imLoader.LoadFile("ext/Skybox/right.jpg")  },
             { Skybox::Target::Left,   imLoader.LoadFile("ext/Skybox/left.jpg")   },
@@ -68,12 +59,13 @@ void Game::Init()
             { Skybox::Target::Front,  imLoader.LoadFile("ext/Skybox/front.jpg")  }
         }
     );
-    renderer.SetSkybox(mSkybox.get());
+    mEngine.SetSkybox(std::move(skybox));
 }
 
 void Game::SetupWorld()
 {
     auto& scene = mScene;
+    auto& renderer = mEngine.GetRenderer();
 
     //
     // Normal objects
@@ -143,31 +135,28 @@ void Game::SetupWorld()
 
 void Game::SetupWindow()
 {
-    // Setup window
-    bool success = mWindow.Create(800, 600, "TheRoom", Window::Mode::Windowed);
-    if (!success)
-        throw std::runtime_error(GetLastGlfwError().GetDescription());
+    auto& window = mEngine.GetWindow();
+    auto& renderer = mEngine.GetRenderer();
 
-    mWindow.SetShowFPS(true);
-    mWindow.SetCloseHandler(mExitHandler);
+    window.SetCloseHandler(mExitHandler);
 
     // Setup input event handlers
-    mWindow.SetMouseButtonPressHandler(
-        [this](MouseButton mb, ButtonAction ba)
+    window.SetMouseButtonPressHandler(
+        [&window](MouseButton mb, ButtonAction ba)
         {
             if (mb == MouseButton::Left && ba == ButtonAction::Press)
-                mWindow.SetMouseGrabEnabled(true);
+                window.SetMouseGrabEnabled(true);
         }
     );
-    mWindow.SetKeyPressedHandler(
-        [this](Key k, KeyAction ka)
+    window.SetKeyPressedHandler(
+        [this, &window, &renderer](Key k, KeyAction ka)
         {
             // Exit
             if(k == Key::Escape && ka == KeyAction::Release)
                 mExitHandler();
             // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
-                mWindow.SetMouseGrabEnabled(false);
+                window.SetMouseGrabEnabled(false);
             if(k == Key::B && ka == KeyAction::Release)
                 renderer.ToggleShowAABBs();
             if(k == Key::R && ka == KeyAction::Release)
@@ -176,62 +165,11 @@ void Game::SetupWindow()
     );
 }
 
-void Game::LoadShaders()
-{
-    // The shader map
-    std::unordered_map<std::string, std::vector<std::pair<Shader::Type, std::string>>> shadersLoc =
-    {
-        {
-            "geometry_pass",
-            {
-                { Shader::Type::Vertex,   "res/geometry_pass_vert.glsl" },
-                { Shader::Type::Fragment, "res/geometry_pass_frag.glsl" },
-            }
-        },
-        {
-            "light_pass",
-            {
-                { Shader::Type::Vertex,   "res/light_pass_vert.glsl" },
-                { Shader::Type::Fragment, "res/light_pass_frag.glsl" },
-            }
-        }
-    };
-
-    // Load shaders
-    for (const auto& p : shadersLoc)
-    {
-        // Will temporarily store the the compiled shaders
-        std::unordered_map<Shader::Type, Shader> shaders;
-        for (const auto& f : p.second)
-        {
-            // Load file
-            auto shaderFile = FileLoad<BufferType>(f.second);
-            if (!shaderFile)
-                throw std::runtime_error("Could not find shader file: \n" + f.second);
-
-            // Convert it to std::string containter
-            std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
-
-            // Create shader from source
-            Shader shader(shaderSrc, f.first);
-
-            // Insert loaded shader id to temp map
-            shaders.emplace(f.first, std::move(shader));
-        }
-
-        // Fetch vert and frag shader id's from temp map and link
-        ShaderProgram program(
-            shaders.at(Shader::Type::Vertex).Id(),
-            shaders.at(Shader::Type::Fragment).Id()
-        );
-        mShaderPrograms.emplace(p.first, std::move(program));
-    }
-}
 
 void Game::LoadTextures()
 {
     // Retrieve the textureStore from the renderer
-    auto& textureStore = renderer.GetTextureStore();
+    auto& textureStore = mEngine.GetRenderer().GetTextureStore();
 
     // The ImageLoader object
     ImageLoader imageLoader;
@@ -258,6 +196,7 @@ void Game::LoadTextures()
 void Game::LoadModels()
 {
     // Retrieve the model and texture stores from the renderer
+    auto& renderer = mEngine.GetRenderer();
     auto& modelStore = renderer.GetModelStore();
     auto& textureStore = renderer.GetTextureStore();
 
@@ -312,21 +251,23 @@ void Game::LoadModels()
 
 std::vector<Camera::MoveDirection> Game::CameraMoveDirections()
 {
+    auto& window = mEngine.GetWindow();
     std::vector<Camera::MoveDirection> mds;
-    if(mWindow.IsKeyPressed(Key::W))
+    if(window.IsKeyPressed(Key::W))
         mds.push_back(Camera::MoveDirection::Forward);
-    if(mWindow.IsKeyPressed(Key::A))
+    if(window.IsKeyPressed(Key::A))
         mds.push_back(Camera::MoveDirection::Left);
-    if(mWindow.IsKeyPressed(Key::S))
+    if(window.IsKeyPressed(Key::S))
         mds.push_back(Camera::MoveDirection::BackWard);
-    if(mWindow.IsKeyPressed(Key::D))
+    if(window.IsKeyPressed(Key::D))
         mds.push_back(Camera::MoveDirection::Right);
     return mds;
 }
 
 std::tuple<float, float> Game::CameraLookOffset()
 {
-    std::tuple<double, double> curDiff = mWindow.GetCursorDiff();
+    auto& window = mEngine.GetWindow();
+    std::tuple<double, double> curDiff = window.GetCursorDiff();
     return std::make_tuple(
         static_cast<float>(std::get<0>(curDiff)),
         static_cast<float>(std::get<1>(curDiff))
@@ -335,35 +276,31 @@ std::tuple<float, float> Game::CameraLookOffset()
 
 void Game::Update(float dt)
 {
-    (void) dt;
+    // Update the core
+    mEngine.Update(dt);
 
-    // Poll window events
-    mWindow.Update();
-
-    // Update the interpolation state of the world
-    renderer.Update(dt);
-
+    auto& scene = mScene;
+    auto& window = mEngine.GetWindow();
     // Update camera euler angles
-    if (mWindow.MouseGrabEnabled())
+    if (window.MouseGrabEnabled())
         mCamera.Look(CameraLookOffset());
 
     // Update camera position
     mCamera.Move(CameraMoveDirections());
 
     // Update light position
-    auto& scene = mScene;
     float increase = 0.7f;
-    if(mWindow.IsKeyPressed(Key::Kp8))
+    if(window.IsKeyPressed(Key::Kp8))
         scene.Move("teapot", glm::vec3(0.0f, increase, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp4))
+    if(window.IsKeyPressed(Key::Kp4))
         scene.Move("teapot", glm::vec3(-increase, 0.0f, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp2))
+    if(window.IsKeyPressed(Key::Kp2))
         scene.Move("teapot", glm::vec3(0.0f, -increase, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp6))
+    if(window.IsKeyPressed(Key::Kp6))
         scene.Move("teapot", glm::vec3(increase, 0.0f, 0.0f));
-    if(mWindow.IsKeyPressed(Key::Kp5))
+    if(window.IsKeyPressed(Key::Kp5))
         scene.Move("teapot", glm::vec3(0.0f, 0.0f, -increase));
-    if(mWindow.IsKeyPressed(Key::Kp0))
+    if(window.IsKeyPressed(Key::Kp0))
         scene.Move("teapot", glm::vec3(0.0f, 0.0f, increase));
 
     // Update cubes' rotations
@@ -380,30 +317,21 @@ void Game::Update(float dt)
 void Game::Render(float interpolation)
 {
     // View calculation with camera
-    auto lookOffset = mWindow.MouseGrabEnabled() ? CameraLookOffset() : std::make_tuple(0.0f, 0.0f);
+    auto& window = mEngine.GetWindow();
+    auto lookOffset = window.MouseGrabEnabled() ? CameraLookOffset() : std::make_tuple(0.0f, 0.0f);
     auto iCamState = mCamera.Interpolate(CameraMoveDirections(), lookOffset, interpolation);
 
     // Create the view matrix and pass it to the renderer
     glm::mat4 view = glm::lookAt(iCamState.position, iCamState.position + iCamState.front, iCamState.up);
-    renderer.SetView(view);
 
     // Render
-    renderer.Render(interpolation);
-
-    // Show it
-    mWindow.SwapBuffers();
+    mEngine.GetRenderer().SetView(view);
+    mEngine.Render(interpolation);
 }
 
 void Game::Shutdown()
 {
-    // Destroy Skybox
-    mSkybox.reset();
-
-    // Renderer
-    renderer.Shutdown();
-
-    // Window
-    mWindow.Destroy();
+    mEngine.Shutdown();
 }
 
 void Game::SetExitHandler(std::function<void()> f)

@@ -28,72 +28,56 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _ENGINE_HPP_
+#define _ENGINE_HPP_
 
-#include <functional>
-#include <vector>
-#include "../Core/Engine.hpp"
-#include "../Graphics/Util/Camera.hpp"
-#include "../Graphics/Scene/Scene.hpp"
+#include "../Window/Window.hpp"
+#include "../Graphics/Renderer/Renderer.hpp"
+#include "../Graphics/Renderer/Skybox.hpp"
+#include "../Graphics/Shader/Shader.hpp"
 
-class Game
+class Engine
 {
     public:
-        /*! Constructor */
-        Game();
-
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
-
         /*! Initializes all the low level modules of the game */
         void Init();
 
-        /*! Called by the mainloop to update the game state */
+        /*! Called when updating the game state */
         void Update(float dt);
 
-        /*! Called by the mainloop to render the current frame */
+        /*! Called when rendering the current frame */
         void Render(float interpolation);
 
         /*! Deinitializes all the low level modules of the game */
         void Shutdown();
 
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
+        // Retrieves the window instance
+        Window& GetWindow();
+
+        // Retrieves the renderer instance
+        Renderer& GetRenderer();
+
+        // Sets adds a ShaderProgram to the program list
+        void AddShaderProgram(const std::string& name, ShaderProgram sp);
+
+        // Sets the skybox that is used by the renderer
+        void SetSkybox(std::unique_ptr<Skybox> skybox);
 
     private:
-        // Called during initialization to setup window and input
-        void SetupWindow();
-        // Called during initialization to load textures
-        void LoadTextures();
-        // Called during initialization to load models
-        void LoadModels();
-        // Called during initialization to setup the world
-        void SetupWorld();
+        // Loads the default shaders used
+        void LoadShaders();
 
-        // The engine instance
-        Engine mEngine;
+        // The Game Window
+        Window mWindow;
 
-        // The Scene
-        Scene mScene;
+        // The Renderer
+        Renderer mRenderer;
 
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        // The loaded ShaderProgram(s)
+        std::unordered_map<std::string, ShaderProgram> mShaderPrograms;
 
-        // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
-        std::tuple<float, float> CameraLookOffset();
-        Camera mCamera;
-
-        // The data needed for rotating the cubes
-        struct RotationData
-        {
-            float degreesInc;
-            bool rotating;
-        };
-        RotationData mRotationData;
+        // The skybox used
+        std::unique_ptr<Skybox> mSkybox;
 };
 
-#endif // ! _GAME_HPP_
-
+#endif // ! _ENGINE_HPP_

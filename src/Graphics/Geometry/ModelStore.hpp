@@ -37,7 +37,7 @@
 #include <glad/glad.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "Model.hpp"
+#include "Geometry.hpp"
 #include "Material.hpp"
 
 // MeshDescription

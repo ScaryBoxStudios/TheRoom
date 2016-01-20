@@ -28,13 +28,28 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MODEL_HPP_
-#define _MODEL_HPP_
+#ifndef _GEOMETRY_HPP_
+#define _GEOMETRY_HPP_
 
 #include <string>
 #include <vector>
-#include "Mesh.hpp"
+#include <array>
+#include <cstdint>
 #include "../Scene/AABB.hpp"
+#include <glad/glad.h>
+
+struct VertexData
+{
+    GLfloat vx, vy, vz, // Vertices
+            nx, ny, nz, // Normals
+            tx, ty;     // TexCoords
+};
+
+struct MeshData
+{
+    std::vector<VertexData> data;
+    std::vector<uint32_t> indices;
+};
 
 struct ModelData
 {
@@ -42,4 +57,4 @@ struct ModelData
     AABB boundingBox;
 };
 
-#endif // ! _MODEL_HPP_
+#endif // ! _GEOMETRY_HPP_

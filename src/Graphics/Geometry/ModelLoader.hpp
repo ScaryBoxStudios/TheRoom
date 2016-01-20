@@ -33,7 +33,7 @@
 
 #include <vector>
 #include <cstdint>
-#include "Model.hpp"
+#include "Geometry.hpp"
 
 class ModelLoader
 {

@@ -44,7 +44,7 @@ struct VertexData
             tx, ty;     // TexCoords
 };
 
-struct Mesh
+struct MeshData
 {
     std::vector<VertexData> data;
     std::vector<uint32_t> indices;

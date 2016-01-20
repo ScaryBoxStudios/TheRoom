@@ -38,7 +38,7 @@
 
 struct Model
 {
-    std::vector<Mesh> meshes;
+    std::vector<MeshData> meshes;
     AABB boundingBox;
 };
 

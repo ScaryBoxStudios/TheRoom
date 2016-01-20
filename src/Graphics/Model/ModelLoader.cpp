@@ -25,11 +25,11 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
     // Used for creating the boundingBox
     glm::vec3 minPoint, maxPoint;
 
-    auto processMesh = [&minPoint, &maxPoint](aiMesh* mesh, const aiScene* scene) -> Mesh
+    auto processMesh = [&minPoint, &maxPoint](aiMesh* mesh, const aiScene* scene) -> MeshData
     {
         (void) scene;
 
-        Mesh mData;
+        MeshData mData;
 
         for (std::uint32_t i = 0; i < mesh->mNumVertices; ++i)
         {

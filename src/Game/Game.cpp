@@ -264,7 +264,7 @@ void Game::LoadModels()
     // Model loader instance
     ModelLoader modelLoader;
 
-    struct ModelData
+    struct MdlData
     {
         std::string filepath;
         std::string extension;
@@ -288,7 +288,7 @@ void Game::LoadModels()
     well.SetDiffuseTexture(textureStore["well_diff"]->texId);
     well.SetSpecularTexture(textureStore["well_spec"]->texId);
 
-    std::vector<ModelData> models = {
+    std::vector<MdlData> models = {
         { "ext/Cube/cube.obj",               "obj", "cube",   mahogany } // Cube
     ,   { "ext/teapot.obj",                  "obj", "teapot", white    } // Teapot
     ,   { "ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  house    } // House
@@ -301,7 +301,7 @@ void Game::LoadModels()
         if(!file)
             throw std::runtime_error("Couldn't load file (" + m.filepath + ")");
 
-        Model model = modelLoader.Load(*file, m.extension.c_str());
+        ModelData model = modelLoader.Load(*file, m.extension.c_str());
         if(model.meshes.size() == 0)
             throw std::runtime_error("Couldn't load model (" + m.filepath + ")");
 

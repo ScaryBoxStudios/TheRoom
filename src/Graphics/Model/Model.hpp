@@ -36,7 +36,7 @@
 #include "Mesh.hpp"
 #include "../Scene/AABB.hpp"
 
-struct Model
+struct ModelData
 {
     std::vector<MeshData> meshes;
     AABB boundingBox;

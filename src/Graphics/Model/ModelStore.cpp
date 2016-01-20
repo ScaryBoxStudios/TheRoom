@@ -25,7 +25,7 @@ void ModelStore::Clear()
     mModels.clear();
 }
 
-void ModelStore::Load(const std::string& name, const Model& data)
+void ModelStore::Load(const std::string& name, const ModelData& data)
 {
     ModelDescription modelDesc = {};
 

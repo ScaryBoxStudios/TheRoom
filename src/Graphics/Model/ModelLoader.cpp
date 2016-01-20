@@ -4,7 +4,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* type)
+ModelData ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* type)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFileFromMemory(
@@ -20,7 +20,7 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
                                         type);
 
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        return Model();
+        return ModelData();
 
     // Used for creating the boundingBox
     glm::vec3 minPoint, maxPoint;
@@ -109,10 +109,10 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
         return mData;
     };
 
-    std::function<Model(aiNode*, const aiScene*)> processNode =
-    [&processMesh, &processNode](aiNode* node, const aiScene* scene) -> Model
+    std::function<ModelData(aiNode*, const aiScene*)> processNode =
+    [&processMesh, &processNode](aiNode* node, const aiScene* scene) -> ModelData
     {
-        Model model;
+        ModelData model;
 
         // Process all the node's meshes
         for (std::uint32_t i = 0; i < node->mNumMeshes; ++i)
@@ -124,7 +124,7 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
         // Same for its children
         for (std::uint32_t i = 0; i < node->mNumChildren; ++i)
         {
-            Model childModel = processNode(node->mChildren[i], scene);
+            ModelData childModel = processNode(node->mChildren[i], scene);
             for (auto& mesh : childModel.meshes)
                 model.meshes.push_back(std::move(mesh));
         }
@@ -132,7 +132,7 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
         return model;
     };
 
-    Model model = processNode(scene->mRootNode, scene);
+    ModelData model = processNode(scene->mRootNode, scene);
     model.boundingBox = AABB(minPoint, maxPoint);
     return model;
 }

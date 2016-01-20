@@ -76,7 +76,7 @@ class ModelStore
         ModelStore& operator=(ModelStore&& other) = default;
 
         // Loads given data into the GPU
-        void Load(const std::string& name, const Model& data);
+        void Load(const std::string& name, const ModelData& data);
 
         // Retrieves pointer a loaded model object
         ModelDescription* operator[](const std::string& name);

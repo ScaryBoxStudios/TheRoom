@@ -46,21 +46,21 @@ void ModelStore::Load(const std::string& name, const Model& data)
             glBindBuffer(GL_ARRAY_BUFFER, vboId);
             {
                 glBufferData(GL_ARRAY_BUFFER,
-                    mesh.data.size() * sizeof(MeshData),
+                    mesh.data.size() * sizeof(VertexData),
                     mesh.data.data(),
                     GL_STATIC_DRAW
                 );
 
                 // Vertices
-                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData), (GLvoid*)(offsetof(MeshData, vx)));
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(offsetof(VertexData, vx)));
                 glEnableVertexAttribArray(0);
 
                 // Normals
-                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(MeshData), (GLvoid*)(offsetof(MeshData, nx)));
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(offsetof(VertexData, nx)));
                 glEnableVertexAttribArray(1);
 
                 // TexCoords
-                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(MeshData), (GLvoid*)(offsetof(MeshData, tx)));
+                glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(offsetof(VertexData, tx)));
                 glEnableVertexAttribArray(2);
             }
             glBindBuffer(GL_ARRAY_BUFFER, 0);

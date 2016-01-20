@@ -37,7 +37,7 @@
 
 #include <glad/glad.h>
 
-struct MeshData
+struct VertexData
 {
     GLfloat vx, vy, vz, // Vertices
             nx, ny, nz, // Normals
@@ -46,7 +46,7 @@ struct MeshData
 
 struct Mesh
 {
-    std::vector<MeshData> data;
+    std::vector<VertexData> data;
     std::vector<uint32_t> indices;
 };
 

@@ -33,31 +33,31 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
 
         for (std::uint32_t i = 0; i < mesh->mNumVertices; ++i)
         {
-            MeshData meshData;
+            VertexData vertexData;
 
             // Vertices
             const aiVector3D& vert = mesh->mVertices[i];
-            meshData.vx = vert.x;
-            meshData.vy = vert.y;
-            meshData.vz = vert.z;
+            vertexData.vx = vert.x;
+            vertexData.vy = vert.y;
+            vertexData.vz = vert.z;
 
             // Normals
             const aiVector3D& norm = mesh->mNormals[i];
-            meshData.nx = norm.x;
-            meshData.ny = norm.y;
-            meshData.nz = norm.z;
+            vertexData.nx = norm.x;
+            vertexData.ny = norm.y;
+            vertexData.nz = norm.z;
 
             // Texture coordinates
             if (mesh->mTextureCoords[0])
             {
                 const aiVector3D& texCoord = mesh->mTextureCoords[0][i];
-                meshData.tx = texCoord.x;
-                meshData.ty = texCoord.y;
+                vertexData.tx = texCoord.x;
+                vertexData.ty = texCoord.y;
             }
             else
             {
-                meshData.tx = 0;
-                meshData.ty = 0;
+                vertexData.tx = 0;
+                vertexData.ty = 0;
             }
 
             // AABB minPoint
@@ -75,7 +75,7 @@ Model ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const char* t
             if (vert.z > maxPoint.z)
                 maxPoint.z = vert.z;
 
-            mData.data.push_back(meshData);
+            mData.data.push_back(vertexData);
         }
 
         // Indices

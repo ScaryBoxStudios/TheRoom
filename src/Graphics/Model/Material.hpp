@@ -39,17 +39,36 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-struct Material
+class Material
 {
-    // Diffuse properties
-    glm::vec3 diffuseColor = glm::vec3(0x00);
-    GLuint diffuseTexId;
-    bool usesDiffTex = false; // Indicates that diffuse texture is set
+    public:
+        // Constructor, default material
+        Material();
 
-    // Specular properties
-    GLfloat specularColor = 0.0f;
-    GLuint specularTexId;
-    bool usesSpecTex = false; // Indicates that specular texture is set
+        // Diffuse color
+        const glm::vec3& GetDiffuseColor() const;
+        void SetDiffuseColor(const glm::vec3& v);
+        // Diffuse texture
+        GLuint GetDiffuseTexture() const;
+        void SetDiffuseTexture(GLuint id);
+        bool UsesDiffuseTexture() const;
+
+        // Specular color
+        const glm::vec3& GetSpecularColor() const;
+        void SetSpecularColor(const glm::vec3& v);
+        // Specular texture
+        GLuint GetSpecularTexture() const;
+        void SetSpecularTexture(GLuint id);
+        bool UsesSpecularTexture() const;
+
+    private:
+        // Diffuse properties
+        glm::vec3 mDiffColor;
+        GLuint mDiffTexture;
+
+        // Specular properties
+        glm::vec3 mSpecColor;
+        GLuint mSpecTexture;
 };
 
 #endif // ! _MATERIAL_HPP_

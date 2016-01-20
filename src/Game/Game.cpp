@@ -274,25 +274,19 @@ void Game::LoadModels()
 
     // Create materials
     Material mahogany;
-    mahogany.diffuseTexId = textureStore["mahogany_wood"]->texId;
-    mahogany.specularTexId = textureStore["mahogany_wood_spec"]->texId;
-    mahogany.usesDiffTex = true;
-    mahogany.usesSpecTex = true;
+    mahogany.SetDiffuseTexture(textureStore["mahogany_wood"]->texId);
+    mahogany.SetSpecularTexture(textureStore["mahogany_wood_spec"]->texId);
 
     Material white;
-    white.diffuseColor = glm::vec3(0xFF);
+    white.SetDiffuseColor(glm::vec3(0xFF));
 
     Material house;
-    house.diffuseTexId = textureStore["house_diff"]->texId;
-    house.specularTexId = textureStore["house_spec"]->texId;
-    house.usesDiffTex = true;
-    house.usesSpecTex = true;
+    house.SetDiffuseTexture(textureStore["house_diff"]->texId);
+    house.SetSpecularTexture(textureStore["house_spec"]->texId);
 
     Material well;
-    well.diffuseTexId = textureStore["well_diff"]->texId;
-    well.specularTexId = textureStore["well_spec"]->texId;
-    well.usesDiffTex = true;
-    well.usesSpecTex = true;
+    well.SetDiffuseTexture(textureStore["well_diff"]->texId);
+    well.SetSpecularTexture(textureStore["well_spec"]->texId);
 
     std::vector<ModelData> models = {
         { "ext/Cube/cube.obj",               "obj", "cube",   mahogany } // Cube

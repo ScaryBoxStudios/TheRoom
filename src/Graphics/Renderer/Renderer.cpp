@@ -186,21 +186,21 @@ void Renderer::GeometryPass(float interpolation)
             // Upload material parameters
             //
             // Diffuse
-            const glm::vec3& diffCol = mdl->material.diffuseColor;
+            const glm::vec3& diffCol = mdl->material.GetDiffuseColor();
             glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-            if (mdl->material.usesDiffTex)
+            if (mdl->material.UsesDiffuseTexture())
             {
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mdl->material.diffuseTexId);
+                glBindTexture(GL_TEXTURE_2D, mdl->material.GetDiffuseTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
             }
 
             // Specular
-            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), mdl->material.specularColor);
-            if (mdl->material.usesSpecTex)
+            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), mdl->material.GetSpecularColor().x);
+            if (mdl->material.UsesSpecularTexture())
             {
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, mdl->material.specularTexId);
+                glBindTexture(GL_TEXTURE_2D, mdl->material.GetSpecularTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
             }
 

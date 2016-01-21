@@ -7,24 +7,6 @@
 #include <png++/png.hpp>
 
 //--------------------------------------------------
-// \brief Pixel traits class specialization
-// for png::rgba_pixel
-//--------------------------------------------------
-template <>
-struct PixelTraits<png::rgba_pixel>
-{
-    static unsigned int GetChannels()
-    {
-        return 4;
-    }
-
-    static unsigned int GetBitDepth()
-    {
-        return 8;
-    }
-};
-
-//--------------------------------------------------
 // \brief PixelBuffer traits class specialization
 // for png::pixel_buffer of Png++ library
 //--------------------------------------------------
@@ -49,6 +31,18 @@ struct PixelBufferTraits<SolidBuffer<PixelType>>
     static const std::uint8_t* GetData(SolidBuffer<PixelType>& pb)
     {
         return pb.get_bytes().data();
+    }
+
+    static std::uint8_t Channels(SolidBuffer<PixelType>& pb)
+    {
+        (void) pb;
+        return SolidBuffer<Pixel>::pixel_traits_t::get_channels();
+    }
+
+    static std::uint8_t BitDepth(SolidBuffer<PixelType>& pb)
+    {
+        (void) pb;
+        return SolidBuffer<Pixel>::pixel_traits_t::get_bit_depth();
     }
 };
 

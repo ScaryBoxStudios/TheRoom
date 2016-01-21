@@ -87,7 +87,7 @@ void TextureStore::Load(const std::string& name, const PixelBuffer& pb)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    GLint format = PixelTraits<typename PixelBufferTraits<PixelBuffer>::Pixel>::GetChannels() == 4 ? GL_RGBA : GL_RGB;
+    GLint format = PixelBufferTraits<PixelBuffer>::Channels(pb) == 4 ? GL_RGBA : GL_RGB;
     uint32_t width = PixelBufferTraits<PixelBuffer>::Width(pb);
     uint32_t height = PixelBufferTraits<PixelBuffer>::Height(pb);
     const GLvoid* data = PixelBufferTraits<PixelBuffer>::GetData(pb);

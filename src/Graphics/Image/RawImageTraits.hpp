@@ -39,24 +39,6 @@
 struct RawPixel {};
 
 //--------------------------------------------------
-// \brief Pixel traits class specialization
-// for JpegPixel
-//--------------------------------------------------
-template <>
-struct PixelTraits<RawPixel>
-{
-    static unsigned int GetChannels()
-    {
-        return 3;
-    }
-
-    static unsigned int GetBitDepth()
-    {
-        return 8;
-    }
-};
-
-//--------------------------------------------------
 // \brief PixelBuffer traits class specialization
 // for RawImage container
 //--------------------------------------------------
@@ -78,6 +60,17 @@ struct PixelBufferTraits<RawImage<>>
     static const std::uint8_t* GetData(const RawImage<>& ri)
     {
         return ri.Data();
+    }
+
+    static std::uint8_t Channels(const RawImage<>& ri)
+    {
+        return ri.GetProperties().channels;
+    }
+
+    static std::uint8_t BitDepth(const RawImage<>& ri)
+    {
+        (void) ri;
+        return 8;
     }
 };
 

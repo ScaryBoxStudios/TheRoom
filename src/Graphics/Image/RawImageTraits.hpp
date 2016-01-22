@@ -31,7 +31,6 @@
 #ifndef _RAWIMAGETRAITS_HPP_
 #define _RAWIMAGETRAITS_HPP_
 
-#include "PixelTraits.hpp"
 #include "PixelBufferTraits.hpp"
 #include "RawImage.hpp"
 

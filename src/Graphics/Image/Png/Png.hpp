@@ -2,7 +2,6 @@
 #define _PNG_IMPL_HPP_
 
 #include <cstdint>
-#include "../PixelTraits.hpp"
 #include "../PixelBufferTraits.hpp"
 #include <png++/png.hpp>
 

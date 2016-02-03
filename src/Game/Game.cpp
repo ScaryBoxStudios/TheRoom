@@ -6,6 +6,7 @@ WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Graphics/Image/ImageLoader.hpp"
 #include "../Graphics/Geometry/ModelLoader.hpp"
+#include "../Graphics/Scene/SceneLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 
@@ -64,6 +65,15 @@ void Game::Init()
 
 void Game::SetupWorld()
 {
+    // Load sample scene file
+    std::string sceneFile= "ext/scene.json";
+    auto sceneFileData = FileLoad<BufferType>(sceneFile);
+    if(!sceneFileData)
+        throw std::runtime_error("Couldn't load file (" + sceneFile+ ")");
+    SceneLoader sceneLoader;
+    SceneFile sf = sceneLoader.Load(*sceneFileData);
+    (void) sf;
+
     auto& scene = mScene;
     auto& renderer = mEngine.GetRenderer();
 

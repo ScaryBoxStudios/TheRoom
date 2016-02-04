@@ -44,7 +44,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Initialize the TextRenderer
     mTextRenderer.Init(mScreenWidth, mScreenHeight);
-    mTextRenderer.GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
 
     // Initialize the AABBRenderer
     mAABBRenderer.Init();
@@ -127,9 +126,6 @@ void Renderer::Render(float interpolation)
         // Render the AABBs if enabled
         if (mShowAABBs)
             mAABBRenderer.Render(interpolation);
-
-        // Render sample text
-        mTextRenderer.RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
     }
 }
 
@@ -310,6 +306,11 @@ void Renderer::SetView(const glm::mat4& view)
 void Renderer::ToggleShowAABBs()
 {
     mShowAABBs = !mShowAABBs;
+}
+
+TextRenderer& Renderer::GetTextRenderer()
+{
+    return mTextRenderer;
 }
 
 TextureStore& Renderer::GetTextureStore()

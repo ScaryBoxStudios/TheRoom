@@ -47,6 +47,9 @@ void Game::Init()
     // Pass the current scene to renderer
     mEngine.GetRenderer().SetScene(&mScene);
 
+    // Load font
+    mEngine.GetRenderer().GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
+
     // Load the skybox
     auto skybox = std::make_unique<Skybox>();
     ImageLoader imLoader;
@@ -337,6 +340,9 @@ void Game::Render(float interpolation)
     // Render
     mEngine.GetRenderer().SetView(view);
     mEngine.Render(interpolation);
+
+    // Render sample text
+    mEngine.GetRenderer().GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
 }
 
 void Game::Shutdown()

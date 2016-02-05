@@ -202,7 +202,6 @@ void MainScreen::onRender(float interpolation)
 
     // Render sample text
     mEngine->GetRenderer().GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
-    mEngine->Render(interpolation);
 }
 
 void MainScreen::onShutdown()

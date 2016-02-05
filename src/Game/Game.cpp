@@ -82,6 +82,9 @@ void Game::Render(float interpolation)
     Screen* s = mScreenManager.GetActiveScreen();
     if (s)
         s->onRender(interpolation);
+
+    // Pass event to engine
+    mEngine.Render(interpolation);
 }
 
 void Game::Shutdown()

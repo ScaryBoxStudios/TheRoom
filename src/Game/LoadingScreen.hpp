@@ -67,6 +67,8 @@ class LoadingScreen : public Screen
         std::unordered_map<std::string, BufferTypePtr> mFileDataCache;
         // Indicates that data files have been loaded to cache
         bool mFileCacheIsReady;
+        // Holds the currently loading file
+        std::string mCurrentlyLoading;
         // Finish callback
         FinishCb mFinishCb;
 };

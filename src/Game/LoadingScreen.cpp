@@ -11,6 +11,9 @@ void LoadingScreen::onInit(ScreenContext& sc)
     // Store the engine reference
     mEngine = sc.GetEngine();
 
+    // Load font
+    mEngine->GetRenderer().GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
+
     // Fire loader thread
     mFileCacheIsReady = false;
     std::thread loaderThread(
@@ -30,9 +33,6 @@ void LoadingScreen::LoadFromMem()
 
     // Load the models
     LoadModels();
-
-    // Load font
-    mEngine->GetRenderer().GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
 
     // Load the skybox
     auto skybox = std::make_unique<Skybox>();
@@ -80,6 +80,7 @@ void LoadingScreen::LoadFileData()
 
     for (const auto& file : fileList)
     {
+        mCurrentlyLoading = file;
         mFileDataCache.emplace(file, FileLoad<BufferType>(file));
         if(!mFileDataCache[file])
             throw std::runtime_error("Couldn't load file (" + file + ")");
@@ -181,6 +182,16 @@ void LoadingScreen::onUpdate(float dt)
 void LoadingScreen::onRender(float interpolation)
 {
     (void) interpolation;
+    // Clear
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Show indicator
+    std::string indicator = "Loading ";
+    indicator += mCurrentlyLoading;
+    indicator += "...";
+    mEngine->GetRenderer().GetTextRenderer().RenderText(indicator, 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
+    mEngine->Render(interpolation);
 }
 
 void LoadingScreen::onShutdown()

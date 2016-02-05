@@ -1,18 +1,30 @@
 #include "LoadingScreen.hpp"
+#include <thread>
 WARN_GUARD_ON
 #include "../Graphics/Image/ImageLoader.hpp"
 #include "../Graphics/Geometry/ModelLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 
-// BufferType for the files loaded
-using BufferType = std::vector<std::uint8_t>;
-
 void LoadingScreen::onInit(ScreenContext& sc)
 {
     // Store the engine reference
     mEngine = sc.GetEngine();
 
+    // Fire loader thread
+    mFileCacheIsReady = false;
+    std::thread loaderThread(
+        [this]()
+        {
+            LoadFileData();
+            mFileCacheIsReady = true;
+        }
+    );
+    loaderThread.detach();
+}
+
+void LoadingScreen::LoadFromMem()
+{
     // Load the textures
     LoadTextures();
 
@@ -27,19 +39,52 @@ void LoadingScreen::onInit(ScreenContext& sc)
     ImageLoader imLoader;
     skybox->Load(
         {
-            { Skybox::Target::Right,  imLoader.LoadFile("ext/Skybox/right.jpg")  },
-            { Skybox::Target::Left,   imLoader.LoadFile("ext/Skybox/left.jpg")   },
-            { Skybox::Target::Top,    imLoader.LoadFile("ext/Skybox/top.jpg")    },
-            { Skybox::Target::Bottom, imLoader.LoadFile("ext/Skybox/bottom.jpg") },
-            { Skybox::Target::Back,   imLoader.LoadFile("ext/Skybox/back.jpg")   },
-            { Skybox::Target::Front,  imLoader.LoadFile("ext/Skybox/front.jpg")  }
+            { Skybox::Target::Right,  imLoader.Load(*mFileDataCache["ext/Skybox/right.jpg"], "jpg") },
+            { Skybox::Target::Left,   imLoader.Load(*mFileDataCache["ext/Skybox/left.jpg"],  "jpg") },
+            { Skybox::Target::Top,    imLoader.Load(*mFileDataCache["ext/Skybox/top.jpg"],   "jpg") },
+            { Skybox::Target::Bottom, imLoader.Load(*mFileDataCache["ext/Skybox/bottom.jpg"],"jpg") },
+            { Skybox::Target::Back,   imLoader.Load(*mFileDataCache["ext/Skybox/back.jpg"],  "jpg") },
+            { Skybox::Target::Front,  imLoader.Load(*mFileDataCache["ext/Skybox/front.jpg"], "jpg") }
         }
     );
-    sc.GetEngine()->SetSkybox(std::move(skybox));
+    mEngine->SetSkybox(std::move(skybox));
 
     // Call finish
     mFinishCb();
 }
+
+void LoadingScreen::LoadFileData()
+{
+    std::vector<std::string> fileList =
+    {
+      // Skybox
+      "ext/Skybox/right.jpg"
+    , "ext/Skybox/left.jpg"
+    , "ext/Skybox/top.jpg"
+    , "ext/Skybox/bottom.jpg"
+    , "ext/Skybox/back.jpg"
+    , "ext/Skybox/front.jpg"
+      // Textures
+    , "ext/mahogany_wood.jpg"
+    , "ext/mahogany_wood_spec.jpg"
+    , "ext/WoodenCabin/WoodCabinDif.jpg"
+    , "ext/WoodenCabin/WoodCabinSM.jpg"
+    , "ext/Dungeon/maps/Wall1_T.tga"
+    , "ext/Dungeon/maps/Wall1_B.tga"
+      // Models
+    , "ext/Cube/cube.obj"
+    , "ext/teapot.obj"
+    , "ext/WoodenCabin/WoodenCabin.dae"
+    , "ext/Dungeon/Well.obj"
+    };
+
+    for (const auto& file : fileList)
+    {
+        mFileDataCache.emplace(file, FileLoad<BufferType>(file));
+        if(!mFileDataCache[file])
+            throw std::runtime_error("Couldn't load file (" + file + ")");
+    }
+};
 
 void LoadingScreen::LoadTextures()
 {
@@ -63,7 +108,8 @@ void LoadingScreen::LoadTextures()
     // Load the textures
     for (const auto& p : textures)
     {
-        RawImage<> pb = imageLoader.LoadFile(p.first);
+        std::string ext = p.first.substr(p.first.find_last_of(".") + 1);
+        RawImage<> pb = imageLoader.Load(*mFileDataCache[p.first], ext);
         textureStore.Load(p.second, pb);
     }
 }
@@ -111,10 +157,7 @@ void LoadingScreen::LoadModels()
 
     for(auto& m : models)
     {
-        auto file = FileLoad<BufferType>(m.filepath);
-        if(!file)
-            throw std::runtime_error("Couldn't load file (" + m.filepath + ")");
-
+        auto& file = mFileDataCache[m.filepath];
         ModelData model = modelLoader.Load(*file, m.extension.c_str());
         if(model.meshes.size() == 0)
             throw std::runtime_error("Couldn't load model (" + m.filepath + ")");
@@ -127,6 +170,11 @@ void LoadingScreen::LoadModels()
 void LoadingScreen::onUpdate(float dt)
 {
     (void) dt;
+    if (mFileCacheIsReady)
+    {
+        LoadFromMem();
+        mFileCacheIsReady = false;
+    }
 }
 
 void LoadingScreen::onRender(float interpolation)

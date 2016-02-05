@@ -18,15 +18,13 @@ void Game::Init()
     // Setup window and input
     SetupWindow();
 
+    //
+    mShouldChangeScreen = false;
+
     // Initialize first screen
     ScreenContext sc(&mEngine);
     std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
-    ls->SetFinishCb(
-        [&sc, this]()
-        {
-            mScreenManager.AddScreen(std::make_unique<MainScreen>(), sc);
-        }
-    );
+    ls->SetFinishCb([this]() { mShouldChangeScreen = true; });
     mScreenManager.AddScreen(std::move(ls), sc);
 }
 
@@ -63,18 +61,27 @@ void Game::SetupWindow()
 
 void Game::Update(float dt)
 {
-    // Check if last screen was poped out
-    if (mScreenManager.IsEmpty())
-        mExitHandler();
+    // Load main screen
+    if (mShouldChangeScreen)
+    {
+        ScreenContext sc(&mEngine);
+        mScreenManager.AddScreen(std::make_unique<MainScreen>(), sc);
+        mShouldChangeScreen = false;
+    }
 
-    // Update current screen
-    mScreenManager.GetActiveScreen()->onUpdate(dt);
+    // Check if last screen was poped out
+    if (mScreenManager.GetActiveScreen() == nullptr)
+        mExitHandler();
+    else
+        mScreenManager.GetActiveScreen()->onUpdate(dt);
 }
 
 void Game::Render(float interpolation)
 {
     // Render current screen
-    mScreenManager.GetActiveScreen()->onRender(interpolation);
+    Screen* s = mScreenManager.GetActiveScreen();
+    if (s)
+        s->onRender(interpolation);
 }
 
 void Game::Shutdown()

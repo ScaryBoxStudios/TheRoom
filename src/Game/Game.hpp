@@ -65,6 +65,9 @@ class Game
         // Called during initialization to setup window and input
         void SetupWindow();
 
+        //
+        bool mShouldChangeScreen;
+
         // The engine instance
         Engine mEngine;
 

@@ -13,11 +13,6 @@ void ScreenManager::ReplaceScreen(std::unique_ptr<Screen> screen, ScreenContext&
     mScreens.back()->onInit(sc);
 }
 
-bool ScreenManager::IsEmpty() const
-{
-    return mScreens.empty();
-}
-
 Screen* ScreenManager::GetActiveScreen()
 {
     if (mScreens.empty())

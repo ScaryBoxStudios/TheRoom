@@ -33,6 +33,10 @@
 
 #include "Screen.hpp"
 #include <functional>
+#include <unordered_map>
+
+// BufferType for the files loaded
+using BufferType = std::vector<std::uint8_t>;
 
 class LoadingScreen : public Screen
 {
@@ -47,12 +51,22 @@ class LoadingScreen : public Screen
         using FinishCb = std::function<void()>;
         void SetFinishCb(FinishCb cb);
     private:
-        // Called during initialization to load textures
-        void LoadTextures();
-        // Called during initialization to load models
-        void LoadModels();
+        // Loads file data into memory cache
+        void LoadFileData();
+        // Master load function called when file data have been loaded in cache
+        void LoadFromMem();
+            // Called during initialization to load textures
+            void LoadTextures();
+            // Called during initialization to load models
+            void LoadModels();
+
         // Engine ref
         Engine* mEngine;
+        // File data cache
+        using BufferTypePtr = std::unique_ptr<BufferType>;
+        std::unordered_map<std::string, BufferTypePtr> mFileDataCache;
+        // Indicates that data files have been loaded to cache
+        bool mFileCacheIsReady;
         // Finish callback
         FinishCb mFinishCb;
 };

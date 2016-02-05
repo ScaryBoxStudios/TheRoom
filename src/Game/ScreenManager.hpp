@@ -44,9 +44,6 @@ class ScreenManager
         // Replaces current active screen with the given one
         void ReplaceScreen(std::unique_ptr<Screen> screen, ScreenContext& sc);
 
-        // Returns true if screen stack is empty
-        bool IsEmpty() const;
-
         // Retrieves the currently active screen
         Screen* GetActiveScreen();
 

@@ -37,10 +37,8 @@ void Engine::Update(float dt)
 
 void Engine::Render(float interpolation)
 {
-    // Render
-    mRenderer.Render(interpolation);
-
-    // Show it
+    (void) interpolation;
+    // Show rendered backbuffer
     mWindow.SwapBuffers();
 }
 

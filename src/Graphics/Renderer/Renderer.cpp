@@ -14,6 +14,9 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Skybox is initially unset
     mSkybox = nullptr;
 
+    // Scenen is initially unset
+    mScene = nullptr;
+
     // Store the needed program id's
     mGeometryPassProgId = gPassProgId;
     mLightingPassProgId = lPassProgId;
@@ -62,6 +65,8 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 void Renderer::Update(float dt)
 {
     (void) dt;
+    if (!mScene)
+        return;
 
     // Update interpolation variables
     for (auto& obj : mScene->GetNodes())

@@ -169,7 +169,8 @@ void LoadingScreen::LoadModels()
 
 void LoadingScreen::onUpdate(float dt)
 {
-    (void) dt;
+    mEngine->Update(dt);
+
     if (mFileCacheIsReady)
     {
         LoadFromMem();

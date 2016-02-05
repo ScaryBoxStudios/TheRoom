@@ -28,51 +28,37 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _SCREEN_HPP_
+#define _SCREEN_HPP_
 
-#include <functional>
-#include <vector>
 #include "../Core/Engine.hpp"
-#include "ScreenManager.hpp"
 
-class Game
+class ScreenContext
 {
     public:
-        /*! Constructor */
-        Game();
-
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
-
-        /*! Initializes all the low level modules of the game */
-        void Init();
-
-        /*! Called by the mainloop to update the game state */
-        void Update(float dt);
-
-        /*! Called by the mainloop to render the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes all the low level modules of the game */
-        void Shutdown();
-
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
-
+        ScreenContext(Engine* e);
+        Engine* GetEngine();
     private:
-        // Called during initialization to setup window and input
-        void SetupWindow();
-
-        // The engine instance
-        Engine mEngine;
-
-        // The screen manager instance
-        ScreenManager mScreenManager;
-
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        Engine* mEngine;
 };
 
-#endif // ! _GAME_HPP_
+class Screen
+{
+    public:
+        // When initializing the current screen
+        virtual void onInit(ScreenContext& sc) = 0;
+        // Logic update
+        virtual void onUpdate(float dt) = 0;
+        // Key input
+        virtual void onKey(Key k, KeyAction ka);
+        // Mouse input
+        virtual void onMouse(MouseButton mb, ButtonAction ba);
+        // Render frame
+        virtual void onRender(float interpoation) = 0;
+        // When deinitializing the current screen
+        virtual void onShutdown() = 0;
+        // To be called when the current screen is exiting
+        void Finish();
+};
+
+#endif // ! _SCREEN_HPP_

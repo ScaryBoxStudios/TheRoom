@@ -28,51 +28,31 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _SCREEN_MANAGER_HPP_
+#define _SCREEN_MANAGER_HPP_
 
-#include <functional>
 #include <vector>
-#include "../Core/Engine.hpp"
-#include "ScreenManager.hpp"
+#include <memory>
+#include "Screen.hpp"
 
-class Game
+class ScreenManager
 {
     public:
-        /*! Constructor */
-        Game();
+        // Appends a screen the the screen stack
+        void AddScreen(std::unique_ptr<Screen> screen, ScreenContext& sc);
 
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
+        // Replaces current active screen with the given one
+        void ReplaceScreen(std::unique_ptr<Screen> screen, ScreenContext& sc);
 
-        /*! Initializes all the low level modules of the game */
-        void Init();
+        // Returns true if screen stack is empty
+        bool IsEmpty() const;
 
-        /*! Called by the mainloop to update the game state */
-        void Update(float dt);
-
-        /*! Called by the mainloop to render the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes all the low level modules of the game */
-        void Shutdown();
-
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
+        // Retrieves the currently active screen
+        Screen* GetActiveScreen();
 
     private:
-        // Called during initialization to setup window and input
-        void SetupWindow();
-
-        // The engine instance
-        Engine mEngine;
-
-        // The screen manager instance
-        ScreenManager mScreenManager;
-
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        using ScreenPtr = std::unique_ptr<Screen>;
+        std::vector<ScreenPtr> mScreens;
 };
 
-#endif // ! _GAME_HPP_
+#endif // ! _SCREEN_MANAGER_HPP_

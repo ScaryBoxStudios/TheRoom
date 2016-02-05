@@ -28,51 +28,33 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _LOADING_SCREEN_HPP_
+#define _LOADING_SCREEN_HPP_
 
+#include "Screen.hpp"
 #include <functional>
-#include <vector>
-#include "../Core/Engine.hpp"
-#include "ScreenManager.hpp"
 
-class Game
+class LoadingScreen : public Screen
 {
     public:
-        /*! Constructor */
-        Game();
+        // Screen interface
+        void onInit(ScreenContext& sc);
+        void onUpdate(float dt);
+        void onRender(float interpolation);
+        void onShutdown();
 
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
-
-        /*! Initializes all the low level modules of the game */
-        void Init();
-
-        /*! Called by the mainloop to update the game state */
-        void Update(float dt);
-
-        /*! Called by the mainloop to render the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes all the low level modules of the game */
-        void Shutdown();
-
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
-
+        // Finish callback
+        using FinishCb = std::function<void()>;
+        void SetFinishCb(FinishCb cb);
     private:
-        // Called during initialization to setup window and input
-        void SetupWindow();
-
-        // The engine instance
-        Engine mEngine;
-
-        // The screen manager instance
-        ScreenManager mScreenManager;
-
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        // Called during initialization to load textures
+        void LoadTextures();
+        // Called during initialization to load models
+        void LoadModels();
+        // Engine ref
+        Engine* mEngine;
+        // Finish callback
+        FinishCb mFinishCb;
 };
 
-#endif // ! _GAME_HPP_
+#endif // ! _LOADING_SCREEN_HPP_

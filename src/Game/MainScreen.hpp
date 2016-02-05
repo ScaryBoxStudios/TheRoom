@@ -28,51 +28,43 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _MAIN_SCREEN_HPP_
+#define _MAIN_SCREEN_HPP_
 
-#include <functional>
-#include <vector>
-#include "../Core/Engine.hpp"
-#include "ScreenManager.hpp"
+#include "Screen.hpp"
+#include "../Graphics/Util/Camera.hpp"
+#include "../Graphics/Scene/Scene.hpp"
 
-class Game
+class MainScreen : public Screen
 {
     public:
-        /*! Constructor */
-        Game();
-
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
-
-        /*! Initializes all the low level modules of the game */
-        void Init();
-
-        /*! Called by the mainloop to update the game state */
-        void Update(float dt);
-
-        /*! Called by the mainloop to render the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes all the low level modules of the game */
-        void Shutdown();
-
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
-
+        void onInit(ScreenContext& sc);
+        void onUpdate(float dt);
+        void onKey(Key k, KeyAction ka);
+        void onRender(float interpolation);
+        void onShutdown();
     private:
-        // Called during initialization to setup window and input
-        void SetupWindow();
+        // Called during initialization to setup the world
+        void SetupWorld();
 
-        // The engine instance
-        Engine mEngine;
+        // Engine ref
+        Engine* mEngine;
 
-        // The screen manager instance
-        ScreenManager mScreenManager;
+        // The Scene
+        Scene mScene;
 
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        // The camera view
+        std::vector<Camera::MoveDirection> CameraMoveDirections();
+        std::tuple<float, float> CameraLookOffset();
+        Camera mCamera;
+
+        // The data needed for rotating the cubes
+        struct RotationData
+        {
+            float degreesInc;
+            bool rotating;
+        };
+        RotationData mRotationData;
 };
 
-#endif // ! _GAME_HPP_
+#endif // ! _MAIN_SCREEN_HPP_

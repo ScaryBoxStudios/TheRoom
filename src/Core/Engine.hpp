@@ -57,6 +57,9 @@ class Engine
         // Retrieves the renderer instance
         Renderer& GetRenderer();
 
+        // Retrieves the text renderer instance
+        TextRenderer& GetTextRenderer();
+
         // Sets adds a ShaderProgram to the program list
         void AddShaderProgram(const std::string& name, ShaderProgram sp);
 
@@ -72,6 +75,9 @@ class Engine
 
         // The Renderer
         Renderer mRenderer;
+
+        // The Text Renderer
+        TextRenderer mTextRenderer;
 
         // The loaded ShaderProgram(s)
         std::unordered_map<std::string, ShaderProgram> mShaderPrograms;

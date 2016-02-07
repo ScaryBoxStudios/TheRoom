@@ -12,7 +12,7 @@ void LoadingScreen::onInit(ScreenContext& sc)
     mEngine = sc.GetEngine();
 
     // Load font
-    mEngine->GetRenderer().GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
+    mEngine->GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
 
     // Fire loader thread
     mFileCacheIsReady = false;
@@ -190,7 +190,7 @@ void LoadingScreen::onRender(float interpolation)
     std::string indicator = "Loading ";
     indicator += mCurrentlyLoading;
     indicator += "...";
-    mEngine->GetRenderer().GetTextRenderer().RenderText(indicator, 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
+    mEngine->GetTextRenderer().RenderText(indicator, 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
 }
 
 void LoadingScreen::onShutdown()

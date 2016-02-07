@@ -77,9 +77,6 @@ class Renderer
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
 
-        /* ! Retrieves the text renderer helper */
-        TextRenderer& GetTextRenderer();
-
         /*! Toggles showing the AABBs */
         void ToggleShowAABBs();
 
@@ -119,9 +116,6 @@ class Renderer
 
         // The root Skybox used
         const Skybox* mSkybox;
-
-        // The text rendering utility
-        TextRenderer mTextRenderer;
 
         // The AABB rendering utility
         AABBRenderer mAABBRenderer;

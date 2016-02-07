@@ -24,6 +24,12 @@ void Engine::Init()
         mShaderPrograms.at("geometry_pass").Id(),
         mShaderPrograms.at("light_pass").Id()
     );
+
+    // Initialize the TextRenderer
+    mTextRenderer.Init(
+        mWindow.GetWidth(),
+        mWindow.GetHeight()
+    );
 }
 
 void Engine::Update(float dt)
@@ -50,6 +56,9 @@ void Engine::Shutdown()
     // Remove cached shader programs
     mShaderPrograms.clear();
 
+    // TextRenderer
+    mTextRenderer.Shutdown();
+
     // Renderer
     mRenderer.Shutdown();
 
@@ -65,6 +74,11 @@ Window& Engine::GetWindow()
 Renderer& Engine::GetRenderer()
 {
     return mRenderer;
+}
+
+TextRenderer& Engine::GetTextRenderer()
+{
+    return mTextRenderer;
 }
 
 void Engine::AddShaderProgram(const std::string& name, ShaderProgram sp)

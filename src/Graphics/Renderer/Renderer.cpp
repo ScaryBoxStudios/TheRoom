@@ -45,9 +45,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Create the GBuffer
     mGBuffer = std::make_unique<GBuffer>(mScreenWidth, mScreenHeight);
 
-    // Initialize the TextRenderer
-    mTextRenderer.Init(mScreenWidth, mScreenHeight);
-
     // Initialize the AABBRenderer
     mAABBRenderer.Init();
     mAABBRenderer.SetProjection(mProjection);
@@ -141,9 +138,6 @@ void Renderer::Shutdown()
 
     // Shutdown the AABBRenderer
     mAABBRenderer.Shutdown();
-
-    // Shutdown TextRenderer
-    mTextRenderer.Shutdown();
 
     // Destroy GBuffer
     mGBuffer.reset();
@@ -311,11 +305,6 @@ void Renderer::SetView(const glm::mat4& view)
 void Renderer::ToggleShowAABBs()
 {
     mShowAABBs = !mShowAABBs;
-}
-
-TextRenderer& Renderer::GetTextRenderer()
-{
-    return mTextRenderer;
 }
 
 TextureStore& Renderer::GetTextureStore()

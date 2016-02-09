@@ -41,6 +41,10 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
+//
+// On the right side comments are listed the
+// json keys used in the scene file format
+//
 struct SceneFile
 {
     struct
@@ -48,7 +52,7 @@ struct SceneFile
         std::string version;   // "version"
         std::string type;      // "type"
         std::string generator; // "generator"
-    } metadata;
+    } metadata; // "metadata"
 
     struct Geometry
     {
@@ -57,11 +61,37 @@ struct SceneFile
     };
     std::vector<Geometry> geometries; // "geometries"
 
+    struct Image
+    {
+        rUUID uuid;      // "uuid"
+        std::string url; // "url"
+    };
+    std::vector<Image> images; // "images"
+
+    // Used by Texture and Material structs
+    struct Color { std::uint8_t r, g, b, a; };
+
+    struct Texture
+    {
+        rUUID uuid;  // "uuid"
+        rUUID image; // "image"
+        enum class WrapMode
+        {
+            ClampToEdge,
+            ClampToBorder,
+            MirroredRepeat,
+            Repeat
+        };
+        std::vector<WrapMode> wrap; // "wrap" - In s, t, r order?
+        Color borderColor; // "borderColor"
+    };
+    std::vector<Texture> textures; // "textures"
+
     struct Material
     {
-        struct Color { std::uint8_t r, g, b, a; };
         rUUID uuid;       // "uuid"
-        std::string type; // "type"
+        std::string name; // "name"
+        std::string type; // "type" - Can be MeshPhongMaterial | ???
         Color color;      // "color"
         Color ambient;    // "ambient"
         Color emissive;   // "emissive"
@@ -70,6 +100,8 @@ struct SceneFile
         float opacity;    // "opacity"
         bool transparent; // "transparent"
         bool wireframe;   // "wireframe"
+        rUUID map;        // "map" - Diffuse map
+        rUUID specMap;    // "specMap" - Specular map
     };
     std::vector<Material> materials; // "materials"
 

@@ -73,6 +73,88 @@ SceneFile SceneLoader::Load(const Buffer& data)
         }
     }
 
+    // Parse images
+    if(doc.HasMember("images"))
+    {
+        Value& images = doc["images"];
+        assert(images.IsArray());
+
+        for(SizeType i = 0; i < images.Size(); ++i)
+        {
+            // Parse image
+            Value& im = images[i];
+            SceneFile::Image img = {};
+
+            // UUID
+            assert(StringToUUID(im["uuid"].GetString(), img.uuid));
+
+            // Url
+            img.url = im["url"].GetString();
+
+            // Add parsed image to the list
+            sc.images.push_back(img);
+        }
+    }
+
+    // Helper
+    auto parseColor = [](std::uint32_t v) -> SceneFile::Color
+    {
+        SceneFile::Color col = {};
+        col.r = (v >> 0) & 0xFF;
+        col.g = (v >> 8) & 0xFF;
+        col.b = (v >> 16) & 0xFF;
+        col.a = (v >> 24) & 0xFF;
+        return col;
+    };
+
+    // Parse textures
+    if(doc.HasMember("textures"))
+    {
+        Value& textures = doc["textures"];
+        assert(textures.IsArray());
+
+        for(SizeType i = 0; i < textures.Size(); ++i)
+        {
+            // Parse texture
+            Value& t = textures[i];
+            SceneFile::Texture tex = {};
+
+            // UUID
+            assert(StringToUUID(t["uuid"].GetString(), tex.uuid));
+
+            // Image
+            assert(StringToUUID(t["image"].GetString(), tex.image));
+
+            // WrapMode
+            if(t.HasMember("wrap"))
+            {
+                Value& wrap = t["wrap"];
+                assert(wrap.IsArray());
+                for(SizeType j = 0; j < wrap.Size(); ++j)
+                {
+                    std::string curWrap = wrap[j].GetString();
+                    SceneFile::Texture::WrapMode wm;
+                    if (curWrap == "clampToEdge")
+                        wm = SceneFile::Texture::WrapMode::ClampToEdge;
+                    else if (curWrap == "clampToBorder")
+                        wm = SceneFile::Texture::WrapMode::ClampToBorder;
+                    else if (curWrap == "mirroredRepeat")
+                        wm = SceneFile::Texture::WrapMode::MirroredRepeat;
+                    else if (curWrap == "repeat")
+                        wm = SceneFile::Texture::WrapMode::Repeat;
+                    tex.wrap.push_back(wm);
+                }
+            }
+
+            // BorderColor
+            if(t.HasMember("borderColor"))
+                tex.borderColor = parseColor(t["borderColor"].GetInt());
+
+            // Add parsed texture to the list
+            sc.textures.push_back(tex);
+        }
+    }
+
     // Parse materials
     if(doc.HasMember("materials"))
     {
@@ -88,19 +170,12 @@ SceneFile SceneLoader::Load(const Buffer& data)
             // UUID
             assert(StringToUUID(m["uuid"].GetString(), mt.uuid));
 
+            // Name
+            if(m.HasMember("name"))
+                mt.name = m["name"].GetString();
+
             // Type
             mt.type = m["type"].GetString();
-
-            // Helper
-            auto parseColor = [](std::uint32_t v) -> SceneFile::Material::Color
-            {
-                SceneFile::Material::Color col = {};
-                col.r = (v >> 0) & 0xFF;
-                col.g = (v >> 8) & 0xFF;
-                col.b = (v >> 16) & 0xFF;
-                col.a = (v >> 24) & 0xFF;
-                return col;
-            };
 
             // Colors
             if (m.HasMember("color"))
@@ -125,6 +200,14 @@ SceneFile SceneLoader::Load(const Buffer& data)
             // Wireframe
             if (m.HasMember("wireframe"))
                 mt.wireframe = m["wireframe"].GetBool();
+
+            // Map
+            if (m.HasMember("map"))
+                assert(StringToUUID(m["map"].GetString(), mt.map));
+
+            // SpecMap
+            if (m.HasMember("specMap"))
+                assert(StringToUUID(m["specMap"].GetString(), mt.specMap));
 
             // Add parsed material to the list
             sc.materials.push_back(mt);

@@ -4,4 +4,4 @@ Defines:     ["_SCL_SECURE_NO_WARNINGS"]
 Libraries:   [vorbis, ogg, freetype, openal, png, glfw, glad, assimp, jpeg]
 OSLibraries:
   Windows: ["zlib", "rpcrt4", "winmm", "opengl32", "glu32", "ole32", "gdi32", "advapi32", "user32", "shell32"]
-  Linux:   ["z", "GLU", "GL", "X11", "Xcursor", "Xinerama", "Xrandr", "Xxf86vm", "Xi", "pthread"]
+  Linux:   ["z", "uuid", "GLU", "GL", "X11", "Xcursor", "Xinerama", "Xrandr", "Xxf86vm", "Xi", "pthread"]

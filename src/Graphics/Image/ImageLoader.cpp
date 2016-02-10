@@ -18,7 +18,7 @@ class vectorwrapbuf : public std::basic_streambuf<CharT, TraitsT>
     public:
         vectorwrapbuf(std::vector<CharT> &vec)
         {
-            setg(vec.data(), vec.data(), vec.data() + vec.size());
+            this->setg(vec.data(), vec.data(), vec.data() + vec.size());
         }
 };
 

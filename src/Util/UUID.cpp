@@ -105,7 +105,7 @@ bool StringToUUID(const char* str, rUUID& uuid)
         return false;
 
     char s[37];
-    uuid_unparse (uuid, s);
+    uuid_unparse(lUUID, s);
     uuid.mUUID = std::string(s);
     return true;
 #endif

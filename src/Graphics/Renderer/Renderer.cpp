@@ -252,22 +252,22 @@ void Renderer::LightPass(float interpolation)
 
         // Set directional light properties
         glUniform3f(glGetUniformLocation(progId, "dirLight.direction"), mLightDir.x, mLightDir.y, mLightDir.z);
-        glUniform3f(glGetUniformLocation(progId, "dirLight.ambient"), 0.05f, 0.05f, 0.05f);
-        glUniform3f(glGetUniformLocation(progId, "dirLight.diffuse"), 0.4f, 0.4f, 0.4f);
-        glUniform3f(glGetUniformLocation(progId, "dirLight.specular"), 0.5f, 0.5f, 0.5f);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.properties.ambient"), 0.05f, 0.05f, 0.05f);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.properties.diffuse"), 0.4f, 0.4f, 0.4f);
+        glUniform3f(glGetUniformLocation(progId, "dirLight.properties.specular"), 0.5f, 0.5f, 0.5f);
 
         // Set light's properties
         auto& categories = mScene->GetCategories();
         auto lightIt = categories.find(SceneNodeCategory::Light);
         const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
         const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-        glUniform3f(glGetUniformLocation(progId, "light.position"), lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(glGetUniformLocation(progId, "light.ambient"),  0.2f, 0.2f, 0.2f);
-        glUniform3f(glGetUniformLocation(progId, "light.diffuse"),  0.5f, 0.5f, 0.5f);
-        glUniform3f(glGetUniformLocation(progId, "light.specular"), 1.0f, 1.0f, 1.0f);
-        glUniform1f(glGetUniformLocation(progId, "light.constant"), 1.0f);
-        glUniform1f(glGetUniformLocation(progId, "light.linear"), 0.09f);
-        glUniform1f(glGetUniformLocation(progId, "light.quadratic"), 0.032f);
+        glUniform3f(glGetUniformLocation(progId, "pLight.position"), lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(glGetUniformLocation(progId, "pLight.properties.ambient"),  0.2f, 0.2f, 0.2f);
+        glUniform3f(glGetUniformLocation(progId, "pLight.properties.diffuse"),  0.5f, 0.5f, 0.5f);
+        glUniform3f(glGetUniformLocation(progId, "pLight.properties.specular"), 1.0f, 1.0f, 1.0f);
+        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), 0.09f);
+        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), 0.032f);
 
         // Set material properties
         glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);

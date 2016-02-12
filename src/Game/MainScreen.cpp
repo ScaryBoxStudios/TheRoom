@@ -97,6 +97,13 @@ void MainScreen::SetupWorld()
         scene.Scale("plane", glm::vec3(75.0f, 0.1f, 75.0f));
     }
 
+    // Add sphere
+    {
+        const auto& initAABB = renderer.GetModelStore()["sphere"]->localAABB;
+        scene.CreateNode("sphere", "sphere", SceneNodeCategory::Normal, initAABB);
+        scene.Move("sphere", glm::vec3(0.0f, 3.0f, -2.0f));
+    }
+
     //
     // Light objects
     //

@@ -57,4 +57,7 @@ struct ModelData
     AABB boundingBox;
 };
 
+// Generates UVSphere geometry data for the given properties
+ModelData GenUVSphere(float radius, std::uint32_t rings, std::uint32_t sectors);
+
 #endif // ! _GEOMETRY_HPP_

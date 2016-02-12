@@ -166,6 +166,11 @@ void LoadingScreen::LoadModels()
         modelStore.Load(m.name, std::move(model));
         modelStore[m.name]->material = m.material;
     }
+
+    // Add sample UV Sphere
+    ModelData sphereModel = GenUVSphere(1, 32, 32);
+    modelStore.Load("sphere", std::move(sphereModel));
+    modelStore["sphere"]->material = mahogany;
 }
 
 void LoadingScreen::onUpdate(float dt)

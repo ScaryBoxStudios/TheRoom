@@ -62,6 +62,9 @@ void Engine::Shutdown()
     // Renderer
     mRenderer.Shutdown();
 
+    // Explicitly deallocate GPU data
+    mTextureStore.Clear();
+
     // Window
     mWindow.Destroy();
 }
@@ -69,6 +72,11 @@ void Engine::Shutdown()
 Window& Engine::GetWindow()
 {
     return mWindow;
+}
+
+TextureStore& Engine::GetTextureStore()
+{
+    return mTextureStore;
 }
 
 Renderer& Engine::GetRenderer()

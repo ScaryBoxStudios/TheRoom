@@ -38,7 +38,6 @@
 #include "AABBRenderer.hpp"
 #include "ShadowRenderer.hpp"
 #include "../Geometry/ModelStore.hpp"
-#include "../Texture/TextureStore.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
 
@@ -70,9 +69,6 @@ class Renderer
 
         /*! Sets the current rendering scene */
         void SetScene(const Scene* scene);
-
-        /*! Retrieves the renderer's TextureStore */
-        TextureStore& GetTextureStore();
 
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
@@ -107,9 +103,6 @@ class Renderer
 
         // Shader programIds of the geometry pass and the lighting pass
         GLuint mGeometryPassProgId, mLightingPassProgId;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
 
         // The GBuffer used by the deffered rendering steps
         std::unique_ptr<GBuffer> mGBuffer;

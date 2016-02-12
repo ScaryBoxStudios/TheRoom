@@ -90,7 +90,7 @@ void LoadingScreen::LoadFileData()
 void LoadingScreen::LoadTextures()
 {
     // Retrieve the textureStore from the renderer
-    auto& textureStore = mEngine->GetRenderer().GetTextureStore();
+    auto& textureStore = mEngine->GetTextureStore();
 
     // The ImageLoader object
     ImageLoader imageLoader;
@@ -120,7 +120,7 @@ void LoadingScreen::LoadModels()
     // Retrieve the model and texture stores from the renderer
     auto& renderer = mEngine->GetRenderer();
     auto& modelStore = renderer.GetModelStore();
-    auto& textureStore = renderer.GetTextureStore();
+    auto& textureStore = mEngine->GetTextureStore();
 
     // Model loader instance
     ModelLoader modelLoader;

@@ -143,7 +143,6 @@ void Renderer::Shutdown()
     mGBuffer.reset();
 
     // Explicitly deallocate GPU data
-    mTextureStore.Clear();
     mModelStore.Clear();
 }
 
@@ -305,11 +304,6 @@ void Renderer::SetView(const glm::mat4& view)
 void Renderer::ToggleShowAABBs()
 {
     mShowAABBs = !mShowAABBs;
-}
-
-TextureStore& Renderer::GetTextureStore()
-{
-    return mTextureStore;
 }
 
 ModelStore& Renderer::GetModelStore()

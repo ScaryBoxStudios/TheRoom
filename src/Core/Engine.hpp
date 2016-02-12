@@ -32,6 +32,7 @@
 #define _ENGINE_HPP_
 
 #include "../Window/Window.hpp"
+#include "../Graphics/Texture/TextureStore.hpp"
 #include "../Graphics/Renderer/Renderer.hpp"
 #include "../Graphics/Renderer/Skybox.hpp"
 #include "../Graphics/Shader/Shader.hpp"
@@ -54,6 +55,9 @@ class Engine
         // Retrieves the window instance
         Window& GetWindow();
 
+        // Retrieves the TextureStore instance
+        TextureStore& GetTextureStore();
+
         // Retrieves the renderer instance
         Renderer& GetRenderer();
 
@@ -72,6 +76,9 @@ class Engine
 
         // The Game Window
         Window mWindow;
+
+        // Stores the textures loaded in the gpu
+        TextureStore mTextureStore;
 
         // The Renderer
         Renderer mRenderer;

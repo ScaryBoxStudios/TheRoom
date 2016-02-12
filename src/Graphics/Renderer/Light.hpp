@@ -28,97 +28,64 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _RENDERER_HPP_
-#define _RENDERER_HPP_
+#ifndef _LIGHT_HPP_
+#define _LIGHT_HPP_
 
-#include <memory>
-#include "GBuffer.hpp"
-#include "Light.hpp"
-#include "Skybox.hpp"
-#include "TextRenderer.hpp"
-#include "AABBRenderer.hpp"
-#include "ShadowRenderer.hpp"
-#include "../Geometry/ModelStore.hpp"
-#include "../Scene/Scene.hpp"
-#include "../Scene/Transform.hpp"
+#include <vector>
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-class Renderer
+// Generic light properties
+struct LightProps
 {
-    public:
-        /*! Initializes the renderer */
-        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
-
-        /*! Called when updating the game state */
-        void Update(float dt);
-
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes the renderer */
-        void Shutdown();
-
-        /*! Sets the view matrix */
-        void SetView(const glm::mat4& view);
-
-        /*! Sets the skybox */
-        void SetSkybox(const Skybox* s);
-
-        /*! Sets the current rendering scene */
-        void SetScene(const Scene* scene);
-
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
-
-        /*! Toggles showing the AABBs */
-        void ToggleShowAABBs();
-
-    private:
-        // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
-
-        // Performs the light pass rendering step
-        void LightPass(float interpolation);
-
-        // The projection matrix
-        glm::mat4 mProjection;
-
-        // The view matrix
-        glm::mat4 mView;
-
-        // The screen size
-        int mScreenWidth, mScreenHeight;
-
-        // Currently rendering scene
-        const Scene* mScene;
-
-        // The lights that are rendered
-        Lights mLights;
-
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Shader programIds of the geometry pass and the lighting pass
-        GLuint mGeometryPassProgId, mLightingPassProgId;
-
-        // The GBuffer used by the deffered rendering steps
-        std::unique_ptr<GBuffer> mGBuffer;
-
-        // The root Skybox used
-        const Skybox* mSkybox;
-
-        // The AABB rendering utility
-        AABBRenderer mAABBRenderer;
-
-        // The shadow map rendering utility
-        ShadowRenderer mShadowRenderer;
-
-        // When flag on AABBs are shown
-        bool mShowAABBs;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
 };
 
-#endif // ! _RENDERER_HPP_
+// Attenuation properties
+struct AttenuationProps
+{
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+// Directional light properties
+struct DirLight
+{
+    LightProps properties;
+    glm::vec3 direction;
+};
+
+// Point light properties
+struct PointLight
+{
+    LightProps properties;
+    AttenuationProps attProps;
+    glm::vec3 position;
+};
+
+// Spot light properties
+struct SpotLight
+{
+    LightProps properties;
+    AttenuationProps attProps;
+    glm::vec3 position;
+    glm::vec3 direction;
+    float cutOff;
+    float outerCutOff;
+};
+
+// Aggregate holding the lights a scene may have
+struct Lights
+{
+    std::vector<DirLight> dirLights;
+    std::vector<PointLight> pointLights;
+    std::vector<SpotLight> spotLights;
+};
+
+#endif // ! _LIGHT_HPP_

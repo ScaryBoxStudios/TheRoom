@@ -55,8 +55,23 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mShadowRenderer.Init(8096, 8096);
     mShadowRenderer.SetModelStore(&mModelStore);
 
-    // Set directional light position
-    mLightDir = glm::vec3(-0.3f, -0.5f, -0.5f);
+    // Add main directional light
+    DirLight dirLight;
+    dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
+    dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    dirLight.properties.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
+    dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    mLights.dirLights.push_back(dirLight);
+
+    // Add point light
+    PointLight pointLight;
+    pointLight.properties.ambient  = glm::vec3(0.2f, 0.2f, 0.2f);
+    pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
+    pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+    pointLight.attProps.constant   = 1.0f;
+    pointLight.attProps.linear     = 0.09f;
+    pointLight.attProps.quadratic  = 0.032f;
+    mLights.pointLights.push_back(pointLight);
 }
 
 void Renderer::Update(float dt)
@@ -84,7 +99,7 @@ void Renderer::Render(float interpolation)
         mShadowRenderer.SetScene(mScene);
 
         // Set light's properties
-        mShadowRenderer.SetLightPos(-mLightDir);
+        mShadowRenderer.SetLightPos(-(mLights.dirLights.front().direction));
 
         // Render depth map
         mShadowRenderer.Render(interpolation);
@@ -250,23 +265,29 @@ void Renderer::LightPass(float interpolation)
         glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 
         // Set directional light properties
-        glUniform3f(glGetUniformLocation(progId, "dirLight.direction"), mLightDir.x, mLightDir.y, mLightDir.z);
-        glUniform3f(glGetUniformLocation(progId, "dirLight.properties.ambient"), 0.05f, 0.05f, 0.05f);
-        glUniform3f(glGetUniformLocation(progId, "dirLight.properties.diffuse"), 0.4f, 0.4f, 0.4f);
-        glUniform3f(glGetUniformLocation(progId, "dirLight.properties.specular"), 0.5f, 0.5f, 0.5f);
+        const DirLight& dirLight = mLights.dirLights.front();
+        glUniform3fv(glGetUniformLocation(progId, "dirLight.direction"),           1, glm::value_ptr(dirLight.direction));
+        glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.ambient"),  1, glm::value_ptr(dirLight.properties.ambient));
+        glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.diffuse"),  1, glm::value_ptr(dirLight.properties.diffuse));
+        glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.specular"), 1, glm::value_ptr(dirLight.properties.specular));
 
-        // Set light's properties
+        // Set point light's properties
+        PointLight& pLight = mLights.pointLights.front();
+
+        // Update changing position
         auto& categories = mScene->GetCategories();
         auto lightIt = categories.find(SceneNodeCategory::Light);
         const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
         const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-        glUniform3f(glGetUniformLocation(progId, "pLight.position"), lightPos.x, lightPos.y, lightPos.z);
-        glUniform3f(glGetUniformLocation(progId, "pLight.properties.ambient"),  0.2f, 0.2f, 0.2f);
-        glUniform3f(glGetUniformLocation(progId, "pLight.properties.diffuse"),  0.5f, 0.5f, 0.5f);
-        glUniform3f(glGetUniformLocation(progId, "pLight.properties.specular"), 1.0f, 1.0f, 1.0f);
-        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.constant"), 1.0f);
-        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), 0.09f);
-        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), 0.032f);
+        pLight.position = lightPos;
+
+        glUniform3fv(glGetUniformLocation(progId, "pLight.position"), 1, glm::value_ptr(pLight.position));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
+        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.constant"), pLight.attProps.constant);
+        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), pLight.attProps.linear);
+        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), pLight.attProps.quadratic);
 
         // Set material properties
         glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);

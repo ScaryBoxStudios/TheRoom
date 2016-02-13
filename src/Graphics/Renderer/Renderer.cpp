@@ -69,8 +69,8 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
     pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
     pointLight.attProps.constant   = 1.0f;
-    pointLight.attProps.linear     = 0.09f;
-    pointLight.attProps.quadratic  = 0.032f;
+    pointLight.attProps.linear     = 0.35f;
+    pointLight.attProps.quadratic  = 1.44f;
     mLights.pointLights.push_back(pointLight);
 }
 
@@ -251,6 +251,16 @@ void Renderer::GeometryPass(float interpolation)
     glUseProgram(0);
 }
 
+float CalcPointLightBSphere(const PointLight& light)
+{
+    float MaxChannel = fmax(fmax(light.properties.diffuse.r, light.properties.diffuse.g), light.properties.diffuse.b);
+    float ret =
+        (-light.attProps.linear
+         +sqrtf(light.attProps.linear * light.attProps.linear - 4 * light.attProps.quadratic
+                * (light.attProps.constant - (256.0f / 5.0f) * MaxChannel))) / (2 * light.attProps.quadratic);
+    return ret;
+}
+
 void Renderer::LightPass(float interpolation)
 {
     // Use the light pass program
@@ -307,6 +317,8 @@ void Renderer::LightPass(float interpolation)
     glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.specular"), 1, glm::value_ptr(dirLight.properties.specular));
 
     // Render
+    glm::mat4 mvp = glm::mat4();
+    glUniformMatrix4fv(glGetUniformLocation(progId, "MVP"), 1, GL_FALSE, glm::value_ptr(mvp));
     glUniform1i(glGetUniformLocation(progId, "lMode"), 1);
     RenderQuad();
 
@@ -331,9 +343,17 @@ void Renderer::LightPass(float interpolation)
     glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), pLight.attProps.linear);
     glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), pLight.attProps.quadratic);
 
+    // Bounding sphere
+    float scaleFactor = CalcPointLightBSphere(pLight);
+    glm::mat4 bsMdl = glm::mat4();
+    bsMdl = glm::translate(bsMdl, pLight.position);
+    bsMdl = glm::scale(bsMdl, glm::vec3(scaleFactor));
+    mvp = mProjection * mView * bsMdl;
+    glUniformMatrix4fv(glGetUniformLocation(progId, "MVP"), 1, GL_FALSE, glm::value_ptr(mvp));
+
     // Render
     glUniform1i(glGetUniformLocation(progId, "lMode"), 2);
-    RenderQuad();
+    RenderSphere();
 
     glUseProgram(0);
 }

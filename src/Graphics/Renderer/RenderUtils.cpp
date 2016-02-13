@@ -71,7 +71,7 @@ void RenderSphere()
     // Render
     glBindVertexArray(vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(sphereIndices.size()), GL_UNSIGNED_INT, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 

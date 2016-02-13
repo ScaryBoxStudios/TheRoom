@@ -1,10 +1,10 @@
 #version 330
 out vec4 color;
-in vec2 UVCoords;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform ivec2 gScreenSize;
 uniform float shininess;
 uniform vec3 viewPos;
 
@@ -161,6 +161,7 @@ uniform int lMode;
 void main(void)
 {
     // Retrieve data from GBuffer
+    vec2 UVCoords = gl_FragCoord.xy / gScreenSize;
     vec3 FragPos = texture(gPosition, UVCoords).rgb;
     vec3 Normal = texture(gNormal, UVCoords).rgb;
     vec3 Diffuse = texture(gAlbedoSpec, UVCoords).rgb;

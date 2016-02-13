@@ -264,6 +264,9 @@ void Renderer::LightPass(float interpolation)
     glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
     glUniform1i(glGetUniformLocation(progId, "shadowMap"), 3);
 
+    // Pass the screen size
+    glUniform2i(glGetUniformLocation(progId, "gScreenSize"), mScreenWidth, mScreenHeight);
+
     // Set material properties
     glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
 

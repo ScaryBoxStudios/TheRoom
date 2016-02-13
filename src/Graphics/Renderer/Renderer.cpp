@@ -224,11 +224,11 @@ void Renderer::GeometryPass(float interpolation)
             }
 
             // Normal map
-            if(mdl->usesNormalMap)
+            if(mdl->material.UsesNormalMapTexture())
             {
                 glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
                 glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, mdl->normalMap.texId);
+                glBindTexture(GL_TEXTURE_2D, mdl->material.GetNormalMapTexture());
                 glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
             }
             else

@@ -5,6 +5,7 @@ Material::Material()
   , mDiffTexture(0)
   , mSpecColor(glm::vec3(0.0f))
   , mSpecTexture(0)
+  , mNMapTexture(0)
 {
 }
 
@@ -62,4 +63,22 @@ void Material::SetSpecularTexture(GLuint id)
 bool Material::UsesSpecularTexture() const
 {
     return mSpecTexture != 0;
+}
+
+//
+//=- Normal Mapping
+//
+GLuint Material::GetNormalMapTexture() const
+{
+    return mNMapTexture;
+}
+
+void Material::SetNormalMapTexture(GLuint id)
+{
+    mNMapTexture = id;
+}
+
+bool Material::UsesNormalMapTexture() const
+{
+    return mNMapTexture != 0;
 }

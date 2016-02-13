@@ -38,7 +38,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "Geometry.hpp"
-#include "Material.hpp"
+#include "../Material/Material.hpp"
 #include "../Texture/TextureStore.hpp"
 
 // MeshDescription
@@ -56,8 +56,6 @@ struct ModelDescription
     std::vector<MeshDescription> meshes;
     Material material;
     AABB localAABB;
-    TextureDescription normalMap;
-    bool usesNormalMap;
 };
 
 // ModelStore

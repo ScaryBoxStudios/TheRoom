@@ -61,6 +61,11 @@ class Material
         void SetSpecularTexture(GLuint id);
         bool UsesSpecularTexture() const;
 
+        // Normal Map texture
+        GLuint GetNormalMapTexture() const;
+        void SetNormalMapTexture(GLuint id);
+        bool UsesNormalMapTexture() const;
+
     private:
         // Diffuse properties
         glm::vec3 mDiffColor;
@@ -69,6 +74,9 @@ class Material
         // Specular properties
         glm::vec3 mSpecColor;
         GLuint mSpecTexture;
+
+        // Normal mapping properties
+        GLuint mNMapTexture;
 };
 
 #endif // ! _MATERIAL_HPP_

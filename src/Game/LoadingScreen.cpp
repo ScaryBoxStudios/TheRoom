@@ -150,6 +150,7 @@ void LoadingScreen::LoadModels()
     Material house;
     house.SetDiffuseTexture(textureStore["house_diff"]->texId);
     house.SetSpecularTexture(textureStore["house_spec"]->texId);
+    house.SetNormalMapTexture(textureStore["house_nmap"]->texId);
 
     Material well;
     well.SetDiffuseTexture(textureStore["well_diff"]->texId);
@@ -157,6 +158,7 @@ void LoadingScreen::LoadModels()
 
     Material wall;
     wall.SetDiffuseTexture(textureStore["wall"]->texId);
+    wall.SetNormalMapTexture(textureStore["wall_nmap"]->texId);
 
     std::vector<MdlData> models = {
         { "ext/Cube/cube.obj",               "obj", "cube",   mahogany } // Cube
@@ -175,19 +177,7 @@ void LoadingScreen::LoadModels()
 
         modelStore.Load(m.name, std::move(model));
 
-        ModelDescription* mdl = modelStore[m.name];
-        mdl->material = m.material;
-
-        TextureDescription* nmapTex = textureStore[m.name + "_nmap"];
-        if(nmapTex != nullptr)
-        {
-            mdl->normalMap = *textureStore[m.name + "_nmap"];
-            mdl->usesNormalMap = true;
-        }
-        else
-        {
-            mdl->usesNormalMap = false;
-        }
+        modelStore[m.name]->material = m.material;
     }
 
     // Add sample UV Sphere

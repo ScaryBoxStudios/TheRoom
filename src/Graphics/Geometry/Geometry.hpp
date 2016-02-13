@@ -40,9 +40,10 @@
 
 struct VertexData
 {
-    GLfloat vx, vy, vz, // Vertices
-            nx, ny, nz, // Normals
-            tx, ty;     // TexCoords
+    GLfloat vx,  vy,  vz,  // Vertices
+            nx,  ny,  nz,  // Normals
+            tx,  ty,       // TexCoords
+            tnx, tny, tnz; // Tangents
 };
 
 struct MeshData

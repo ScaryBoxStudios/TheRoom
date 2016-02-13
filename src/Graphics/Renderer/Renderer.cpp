@@ -223,6 +223,19 @@ void Renderer::GeometryPass(float interpolation)
                 glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
             }
 
+            // Normal map
+            if(mdl->usesNormalMap)
+            {
+                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, mdl->normalMap.texId);
+                glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
+            }
+            else
+            {
+                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
+            }
+
             // Draw all its meshes
             for (const auto& mesh : mdl->meshes)
             {

@@ -47,6 +47,17 @@ ModelData ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const cha
             vertexData.ny = norm.y;
             vertexData.nz = norm.z;
 
+            if(mesh->HasTangentsAndBitangents())
+            {
+                // Tangents
+                const aiVector3D& tan = mesh->mTangents[i];
+                vertexData.tnx = tan.x;
+                vertexData.tny = tan.y;
+                vertexData.tnz = tan.z;
+            }
+            // TODO: think if we need the 'else' part
+            //else {}
+
             // Texture coordinates
             if (mesh->mTextureCoords[0])
             {

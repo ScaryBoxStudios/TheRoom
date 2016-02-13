@@ -69,6 +69,9 @@ void LoadingScreen::LoadFileData()
     , "ext/mahogany_wood_spec.jpg"
     , "ext/WoodenCabin/WoodCabinDif.jpg"
     , "ext/WoodenCabin/WoodCabinSM.jpg"
+    , "ext/WoodenCabin/WoodCabinNM.jpg"
+    , "ext/brickwall.jpg"
+    , "ext/brickwall_NM.jpg"
     , "ext/Dungeon/maps/Wall1_T.tga"
     , "ext/Dungeon/maps/Wall1_B.tga"
       // Models
@@ -102,6 +105,9 @@ void LoadingScreen::LoadTextures()
         {"ext/mahogany_wood_spec.jpg",       "mahogany_wood_spec"},
         {"ext/WoodenCabin/WoodCabinDif.jpg", "house_diff"},
         {"ext/WoodenCabin/WoodCabinSM.jpg",  "house_spec"},
+        {"ext/WoodenCabin/WoodCabinNM.jpg",  "house_nmap"},
+        {"ext/brickwall.jpg",                "wall"},
+        {"ext/brickwall_NM.jpg",             "wall_nmap"},
         {"ext/Dungeon/maps/Wall1_T.tga",     "well_diff"},
         {"ext/Dungeon/maps/Wall1_B.tga",     "well_spec"}
     };
@@ -149,11 +155,15 @@ void LoadingScreen::LoadModels()
     well.SetDiffuseTexture(textureStore["well_diff"]->texId);
     well.SetSpecularTexture(textureStore["well_spec"]->texId);
 
+    Material wall;
+    wall.SetDiffuseTexture(textureStore["wall"]->texId);
+
     std::vector<MdlData> models = {
         { "ext/Cube/cube.obj",               "obj", "cube",   mahogany } // Cube
     ,   { "ext/teapot.obj",                  "obj", "teapot", white    } // Teapot
     ,   { "ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  house    } // House
     ,   { "ext/Dungeon/Well.obj",            "obj", "well",   well     } // Well
+    ,   { "ext/Cube/cube.obj",               "obj", "wall",   wall     } // Wall
     };
 
     for(auto& m : models)
@@ -164,7 +174,20 @@ void LoadingScreen::LoadModels()
             throw std::runtime_error("Couldn't load model (" + m.filepath + ")");
 
         modelStore.Load(m.name, std::move(model));
-        modelStore[m.name]->material = m.material;
+
+        ModelDescription* mdl = modelStore[m.name];
+        mdl->material = m.material;
+
+        TextureDescription* nmapTex = textureStore[m.name + "_nmap"];
+        if(nmapTex != nullptr)
+        {
+            mdl->normalMap = *textureStore[m.name + "_nmap"];
+            mdl->usesNormalMap = true;
+        }
+        else
+        {
+            mdl->usesNormalMap = false;
+        }
     }
 
     // Add sample UV Sphere

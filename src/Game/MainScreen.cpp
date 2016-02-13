@@ -97,6 +97,14 @@ void MainScreen::SetupWorld()
         scene.Scale("plane", glm::vec3(75.0f, 0.1f, 75.0f));
     }
 
+    // Add wall
+    {
+        const auto& initAABB = renderer.GetModelStore()["wall"]->localAABB;
+        scene.CreateNode("wall", "wall", SceneNodeCategory::Normal, initAABB);
+        scene.Move("wall", glm::vec3(10.0f, 0.0f, 2.0f));
+        scene.Scale("wall", glm::vec3(3.0f, 3.0f, 3.0f));
+    }
+
     // Add sphere
     {
         const auto& initAABB = renderer.GetModelStore()["sphere"]->localAABB;

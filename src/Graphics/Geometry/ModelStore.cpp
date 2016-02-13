@@ -62,6 +62,10 @@ void ModelStore::Load(const std::string& name, const ModelData& data)
                 // TexCoords
                 glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(offsetof(VertexData, tx)));
                 glEnableVertexAttribArray(2);
+
+                // Tangent
+                glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(offsetof(VertexData, tnx)));
+                glEnableVertexAttribArray(3);
             }
             glBindBuffer(GL_ARRAY_BUFFER, 0);
 

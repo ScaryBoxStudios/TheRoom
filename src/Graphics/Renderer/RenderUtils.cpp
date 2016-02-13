@@ -1,6 +1,7 @@
 #include "RenderUtils.hpp"
 #include <glad/glad.h>
 #include <GL/gl.h>
+#include "../Geometry/Geometry.hpp"
 #include "../Util/GLUtils.hpp"
 
 void RenderQuad()
@@ -32,6 +33,52 @@ void RenderQuad()
     }
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &quadVao);
+}
+
+void RenderSphere()
+{
+    ModelData sphere = GenUVSphere(1.0f, 16, 16);
+    const auto& sphereData = sphere.meshes.front().data;
+    const auto& sphereIndices = sphere.meshes.front().indices;
+
+    GLuint vao, vbo, ebo;
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+
+    glBindVertexArray(vao);
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER,
+            sphereData.size() * sizeof(VertexData),
+            sphereData.data(),
+            GL_STATIC_DRAW
+        );
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexData), (GLvoid*)(offsetof(VertexData, vx)));
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            sphereIndices.size() * sizeof(GLuint),
+            sphereIndices.data(),
+            GL_STATIC_DRAW
+        );
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+    glBindVertexArray(0);
+
+    // Render
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glDrawElements(GL_TRIANGLES, sphereIndices.size(), GL_UNSIGNED_INT, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // Release resources
+    glDeleteBuffers(1, &ebo);
+    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &vao);
 }
 
 void RenderBox(const AABB& aabb)

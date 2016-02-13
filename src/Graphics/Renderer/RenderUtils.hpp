@@ -36,6 +36,9 @@
 // Renders a 1x1 quad in NDC, used for framebuffer color targets
 void RenderQuad();
 
+// Renders a unit sphere
+void RenderSphere();
+
 // Renders a AABB in model space
 void RenderBox(const AABB& aabb);
 

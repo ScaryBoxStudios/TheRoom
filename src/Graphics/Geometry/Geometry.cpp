@@ -16,11 +16,20 @@ ModelData GenUVSphere(float radius, std::uint32_t rings = 32, std::uint32_t sect
     // Alias
     const auto pi = glm::pi<float>();
 
+    // Preallocate space
+    vertices.resize(rings * sectors);
+    normals.resize(rings * sectors);
+    texCoords.resize(rings * sectors);
+    indices.resize(rings * sectors * 6);
+
     //
     const float R = 1.0f / static_cast<float>(rings - 1);
     const float S = 1.0f / static_cast<float>(sectors - 1);
 
     // Calc the vertices
+    auto v = std::begin(vertices);
+    auto n = std::begin(normals);
+    auto t = std::begin(texCoords);
     for (std::uint32_t r = 0; r < rings; ++r)
     {
         for (std::uint32_t s = 0; s < sectors; ++s)
@@ -30,27 +39,32 @@ ModelData GenUVSphere(float radius, std::uint32_t rings = 32, std::uint32_t sect
             float y = sinf(-pi / 2 + pi * r * R);
 
             // Push back vertex data
-            vertices.push_back(glm::vec3(x, y, z) * radius);
-
-            // Push back indices
-            {
-                int curRow = r * sectors;
-                int nextRow = (r + 1) * sectors;
-
-                indices.push_back(curRow + s);
-                indices.push_back(nextRow + s);
-                indices.push_back(nextRow + (s+1));
-
-                indices.push_back(curRow + s);
-                indices.push_back(nextRow + (s+1));
-                indices.push_back(curRow + (s+1));
-            }
+            *v++ = (glm::vec3(x, y, z) * radius);
 
             // Push back normal
-            normals.push_back(glm::vec3(x, y, z));
+            *n++ = (glm::vec3(x, y, z));
 
             // Push back texture coordinates
-            texCoords.push_back(glm::vec2(s*S, r*R));
+            *t++ = (glm::vec2(s*S, r*R));
+        }
+    }
+
+    // Calc indices
+    auto it = std::begin(indices);
+    for (std::uint32_t r = 0; r < rings - 1; ++r)
+    {
+        for (std::uint32_t s = 0; s < sectors - 1; ++s)
+        {
+            int curRow = r * sectors;
+            int nextRow = (r + 1) * sectors;
+
+            *it++ = (curRow + s);
+            *it++ = (nextRow + s);
+            *it++ = (nextRow + (s+1));
+
+            *it++ = (curRow + s);
+            *it++ = (nextRow + (s+1));
+            *it++ = (curRow + (s+1));
         }
     }
 

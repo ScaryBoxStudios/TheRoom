@@ -93,6 +93,9 @@ void Renderer::Update(float dt)
 
 void Renderer::Render(float interpolation)
 {
+    // Setup clear color
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
     // Render the shadow map
     {
         // Set the rendering scene
@@ -112,6 +115,8 @@ void Renderer::Render(float interpolation)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Make the GeometryPass
+        glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
         GeometryPass(interpolation);
     }
     // Unbind the GBuffer
@@ -121,9 +126,14 @@ void Renderer::Render(float interpolation)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Make the LightPass
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glDisable(GL_DEPTH_TEST);
     LightPass(interpolation);
 
     // Setup forward render context
+    glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer->Id());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, mScreenWidth, mScreenHeight,
@@ -233,75 +243,82 @@ void Renderer::LightPass(float interpolation)
     // Use the light pass program
     GLuint progId = mLightingPassProgId;
     glUseProgram(progId);
-    {
-        // Bind the data textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, mGBuffer->PosId());
-        GLuint gPosId = glGetUniformLocation(progId, "gPosition");
-        glUniform1i(gPosId, 0);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, mGBuffer->NormalId());
-        GLuint gNormId = glGetUniformLocation(progId, "gNormal");
-        glUniform1i(gNormId, 1);
+    // Bind the data textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, mGBuffer->PosId());
+    GLuint gPosId = glGetUniformLocation(progId, "gPosition");
+    glUniform1i(gPosId, 0);
 
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, mGBuffer->AlbedoSpecId());
-        GLuint gAlbSpecId = glGetUniformLocation(progId, "gAlbedoSpec");
-        glUniform1i(gAlbSpecId, 2);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mGBuffer->NormalId());
+    GLuint gNormId = glGetUniformLocation(progId, "gNormal");
+    glUniform1i(gNormId, 1);
 
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
-        glUniform1i(glGetUniformLocation(progId, "shadowMap"), 3);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, mGBuffer->AlbedoSpecId());
+    GLuint gAlbSpecId = glGetUniformLocation(progId, "gAlbedoSpec");
+    glUniform1i(gAlbSpecId, 2);
 
-        // Upload light relevant uniforms
-        // Get the view matrix
-        const auto& view = mView;
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
+    glUniform1i(glGetUniformLocation(progId, "shadowMap"), 3);
 
-        // Setup lighting position parameters
-        const glm::mat4 inverseView = glm::inverse(view);
-        const glm::vec3 viewPos = glm::vec3(inverseView[3].x, inverseView[3].y, inverseView[3].z);
-        GLint viewPosId = glGetUniformLocation(progId, "viewPos");
-        glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
+    // Set material properties
+    glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
 
-        // Set directional light properties
-        const DirLight& dirLight = mLights.dirLights.front();
-        glUniform3fv(glGetUniformLocation(progId, "dirLight.direction"),           1, glm::value_ptr(dirLight.direction));
-        glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.ambient"),  1, glm::value_ptr(dirLight.properties.ambient));
-        glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.diffuse"),  1, glm::value_ptr(dirLight.properties.diffuse));
-        glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.specular"), 1, glm::value_ptr(dirLight.properties.specular));
+    // Pass the light space matrix
+    glUniformMatrix4fv(
+        glGetUniformLocation(progId, "lightSpaceMatrix"),
+        1, GL_FALSE,
+        glm::value_ptr(mShadowRenderer.GetLightViewMatrix())
+    );
 
-        // Set point light's properties
-        PointLight& pLight = mLights.pointLights.front();
+    //
+    // Directional light passes
+    //
+    // Setup lighting position parameters
+    const glm::mat4 inverseView = glm::inverse(mView);
+    const glm::vec3 viewPos = glm::vec3(inverseView[3].x, inverseView[3].y, inverseView[3].z);
+    GLint viewPosId = glGetUniformLocation(progId, "viewPos");
+    glUniform3f(viewPosId, viewPos.x, viewPos.y, viewPos.z);
 
-        // Update changing position
-        auto& categories = mScene->GetCategories();
-        auto lightIt = categories.find(SceneNodeCategory::Light);
-        const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
-        const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-        pLight.position = lightPos;
+    // Set directional light properties
+    const DirLight& dirLight = mLights.dirLights.front();
+    glUniform3fv(glGetUniformLocation(progId, "dirLight.direction"),           1, glm::value_ptr(dirLight.direction));
+    glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.ambient"),  1, glm::value_ptr(dirLight.properties.ambient));
+    glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.diffuse"),  1, glm::value_ptr(dirLight.properties.diffuse));
+    glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.specular"), 1, glm::value_ptr(dirLight.properties.specular));
 
-        glUniform3fv(glGetUniformLocation(progId, "pLight.position"), 1, glm::value_ptr(pLight.position));
-        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
-        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
-        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
-        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.constant"), pLight.attProps.constant);
-        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), pLight.attProps.linear);
-        glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), pLight.attProps.quadratic);
+    // Render
+    glUniform1i(glGetUniformLocation(progId, "lMode"), 1);
+    RenderQuad();
 
-        // Set material properties
-        glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
+    //
+    // Point light passes
+    //
+    // Set point light's properties
+    PointLight& pLight = mLights.pointLights.front();
 
-        // Pass the light space matrix
-        glUniformMatrix4fv(
-            glGetUniformLocation(progId, "lightSpaceMatrix"),
-            1, GL_FALSE,
-            glm::value_ptr(mShadowRenderer.GetLightViewMatrix())
-        );
+    // Update changing position
+    auto& categories = mScene->GetCategories();
+    auto lightIt = categories.find(SceneNodeCategory::Light);
+    const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
+    const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
+    pLight.position = lightPos;
 
-        // Render final contents
-        RenderQuad();
-    }
+    glUniform3fv(glGetUniformLocation(progId, "pLight.position"), 1, glm::value_ptr(pLight.position));
+    glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
+    glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
+    glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
+    glUniform1f(glGetUniformLocation(progId, "pLight.attProps.constant"), pLight.attProps.constant);
+    glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), pLight.attProps.linear);
+    glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), pLight.attProps.quadratic);
+
+    // Render
+    glUniform1i(glGetUniformLocation(progId, "lMode"), 2);
+    RenderQuad();
+
     glUseProgram(0);
 }
 

@@ -156,6 +156,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, vec3 lightPos, vec3
 
 uniform PointLight pLight;
 uniform DirLight dirLight;
+uniform int lMode;
 
 void main(void)
 {
@@ -181,13 +182,14 @@ void main(void)
     // Calculate fragment shadow
     float shadow = ShadowCalculation(FragPosLightSpace, norm, -dirLight.direction, FragPos);
 
-    // Phase 1: Directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir, material, shadow);
+    // Empty result
+    vec3 result = vec3(0.0);
 
-    // Phase 2: Point lights
-    result += CalcPointLight(pLight, norm, FragPos, viewDir, material);
+    if (lMode == 1)
+        result += CalcDirLight(dirLight, norm, viewDir, material, shadow);
+    else if (lMode == 2)
+        result += CalcPointLight(pLight, norm, FragPos, viewDir, material);
 
-    // Phase 3: SpotLights
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir, material);
 
     color = vec4(result, 1.0);

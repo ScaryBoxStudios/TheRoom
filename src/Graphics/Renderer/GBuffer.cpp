@@ -58,6 +58,47 @@ GBuffer::~GBuffer()
     glDeleteFramebuffers(1, &mGBufferId);
 }
 
+void GBuffer::PrepareFor(Mode mode)
+{
+    switch(mode)
+    {
+        case Mode::GeometryPass:
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, mGBufferId);
+            GLuint attachments[3] = {
+                GL_COLOR_ATTACHMENT0
+              , GL_COLOR_ATTACHMENT1
+              , GL_COLOR_ATTACHMENT2
+            };
+            glDrawBuffers(3, attachments);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            break;
+        }
+        case Mode::LightPass:
+        {
+            GLuint textureIds[] = {
+                mPositionBufId,
+                mNormalBufId,
+                mAlbedoSpecBufId
+            };
+
+            for (unsigned int i = 0; i < 3; ++i)
+            {
+                glActiveTexture(GL_TEXTURE0 + i);
+                glBindTexture(GL_TEXTURE_2D, textureIds[i]);
+            }
+            break;
+        }
+        case Mode::StencilPass:
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, mGBufferId);
+            glDrawBuffer(GL_NONE);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            break;
+        }
+    }
+}
+
 GLuint GBuffer::Id() const
 {
     return mGBufferId;

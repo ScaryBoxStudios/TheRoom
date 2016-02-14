@@ -96,54 +96,44 @@ void Renderer::Render(float interpolation)
     // Setup clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    //
     // Render the shadow map
-    {
-        // Set the rendering scene
-        mShadowRenderer.SetScene(mScene);
+    //
+    // Set the rendering scene
+    mShadowRenderer.SetScene(mScene);
+    // Set light's properties
+    mShadowRenderer.SetLightPos(-(mLights.dirLights.front().direction));
+    // Render depth map
+    mShadowRenderer.Render(interpolation);
 
-        // Set light's properties
-        mShadowRenderer.SetLightPos(-(mLights.dirLights.front().direction));
+    //
+    // Make the GeometryPass
+    //
+    GeometryPass(interpolation);
 
-        // Render depth map
-        mShadowRenderer.Render(interpolation);
-    }
-
-    // Bind the GBuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
-    {
-        // Clear the current framebuffer
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Make the GeometryPass
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
-        GeometryPass(interpolation);
-    }
-    // Unbind the GBuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    // Clear default framebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    //
     // Make the LightPass
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glDisable(GL_DEPTH_TEST);
+    //
     LightPass(interpolation);
 
+    //
     // Setup forward render context
-    glEnable(GL_DEPTH_TEST);
+    //
     glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer->Id());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, mScreenWidth, mScreenHeight,
                       0, 0, mScreenWidth, mScreenHeight,
                       GL_DEPTH_BUFFER_BIT,
                       GL_NEAREST);
-    // Check for OpenGL errors
-    CheckGLError();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Check for OpenGL errors
+    CheckGLError();
+
+    //
+    // Forward render stuff on top
+    //
+    glEnable(GL_DEPTH_TEST);
     // Forward rendering block
     {
         // Render the skybox
@@ -154,6 +144,7 @@ void Renderer::Render(float interpolation)
         if (mShowAABBs)
             mAABBRenderer.Render(interpolation);
     }
+    glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::Shutdown()
@@ -173,6 +164,16 @@ void Renderer::Shutdown()
 
 void Renderer::GeometryPass(float interpolation)
 {
+    // Enable depth testing
+    glEnable(GL_DEPTH_TEST);
+
+    // Prepare and bind the GBuffer
+    mGBuffer->PrepareFor(GBuffer::Mode::GeometryPass);
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
+
+    // Clear the current framebuffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Get the view matrix
     const auto& view = mView;
 
@@ -249,6 +250,12 @@ void Renderer::GeometryPass(float interpolation)
     }
 
     glUseProgram(0);
+
+    // Unbind the GBuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Disable depth testing
+    glDisable(GL_DEPTH_TEST);
 }
 
 float CalcPointLightBSphere(const PointLight& light)
@@ -263,26 +270,30 @@ float CalcPointLightBSphere(const PointLight& light)
 
 void Renderer::LightPass(float interpolation)
 {
+    // Prepare GBuffer for the light pass
+    mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
+
+    // Clear default framebuffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Enable blending for multiple light passes
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
     // Use the light pass program
     GLuint progId = mLightingPassProgId;
     glUseProgram(progId);
 
     // Bind the data textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, mGBuffer->PosId());
     GLuint gPosId = glGetUniformLocation(progId, "gPosition");
     glUniform1i(gPosId, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, mGBuffer->NormalId());
     GLuint gNormId = glGetUniformLocation(progId, "gNormal");
     glUniform1i(gNormId, 1);
-
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, mGBuffer->AlbedoSpecId());
     GLuint gAlbSpecId = glGetUniformLocation(progId, "gAlbedoSpec");
     glUniform1i(gAlbSpecId, 2);
 
+    // Bind the shadow map
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
     glUniform1i(glGetUniformLocation(progId, "shadowMap"), 3);
@@ -356,6 +367,7 @@ void Renderer::LightPass(float interpolation)
     RenderSphere();
 
     glUseProgram(0);
+    glDisable(GL_BLEND);
 }
 
 void Renderer::SetSkybox(const Skybox* skybox)

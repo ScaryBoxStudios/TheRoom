@@ -70,6 +70,7 @@ void ShadowRenderer::Shutdown()
 
 void ShadowRenderer::Render(float interpolation)
 {
+    glEnable(GL_DEPTH_TEST);
     glCullFace(GL_FRONT);
 
     // Store previous viewport and set the new one
@@ -116,6 +117,7 @@ void ShadowRenderer::Render(float interpolation)
     glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
     glCullFace(GL_BACK);
+    glDisable(GL_DEPTH_TEST);
 }
 
 void ShadowRenderer::SetScene(const Scene* scene)

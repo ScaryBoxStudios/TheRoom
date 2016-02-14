@@ -43,6 +43,15 @@ class GBuffer
         // Destructor
         ~GBuffer();
 
+        enum class Mode
+        {
+            GeometryPass,
+            LightPass,
+            StencilPass
+        };
+        // Sets the GBuffer mode by binding the relevant internal data
+        void PrepareFor(Mode mode);
+
         // Retrieves the internal GBuffer id
         GLuint Id() const;
 

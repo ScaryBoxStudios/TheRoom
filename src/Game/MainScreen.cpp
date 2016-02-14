@@ -6,6 +6,7 @@ WARN_GUARD_ON
 #include "../Graphics/Scene/SceneLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
+#include "../Graphics/Scene/SceneFactory.hpp"
 
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
@@ -14,6 +15,9 @@ void MainScreen::onInit(ScreenContext& sc)
 {
     // Store engine ref
     mEngine = sc.GetEngine();
+
+    // Store file data cache ref
+    mFileDataCache = sc.GetFileDataCache();
 
     // Cube rotation state
     mRotationData.degreesInc = 0.05f;
@@ -26,7 +30,7 @@ void MainScreen::onInit(ScreenContext& sc)
     SetupWorld();
 
     // Pass the current scene to renderer
-    mEngine->GetRenderer().SetScene(&mScene);
+    mEngine->GetRenderer().SetScene(mScene.get());
 }
 
 void MainScreen::SetupWorld()
@@ -40,8 +44,12 @@ void MainScreen::SetupWorld()
     SceneFile sf = sceneLoader.Load(*sceneFileData);
     (void) sf;
 
-    auto& scene = mScene;
-    auto& renderer = mEngine->GetRenderer();
+    SceneFactory factory(
+        &mEngine->GetTextureStore(),
+        &mEngine->GetRenderer().GetModelStore(),
+        &mEngine->GetMaterialStore(),
+        mFileDataCache);
+    mScene = std::move(factory.CreateFromSceneFile(sf));
 
     //
     // Normal objects
@@ -59,69 +67,35 @@ void MainScreen::SetupWorld()
         glm::vec3(3.0f, 0.4f, -12.0f),
         glm::vec3(-3.5f, 2.0f, -3.0f)
     };
-    for (std::size_t i = 0; i < cubePositions.size(); ++i)
+    for(std::size_t i = 0; i < cubePositions.size(); ++i)
     {
         const auto& pos = cubePositions[i];
 
         const std::string name = "cube" + std::to_string(i);
-        const auto& initAABB = renderer.GetModelStore()["cube"]->localAABB;
-        scene.CreateNode("cube", name, SceneNodeCategory::Normal, initAABB);
-        scene.Move(name, pos);
-        scene.Scale(name, glm::vec3(2.0f));
-        scene.Rotate(name, RotationAxis::X, 20.0f * i);
-        scene.Rotate(name, RotationAxis::Y, 7.0f * i);
-        scene.Rotate(name, RotationAxis::Z, 10.0f * i);
+        mScene->Move(name, pos);
+        mScene->Scale(name, glm::vec3(2.0f));
+        mScene->Rotate(name, RotationAxis::X, 20.0f * i);
+        mScene->Rotate(name, RotationAxis::Y, 7.0f * i);
+        mScene->Rotate(name, RotationAxis::Z, 10.0f * i);
     }
 
-    // Add house
-    {
-        const auto& initAABB = renderer.GetModelStore()["house"]->localAABB;
-        scene.CreateNode("house", "house", SceneNodeCategory::Normal, initAABB);
-        scene.Move("house", glm::vec3(0.0f, -10.0f, -40.0f));
-        scene.Scale("house", glm::vec3(0.3f));
-    }
+    // Setup position
+    mScene->Move("house", glm::vec3(0.0f, -10.0f, -40.0f));
+    mScene->Scale("house", glm::vec3(0.3f));
 
-    // Add well
-    {
-        const auto& initAABB = renderer.GetModelStore()["well"]->localAABB;
-        scene.CreateNode("well", "well", SceneNodeCategory::Normal, initAABB);
-        scene.Move("well", glm::vec3(0.0f, -5.0f, -10.0f));
-        scene.Scale("well", glm::vec3(2.0f));
-    }
+    mScene->Move("well", glm::vec3(0.0f, -5.0f, -10.0f));
+    mScene->Scale("well", glm::vec3(2.0f));
 
-    // Add bottom plane
-    {
-        const auto& initAABB = renderer.GetModelStore()["cube"]->localAABB;
-        scene.CreateNode("cube", "plane", SceneNodeCategory::Normal, initAABB);
-        scene.Move("plane", glm::vec3(0.0f, -11.0f, -40.0f));
-        scene.Scale("plane", glm::vec3(75.0f, 0.1f, 75.0f));
-    }
+    mScene->Move("plane", glm::vec3(0.0f, -11.0f, -40.0f));
+    mScene->Scale("plane", glm::vec3(75.0f, 0.1f, 75.0f));
 
-    // Add wall
-    {
-        const auto& initAABB = renderer.GetModelStore()["wall"]->localAABB;
-        scene.CreateNode("wall", "wall", SceneNodeCategory::Normal, initAABB);
-        scene.Move("wall", glm::vec3(10.0f, 0.0f, 2.0f));
-        scene.Scale("wall", glm::vec3(3.0f, 3.0f, 3.0f));
-    }
+    mScene->Move("wall", glm::vec3(10.0f, 0.0f, 2.0f));
+    mScene->Scale("wall", glm::vec3(3.0f, 3.0f, 3.0f));
 
-    // Add sphere
-    {
-        const auto& initAABB = renderer.GetModelStore()["sphere"]->localAABB;
-        scene.CreateNode("sphere", "sphere", SceneNodeCategory::Normal, initAABB);
-        scene.Move("sphere", glm::vec3(0.0f, 3.0f, -2.0f));
-    }
+    mScene->Move("sphere", glm::vec3(0.0f, 3.0f, -2.0f));
 
-    //
-    // Light objects
-    //
-    // Add cube lights
-    {
-        const auto& initAABB = renderer.GetModelStore()["teapot"]->localAABB;
-        scene.CreateNode("teapot", "teapot", SceneNodeCategory::Light, initAABB);
-        scene.Move("teapot", glm::vec3(4.0f, 0.0f, 0.0f));
-        scene.Scale("teapot", glm::vec3(0.3f));
-    }
+    mScene->Move("teapot", glm::vec3(4.0f, 0.0f, 0.0f));
+    mScene->Scale("teapot", glm::vec3(0.3f));
 }
 
 std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
@@ -178,25 +152,25 @@ void MainScreen::onUpdate(float dt)
     // Update light position
     float increase = 0.7f;
     if(window.IsKeyPressed(Key::Kp8))
-        scene.Move("teapot", glm::vec3(0.0f, increase, 0.0f));
+        scene->Move("teapot", glm::vec3(0.0f, increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp4))
-        scene.Move("teapot", glm::vec3(-increase, 0.0f, 0.0f));
+        scene->Move("teapot", glm::vec3(-increase, 0.0f, 0.0f));
     if(window.IsKeyPressed(Key::Kp2))
-        scene.Move("teapot", glm::vec3(0.0f, -increase, 0.0f));
+        scene->Move("teapot", glm::vec3(0.0f, -increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp6))
-        scene.Move("teapot", glm::vec3(increase, 0.0f, 0.0f));
+        scene->Move("teapot", glm::vec3(increase, 0.0f, 0.0f));
     if(window.IsKeyPressed(Key::Kp5))
-        scene.Move("teapot", glm::vec3(0.0f, 0.0f, -increase));
+        scene->Move("teapot", glm::vec3(0.0f, 0.0f, -increase));
     if(window.IsKeyPressed(Key::Kp0))
-        scene.Move("teapot", glm::vec3(0.0f, 0.0f, increase));
+        scene->Move("teapot", glm::vec3(0.0f, 0.0f, increase));
 
     // Update cubes' rotations
     if (mRotationData.rotating)
     {
-        for(auto& p : scene.GetNodes())
+        for(auto& p : scene->GetNodes())
         {
             if (p.first.substr(0, 4) == "cube")
-                scene.Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
+                scene->Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
         }
     }
 }

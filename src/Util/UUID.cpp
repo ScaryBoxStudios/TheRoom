@@ -79,6 +79,16 @@ const char* rUUID::c_str() const
     return mUUID.c_str();
 }
 
+const std::string& rUUID::ToString() const
+{
+    return mUUID;
+}
+
+void rUUID::SetUuid(const std::string& newId)
+{
+    mUUID = newId;
+}
+
 rUUID::operator const char*() const
 {
     return this->c_str();

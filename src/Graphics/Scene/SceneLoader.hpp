@@ -58,6 +58,7 @@ struct SceneFile
     {
         rUUID uuid;       // "uuid"
         std::string type; // "type"
+        std::string url;  // "url"
     };
     std::vector<Geometry> geometries; // "geometries"
 
@@ -93,6 +94,7 @@ struct SceneFile
         std::string name; // "name"
         std::string type; // "type" - Can be MeshPhongMaterial | ???
         Color color;      // "color"
+        bool hasColor;
         Color ambient;    // "ambient"
         Color emissive;   // "emissive"
         Color specular;   // "specular"
@@ -102,6 +104,7 @@ struct SceneFile
         bool wireframe;   // "wireframe"
         rUUID map;        // "map" - Diffuse map
         rUUID specMap;    // "specMap" - Specular map
+        rUUID nmap;       // "nmap" - Normal map
     };
     std::vector<Material> materials; // "materials"
 

@@ -22,7 +22,7 @@ void Game::Init()
     mShouldChangeScreen = false;
 
     // Initialize first screen
-    ScreenContext sc(&mEngine);
+    ScreenContext sc(&mEngine, &mFileDataCache);
     std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
     ls->SetFinishCb([this]() { mShouldChangeScreen = true; });
     mScreenManager.AddScreen(std::move(ls), sc);
@@ -64,7 +64,7 @@ void Game::Update(float dt)
     // Load main screen
     if (mShouldChangeScreen)
     {
-        ScreenContext sc(&mEngine);
+        ScreenContext sc(&mEngine, &mFileDataCache);
         mScreenManager.AddScreen(std::make_unique<MainScreen>(), sc);
         mShouldChangeScreen = false;
     }

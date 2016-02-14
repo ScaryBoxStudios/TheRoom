@@ -28,57 +28,44 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GAME_HPP_
-#define _GAME_HPP_
+#ifndef _SCENEFACTORY_HPP_
+#define _SCENEFACTORY_HPP_
 
-#include <functional>
-#include <vector>
-#include "../Core/Engine.hpp"
-#include "ScreenManager.hpp"
+#include <memory>
+#include "Scene.hpp"
+#include "SceneLoader.hpp"
+#include "../Texture/TextureStore.hpp"
+#include "../Geometry/ModelStore.hpp"
+#include "../Material/MaterialStore.hpp"
+#include "../../Game/Screen.hpp"
 
-class Game
+class SceneFactory
 {
     public:
-        /*! Constructor */
-        Game();
+        // Constructor
+        SceneFactory(TextureStore* tStore, ModelStore* mdlStore, MaterialStore* matStore, ScreenContext::FileDataCache* fdc);
 
-        // Disable copy construction
-        Game(const Game& other) = delete;
-        Game& operator=(const Game& other) = delete;
-
-        /*! Initializes all the low level modules of the game */
-        void Init();
-
-        /*! Called by the mainloop to update the game state */
-        void Update(float dt);
-
-        /*! Called by the mainloop to render the current frame */
-        void Render(float interpolation);
-
-        /*! Deinitializes all the low level modules of the game */
-        void Shutdown();
-
-        /*! Sets the master exit callback that when called should stop the main loop */
-        void SetExitHandler(std::function<void()> f);
+        // Creates a scene from a given SceneFile struct
+        std::unique_ptr<Scene> CreateFromSceneFile(const SceneFile& sceneFile);
 
     private:
-        // Called during initialization to setup window and input
-        void SetupWindow();
+        // The stores that will be needed by the factory
+        TextureStore*  mTextureStore;
+        ModelStore*    mModelStore;
+        MaterialStore* mMaterialStore;
+        ScreenContext::FileDataCache* mFileDataCache;
 
-        //
-        bool mShouldChangeScreen;
+        // Loads the textures
+        void LoadTextures(const std::vector<SceneFile::Texture>& textures, const std::vector<SceneFile::Image>& images);
 
-        // The engine instance
-        Engine mEngine;
+        // Loads the materials
+        void LoadMaterials(const std::vector<SceneFile::Material>& materials);
 
-        // The file data cache instance
-        ScreenContext::FileDataCache mFileDataCache;
+        // Load geometries
+        void LoadGeometries(const std::vector<SceneFile::Geometry>& geometries);
 
-        // The screen manager instance
-        ScreenManager mScreenManager;
-
-        // Master switch, called when game is exiting
-        std::function<void()> mExitHandler;
+        // Load models
+        void LoadModels(const std::vector<SceneFile::Object::Child>& children);
 };
 
-#endif // ! _GAME_HPP_
+#endif // ! _SCENEFACTORY_HPP_

@@ -35,9 +35,6 @@
 #include <functional>
 #include <unordered_map>
 
-// BufferType for the files loaded
-using BufferType = std::vector<std::uint8_t>;
-
 class LoadingScreen : public Screen
 {
     public:
@@ -64,9 +61,8 @@ class LoadingScreen : public Screen
 
         // Engine ref
         Engine* mEngine;
-        // File data cache
-        using BufferTypePtr = std::unique_ptr<BufferType>;
-        std::unordered_map<std::string, BufferTypePtr> mFileDataCache;
+        // FileDataCache ref
+        ScreenContext::FileDataCache* mFileDataCache;
         // Indicates that data files have been loaded to cache
         bool mFileCacheIsReady;
         // Holds the currently loading file

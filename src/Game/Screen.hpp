@@ -33,13 +33,24 @@
 
 #include "../Core/Engine.hpp"
 
+// BufferType for the files loaded
+using BufferType = std::vector<std::uint8_t>;
+
 class ScreenContext
 {
     public:
-        ScreenContext(Engine* e);
+        using BufferTypePtr = std::unique_ptr<BufferType>;
+        using FileDataCache = std::unordered_map<std::string, BufferTypePtr>;
+
+        ScreenContext(Engine* e, FileDataCache* fdc);
         Engine* GetEngine();
+
+        FileDataCache* GetFileDataCache();
     private:
         Engine* mEngine;
+
+        // File data cache
+        FileDataCache* mFileDataCache;
 };
 
 class Screen

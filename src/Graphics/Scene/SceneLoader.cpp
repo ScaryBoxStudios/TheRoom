@@ -1,5 +1,6 @@
 #include "SceneLoader.hpp"
 #include <assert.h>
+#include <cstring>
 WARN_GUARD_ON
 #include <rapidjson/document.h>
 WARN_GUARD_OFF
@@ -67,6 +68,9 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // Type
             gd.type = g["type"].GetString();
+
+            // Url
+            gd.url = g["url"].GetString();
 
             // Add parsed geometry to the list
             sc.geometries.push_back(gd);
@@ -178,8 +182,15 @@ SceneFile SceneLoader::Load(const Buffer& data)
             mt.type = m["type"].GetString();
 
             // Colors
-            if (m.HasMember("color"))
+            if(m.HasMember("color"))
+            {
                 mt.color = parseColor(m["color"].GetInt());
+                mt.hasColor = true;
+            }
+            else
+            {
+                mt.hasColor = false;
+            }
             if (m.HasMember("ambient"))
                 mt.ambient = parseColor(m["ambient"].GetInt());
             if (m.HasMember("emissive"))
@@ -203,11 +214,24 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // Map
             if (m.HasMember("map"))
-                assert(StringToUUID(m["map"].GetString(), mt.map));
+                if(strcmp(m["map"].GetString(), "") == 0)
+                    mt.map.SetUuid("");
+                else
+                    assert(StringToUUID(m["map"].GetString(), mt.map));
 
             // SpecMap
             if (m.HasMember("specMap"))
-                assert(StringToUUID(m["specMap"].GetString(), mt.specMap));
+                if(strcmp(m["specMap"].GetString(), "") == 0)
+                    mt.specMap.SetUuid("");
+                else
+                    assert(StringToUUID(m["specMap"].GetString(), mt.specMap));
+
+            // Nmap
+            if(m.HasMember("nmap"))
+                if(strcmp(m["nmap"].GetString(), "") == 0)
+                    mt.nmap.SetUuid("");
+                else
+                    assert(StringToUUID(m["nmap"].GetString(), mt.nmap));
 
             // Add parsed material to the list
             sc.materials.push_back(mt);

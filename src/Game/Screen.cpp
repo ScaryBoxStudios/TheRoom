@@ -1,13 +1,19 @@
 #include "Screen.hpp"
 
-ScreenContext::ScreenContext(Engine* e)
+ScreenContext::ScreenContext(Engine* e, ScreenContext::FileDataCache* fdc)
   : mEngine(e)
+  , mFileDataCache(fdc)
 {
 }
 
 Engine* ScreenContext::GetEngine()
 {
     return mEngine;
+}
+
+ScreenContext::FileDataCache* ScreenContext::GetFileDataCache()
+{
+    return mFileDataCache;
 }
 
 void Screen::onKey(Key k, KeyAction ka)

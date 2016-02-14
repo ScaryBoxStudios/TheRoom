@@ -50,8 +50,11 @@ class MainScreen : public Screen
         // Engine ref
         Engine* mEngine;
 
+        // File Data Cache ref
+        ScreenContext::FileDataCache* mFileDataCache;
+
         // The Scene
-        Scene mScene;
+        std::unique_ptr<Scene> mScene;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

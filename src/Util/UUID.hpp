@@ -54,6 +54,12 @@ class rUUID
         // Leq than operator
         bool operator<(const rUUID& rhs) const;
 
+        // Returns the stored string representation of the UUID
+        const std::string& ToString() const;
+
+        // TODO: Remove this when scene loading is 100% complete
+        void SetUuid(const std::string& newId);
+
         // Returns the stored string representation of the UUID in a c string form
         const char* c_str() const;
 

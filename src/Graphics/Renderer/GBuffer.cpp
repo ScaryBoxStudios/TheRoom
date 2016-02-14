@@ -34,27 +34,35 @@ GBuffer::GBuffer(unsigned int width, unsigned int height)
     GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     glDrawBuffers(3, attachments);
 
-    // - Create and attach depth buffer
-    glGenRenderbuffers(1, &mDepthBufId);
-    glBindRenderbuffer(GL_RENDERBUFFER, mDepthBufId);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthBufId);
+    // - Depth + stencil buffer
+    glGenTextures(1, &mDepthStencilBufId);
+    glBindTexture(GL_TEXTURE_2D, mDepthStencilBufId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, mDepthStencilBufId, 0);
 
-    // Unbind stuff
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // - Final buffer
+    glGenTextures(1, &mFinalBufId);
+    glBindTexture(GL_TEXTURE_2D, mFinalBufId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, mFinalBufId, 0);
 
     // Check if framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         throw std::runtime_error("OpenGL: Framebuffer incomplete!");
+
+    // Unbind stuff
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 GBuffer::~GBuffer()
 {
-    GLuint textures[3] = { mPositionBufId, mNormalBufId, mAlbedoSpecBufId };
-    glDeleteRenderbuffers(1, &mDepthBufId);
-    glDeleteTextures(3, textures);
+    GLuint textures[5] = { mPositionBufId, mNormalBufId, mAlbedoSpecBufId, mDepthStencilBufId, mFinalBufId };
+    glDeleteTextures(5, textures);
     glDeleteFramebuffers(1, &mGBufferId);
 }
 
@@ -76,6 +84,9 @@ void GBuffer::PrepareFor(Mode mode)
         }
         case Mode::LightPass:
         {
+            glBindFramebuffer(GL_FRAMEBUFFER, mGBufferId);
+            glDrawBuffer(GL_COLOR_ATTACHMENT3);
+
             GLuint textureIds[] = {
                 mPositionBufId,
                 mNormalBufId,
@@ -87,6 +98,7 @@ void GBuffer::PrepareFor(Mode mode)
                 glActiveTexture(GL_TEXTURE0 + i);
                 glBindTexture(GL_TEXTURE_2D, textureIds[i]);
             }
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             break;
         }
         case Mode::StencilPass:
@@ -97,6 +109,20 @@ void GBuffer::PrepareFor(Mode mode)
             break;
         }
     }
+}
+
+void GBuffer::CopyResultToDefault(int width, int height)
+{
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBufferId);
+    glReadBuffer(GL_COLOR_ATTACHMENT3);
+    glBlitFramebuffer(
+        0, 0, width, height,
+        0, 0, width, height,
+        GL_COLOR_BUFFER_BIT,
+        GL_LINEAR
+    );
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 GLuint GBuffer::Id() const

@@ -85,6 +85,9 @@ class Renderer
         // Performs the light pass rendering step
         void LightPass(float interpolation);
 
+        // Performs a stencil pass
+        void StencilPass(const PointLight& pLight);
+
         // The projection matrix
         glm::mat4 mProjection;
 
@@ -111,6 +114,9 @@ class Renderer
 
         // The GBuffer used by the deffered rendering steps
         std::unique_ptr<GBuffer> mGBuffer;
+
+        // The null program used by the stencil passes
+        std::unique_ptr<ShaderProgram> mNullProgram;
 
         // The root Skybox used
         const Skybox* mSkybox;

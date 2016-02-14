@@ -8,6 +8,25 @@ WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
 
+static const char* nullVShader = R"foo(
+#version 330 core
+layout (location = 0) in vec3 position;
+
+uniform mat4 MVP;
+
+void main()
+{
+    gl_Position = MVP * vec4(position, 1.0f);
+}
+)foo";
+
+static const char* nullFShader = R"foo(
+#version 330 core
+
+void main()
+{
+}
+)foo";
 
 void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId, MaterialStore* materialStore)
 {
@@ -28,9 +47,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Set the clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    // Enable face culling
-    glEnable(GL_CULL_FACE);
-
     // Enable the depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -44,6 +60,11 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Create the GBuffer
     mGBuffer = std::make_unique<GBuffer>(mScreenWidth, mScreenHeight);
+
+    // Initialize the null program used by stencil passes
+    Shader vert(nullVShader, Shader::Type::Vertex);
+    Shader frag(nullFShader, Shader::Type::Fragment);
+    mNullProgram = std::make_unique<ShaderProgram>(vert.Id(), frag.Id());
 
     // Initialize the AABBRenderer
     mAABBRenderer.Init();
@@ -72,8 +93,8 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
     pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
     pointLight.attProps.constant   = 1.0f;
-    pointLight.attProps.linear     = 0.35f;
-    pointLight.attProps.quadratic  = 1.44f;
+    pointLight.attProps.linear     = 0.09f;
+    pointLight.attProps.quadratic  = 0.032f;
     mLights.pointLights.push_back(pointLight);
 }
 
@@ -118,6 +139,11 @@ void Renderer::Render(float interpolation)
     // Make the LightPass
     //
     LightPass(interpolation);
+
+    //
+    // Copy result to default fbo
+    //
+    mGBuffer->CopyResultToDefault(mScreenWidth, mScreenHeight);
 
     //
     // Setup forward render context
@@ -169,6 +195,8 @@ void Renderer::GeometryPass(float interpolation)
 {
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glDepthMask(GL_TRUE);
 
     // Prepare and bind the GBuffer
     mGBuffer->PrepareFor(GBuffer::Mode::GeometryPass);
@@ -258,6 +286,8 @@ void Renderer::GeometryPass(float interpolation)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Disable depth testing
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 }
 
@@ -275,9 +305,10 @@ void Renderer::LightPass(float interpolation)
 {
     // Prepare GBuffer for the light pass
     mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
 
-    // Clear default framebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Clear framebuffer
+    glClear(GL_COLOR_BUFFER_BIT);
 
     // Enable blending for multiple light passes
     glEnable(GL_BLEND);
@@ -339,6 +370,9 @@ void Renderer::LightPass(float interpolation)
     //
     // Point light passes
     //
+    // Enable stencil test for bounding sphere optimization
+    glEnable(GL_STENCIL_TEST);
+
     // Set point light's properties
     PointLight& pLight = mLights.pointLights.front();
 
@@ -348,6 +382,16 @@ void Renderer::LightPass(float interpolation)
     const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
     const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
     pLight.position = lightPos;
+
+    // Make the stencil pass
+    StencilPass(pLight);
+    mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
+
+    //
+    glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     glUniform3fv(glGetUniformLocation(progId, "pLight.position"), 1, glm::value_ptr(pLight.position));
     glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
@@ -369,8 +413,52 @@ void Renderer::LightPass(float interpolation)
     glUniform1i(glGetUniformLocation(progId, "lMode"), 2);
     RenderSphere();
 
+    glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
+
+    // Disable and unbind things
+    glDisable(GL_STENCIL_TEST);
     glUseProgram(0);
     glDisable(GL_BLEND);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void Renderer::StencilPass(const PointLight& pLight)
+{
+    // Prepare the GBuffer for the stencil pass
+    mGBuffer->PrepareFor(GBuffer::Mode::StencilPass);
+    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
+
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
+
+    // Stencil properties
+    glStencilFunc(GL_ALWAYS, 0, 0);
+    glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP);
+    glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP);
+
+    // Calc bounding sphere model
+    float scaleFactor = CalcPointLightBSphere(pLight);
+    glm::mat4 model = glm::mat4();
+    model = glm::translate(model, pLight.position);
+    model = glm::scale(model, glm::vec3(scaleFactor));
+
+    // Store previously used program
+    GLint prevProgram;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
+
+    // Render sphere
+    glUseProgram(mNullProgram->Id());
+    glm::mat4 MVP = mProjection * mView * model;
+    glUniformMatrix4fv(glGetUniformLocation(mNullProgram->Id(), "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
+    RenderSphere();
+    glUseProgram(prevProgram);
+
+    // Disable and unbind stuff
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::SetSkybox(const Skybox* skybox)

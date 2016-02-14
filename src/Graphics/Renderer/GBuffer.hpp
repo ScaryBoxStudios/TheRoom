@@ -52,6 +52,9 @@ class GBuffer
         // Sets the GBuffer mode by binding the relevant internal data
         void PrepareFor(Mode mode);
 
+        // Copies the final texture to the default framebuffer
+        void CopyResultToDefault(int width, int height);
+
         // Retrieves the internal GBuffer id
         GLuint Id() const;
 
@@ -69,8 +72,10 @@ class GBuffer
         GLuint mGBufferId;
         // The position, normal and albedo + specular buffer ids'
         GLuint mPositionBufId, mNormalBufId, mAlbedoSpecBufId;
-        // The depth buffer id
-        GLuint mDepthBufId;
+        // The depth + stencil buffer id
+        GLuint mDepthStencilBufId;
+        // The final buffer
+        GLuint mFinalBufId;
 };
 
 #endif // ! _G_BUFFER_HPP_

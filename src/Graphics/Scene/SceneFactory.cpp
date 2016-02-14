@@ -94,8 +94,7 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
             newMat.SetNormalMapTexture((*mTextureStore)[normalMapId]->texId);
 
         // Add color
-        if(material.hasColor)
-            newMat.SetDiffuseColor(glm::vec3(material.color.r, material.color.g, material.color.b));
+        newMat.SetDiffuseColor(glm::vec3(material.color.r, material.color.g, material.color.b));
 
         mMaterialStore->Load(material.uuid.ToString(), newMat);
     }

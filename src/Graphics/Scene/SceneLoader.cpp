@@ -183,14 +183,7 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // Colors
             if(m.HasMember("color"))
-            {
                 mt.color = parseColor(m["color"].GetInt());
-                mt.hasColor = true;
-            }
-            else
-            {
-                mt.hasColor = false;
-            }
             if (m.HasMember("ambient"))
                 mt.ambient = parseColor(m["ambient"].GetInt());
             if (m.HasMember("emissive"))

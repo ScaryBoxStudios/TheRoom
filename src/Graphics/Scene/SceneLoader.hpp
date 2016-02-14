@@ -94,7 +94,6 @@ struct SceneFile
         std::string name; // "name"
         std::string type; // "type" - Can be MeshPhongMaterial | ???
         Color color;      // "color"
-        bool hasColor;
         Color ambient;    // "ambient"
         Color emissive;   // "emissive"
         Color specular;   // "specular"

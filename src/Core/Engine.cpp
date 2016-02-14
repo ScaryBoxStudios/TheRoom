@@ -22,7 +22,8 @@ void Engine::Init()
         mWindow.GetWidth(),
         mWindow.GetHeight(),
         mShaderPrograms.at("geometry_pass").Id(),
-        mShaderPrograms.at("light_pass").Id()
+        mShaderPrograms.at("light_pass").Id(),
+        &mMaterialStore
     );
 
     // Initialize the TextRenderer

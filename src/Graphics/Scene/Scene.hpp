@@ -50,6 +50,7 @@ class Scene
         /// Creates node and adds it to NodeBank
         SceneNode* CreateNode(
             const std::string& model,
+            const std::string& material,
             const std::string& uuid,
             SceneNodeCategory category,
             const AABB& initAABB,

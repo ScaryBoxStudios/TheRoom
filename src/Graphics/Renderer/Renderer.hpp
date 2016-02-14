@@ -41,6 +41,7 @@
 #include "../Geometry/ModelStore.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
+#include "../Material/MaterialStore.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -51,7 +52,7 @@ class Renderer
 {
     public:
         /*! Initializes the renderer */
-        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
+        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId, MaterialStore* materialStore);
 
         /*! Called when updating the game state */
         void Update(float dt);
@@ -101,6 +102,9 @@ class Renderer
 
         // Stores the models loaded in the gpu
         ModelStore mModelStore;
+
+        // Stores the materials
+        MaterialStore* mMaterialStore;
 
         // Shader programIds of the geometry pass and the lighting pass
         GLuint mGeometryPassProgId, mLightingPassProgId;

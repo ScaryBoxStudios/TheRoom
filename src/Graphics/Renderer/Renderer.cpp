@@ -9,7 +9,7 @@ WARN_GUARD_ON
 WARN_GUARD_OFF
 
 
-void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId)
+void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId, MaterialStore* materialStore)
 {
     // Skybox is initially unset
     mSkybox = nullptr;
@@ -54,6 +54,9 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(8096, 8096);
     mShadowRenderer.SetModelStore(&mModelStore);
+
+    // Set the material store
+    mMaterialStore = materialStore;
 
     // Add main directional light
     DirLight dirLight;
@@ -206,30 +209,30 @@ void Renderer::GeometryPass(float interpolation)
             // Upload material parameters
             //
             // Diffuse
-            const glm::vec3& diffCol = mdl->material.GetDiffuseColor();
+            const glm::vec3& diffCol = (*mMaterialStore)[gObj->GetMaterial()]->GetDiffuseColor();
             glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-            if (mdl->material.UsesDiffuseTexture())
+            if ((*mMaterialStore)[gObj->GetMaterial()]->UsesDiffuseTexture())
             {
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, mdl->material.GetDiffuseTexture());
+                glBindTexture(GL_TEXTURE_2D, (*mMaterialStore)[gObj->GetMaterial()]->GetDiffuseTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
             }
 
             // Specular
-            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), mdl->material.GetSpecularColor().x);
-            if (mdl->material.UsesSpecularTexture())
+            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), (*mMaterialStore)[gObj->GetMaterial()]->GetSpecularColor().x);
+            if ((*mMaterialStore)[gObj->GetMaterial()]->UsesSpecularTexture())
             {
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, mdl->material.GetSpecularTexture());
+                glBindTexture(GL_TEXTURE_2D, (*mMaterialStore)[gObj->GetMaterial()]->GetSpecularTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
             }
 
             // Normal map
-            if(mdl->material.UsesNormalMapTexture())
+            if((*mMaterialStore)[gObj->GetMaterial()]->UsesNormalMapTexture())
             {
                 glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
                 glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, mdl->material.GetNormalMapTexture());
+                glBindTexture(GL_TEXTURE_2D, (*mMaterialStore)[gObj->GetMaterial()]->GetNormalMapTexture());
                 glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
             }
             else

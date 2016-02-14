@@ -32,7 +32,7 @@ std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const SceneFile& sceneF
         SceneNodeCategory category = (child.type.compare("Mesh") == 0) ? SceneNodeCategory::Normal : SceneNodeCategory::Light;
 
         const auto& initAABB = model->localAABB;
-        scene->CreateNode(child.geometry.ToString(), child.name, category, initAABB);
+        scene->CreateNode(child.geometry.ToString(), child.material.ToString(), child.name, category, initAABB);
 
         // Automatically setting starting positions is not working yet
         //scene->SetTransformationMatrix(child.name, child.matrix);
@@ -136,10 +136,5 @@ void SceneFactory::LoadModels(const std::vector<SceneFile::Object::Child>& child
 
         // Assert if no geometry with the given name exists
         assert(model != nullptr);
-
-        // Update material
-        // TODO: Find a way for each model to have its material without affecting
-        //       everything else
-        model->material = *(*mMaterialStore)[child.material.ToString()];
     }
 }

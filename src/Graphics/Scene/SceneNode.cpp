@@ -6,12 +6,14 @@
 //--------------------------------------------------
 SceneNode::SceneNode(
     const std::string& model,
+    const std::string& material,
     const std::string& uuid,
     SceneNodeCategory category,
     AABB localAABB,
     bool isCulled /* = false */,
     SceneNode* parent /* = nullptr */)
     : mModel(model)
+    , mMaterial(material)
     , mCategory(category)
     , mUuid(uuid)
     , mAABB(localAABB)
@@ -93,6 +95,11 @@ void SceneNode::Scale(const glm::vec3& scale, bool scaleChildren /* = false */)
 const std::string& SceneNode::GetModel() const
 {
     return mModel;
+}
+
+const std::string& SceneNode::GetMaterial() const
+{
+    return mMaterial;
 }
 
 Transform& SceneNode::GetTransformation()

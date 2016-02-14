@@ -54,7 +54,6 @@ struct MeshDescription
 struct ModelDescription
 {
     std::vector<MeshDescription> meshes;
-    Material material;
     AABB localAABB;
 };
 

@@ -64,6 +64,7 @@ class SceneNode
         /// Constructor
         SceneNode(
             const std::string& model,
+            const std::string& material,
             const std::string& uuid,
             SceneNodeCategory category,
             AABB localAABB,
@@ -79,14 +80,17 @@ class SceneNode
         /// Move this node and optionally its children too
         void Move(const glm::vec3& pos, bool moveChildren = false);
 
-        // Rotate this node and optionally its children
+        /// Rotate this node and optionally its children
         void Rotate(RotationAxis axis, float angle, bool rotateChildren = false);
 
-        // Scale this node and optionally its children too
+        /// Scale this node and optionally its children too
         void Scale(const glm::vec3& scale, bool scaleChildren = false);
 
         /// Get model
         const std::string& GetModel() const;
+
+        /// Get material
+        const std::string& GetMaterial() const;
 
         /// Get transformation
         Transform& GetTransformation();
@@ -108,6 +112,7 @@ class SceneNode
 
     private:
         std::string mModel;          /// Node's model name
+        std::string mMaterial;       /// Node's material name
         Transform mTransform;        /// Node's current transformation
         SceneNodeCategory mCategory; /// Node's category
         std::string mUuid;           /// Node's unique id

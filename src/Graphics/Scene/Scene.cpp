@@ -9,11 +9,12 @@ Scene::Scene()
     // TODO: decide model, uuid and position for root node
     //mRootNode = CreateNode("", "", SceneNodeCategory::Invalid, glm::vec3(0, 0, 0));
     // Create node
-    mNodes[""] = std::make_unique<SceneNode>("", "", SceneNodeCategory::Invalid, AABB());
+    mNodes[""] = std::make_unique<SceneNode>("", "", "", SceneNodeCategory::Invalid, AABB());
 }
 
 SceneNode* Scene::CreateNode(
     const std::string& model,
+    const std::string& material,
     const std::string& uuid,
     SceneNodeCategory category,
     const AABB& initAABB,
@@ -21,7 +22,7 @@ SceneNode* Scene::CreateNode(
 {
     // Create node
     std::unique_ptr<SceneNode> ptr =
-        std::make_unique<SceneNode>(model, uuid, category, initAABB, isCulled);
+        std::make_unique<SceneNode>(model, material, uuid, category, initAABB, isCulled);
 
     // Save it to category map
     mCategories[category].push_back(ptr.get());

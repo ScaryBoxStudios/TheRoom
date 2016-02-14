@@ -177,7 +177,7 @@
 			{
 				"uuid": "26F6A56B-0FFA-411E-AD55-A3A3D082082A",
 				"type": "Mesh",
-				"name": "cube1",
+				"name": "cube0",
 				"matrix": [2,0,0,0,
                            0,2,0,0,
                            0,0,2,0,
@@ -188,7 +188,7 @@
             {
                 "uuid": "65BA27F7-C2CE-44D7-B645-7CB3B5F61F48",
                 "type": "Mesh",
-                "name": "cube2",
+                "name": "cube1",
                 "matrix": [2,0,0,4,
                            0,2,0,10,
                            0,0,2,-20,
@@ -199,7 +199,7 @@
             {
                 "uuid": "45F6970A-C805-4955-8F55-658BF3744043",
                 "type": "Mesh",
-                "name": "cube3",
+                "name": "cube2",
                 "matrix": [2,0,0,-3,
                            0,2,0,-4.4,
                            0,0,2,-5,
@@ -210,7 +210,7 @@
             {
                 "uuid": "99905059-A36C-4733-8FBD-763D620800F6",
                 "type": "Mesh",
-                "name": "cube4",
+                "name": "cube3",
                 "matrix": [2,0,0,-7.6,
                            0,2,0,-4,
                            0,0,2,-14,
@@ -221,7 +221,7 @@
             {
                 "uuid": "0D4E7174-B25C-4720-992D-8388DCA76342",
                 "type": "Mesh",
-                "name": "cube5",
+                "name": "cube4",
                 "matrix": [2,0,0,4.4,
                            0,2,0,-3.5,
                            0,0,2,-4,
@@ -232,7 +232,7 @@
             {
                 "uuid": "8A7EB79B-EB35-4930-9EC3-BFE91BFC0382",
                 "type": "Mesh",
-                "name": "cube6",
+                "name": "cube5",
                 "matrix": [2,0,0,-3.4,
                            0,2,0,6,
                            0,0,2,-15,
@@ -243,7 +243,7 @@
             {
                 "uuid": "4030F873-8CDA-49D9-ACDD-2CFE6C7D9C96",
                 "type": "Mesh",
-                "name": "cube7",
+                "name": "cube6",
                 "matrix": [2,0,0,2.6,
                            0,2,0,-4,
                            0,0,2,-17,
@@ -254,7 +254,7 @@
             {
                 "uuid": "DD88B567-7B56-4E2D-AB0D-A1B95C4A3BC6",
                 "type": "Mesh",
-                "name": "cube8",
+                "name": "cube7",
                 "matrix": [2,0,0,4,
                            0,2,0,3,
                            0,0,2,-5,
@@ -265,7 +265,7 @@
             {
                 "uuid": "6AA7EE73-0FB0-4686-88C9-3C03802FDF1C",
                 "type": "Mesh",
-                "name": "cube9",
+                "name": "cube8",
                 "matrix": [2,0,0,3,
                            0,2,0,0.4,
                            0,0,2,-12,
@@ -276,7 +276,7 @@
             {
                 "uuid": "F8975274-3DA3-4518-8C34-18132883912D",
                 "type": "Mesh",
-                "name": "cube10",
+                "name": "cube9",
                 "matrix": [2,0,0,-3.5,
                            0,2,0,2,
                            0,0,2,-3,

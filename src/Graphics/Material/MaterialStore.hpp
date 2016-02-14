@@ -28,76 +28,41 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _ENGINE_HPP_
-#define _ENGINE_HPP_
+#ifndef _MATERIALSTORE_HPP_
+#define _MATERIALSTORE_HPP_
 
-#include "../Window/Window.hpp"
-#include "../Graphics/Texture/TextureStore.hpp"
-#include "../Graphics/Renderer/Renderer.hpp"
-#include "../Graphics/Renderer/Skybox.hpp"
-#include "../Graphics/Shader/Shader.hpp"
-#include "../Graphics/Material/MaterialStore.hpp"
+#include <string>
+#include <unordered_map>
+#include "Material.hpp"
 
-class Engine
+class MaterialStore
 {
     public:
-        /*! Initializes all the low level modules of the game */
-        void Init();
+        // Constructor
+        MaterialStore();
 
-        /*! Called when updating the game state */
-        void Update(float dt);
+        // Destructor
+        ~MaterialStore();
 
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
+        // Disable copy construction
+        MaterialStore(const MaterialStore&) = delete;
+        MaterialStore& operator=(const MaterialStore&) = delete;
 
-        /*! Deinitializes all the low level modules of the game */
-        void Shutdown();
+        // Enable move construction
+        MaterialStore(MaterialStore&&) = default;
+        MaterialStore& operator=(MaterialStore&&) = default;
 
-        // Retrieves the window instance
-        Window& GetWindow();
+        // Load a material to store
+        void Load(const std::string& name, const Material& material);
 
-        // Retrieves the TextureStore instance
-        TextureStore& GetTextureStore();
+        // Retrieves a pointer to a loaded material object
+        Material* operator[](const std::string& name);
 
-        // Retrieves the MaterialStore instance
-        MaterialStore& GetMaterialStore();
-
-        // Retrieves the renderer instance
-        Renderer& GetRenderer();
-
-        // Retrieves the text renderer instance
-        TextRenderer& GetTextRenderer();
-
-        // Sets adds a ShaderProgram to the program list
-        void AddShaderProgram(const std::string& name, ShaderProgram sp);
-
-        // Sets the skybox that is used by the renderer
-        void SetSkybox(std::unique_ptr<Skybox> skybox);
+        // Unloads every material in the store
+        void Clear();
 
     private:
-        // Loads the default shaders used
-        void LoadShaders();
-
-        // The Game Window
-        Window mWindow;
-
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-
-        // Stores the loaded materials
-        MaterialStore mMaterialStore;
-
-        // The Renderer
-        Renderer mRenderer;
-
-        // The Text Renderer
-        TextRenderer mTextRenderer;
-
-        // The loaded ShaderProgram(s)
-        std::unordered_map<std::string, ShaderProgram> mShaderPrograms;
-
-        // The skybox used
-        std::unique_ptr<Skybox> mSkybox;
+        std::unordered_map<std::string, Material> mMaterials;
 };
 
-#endif // ! _ENGINE_HPP_
+#endif // ! _MATERIALSTORE_HPP_

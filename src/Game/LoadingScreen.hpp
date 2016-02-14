@@ -57,6 +57,8 @@ class LoadingScreen : public Screen
         void LoadFromMem();
             // Called during initialization to load textures
             void LoadTextures();
+            // Called during initialization to load materials
+            void LoadMaterials();
             // Called during initialization to load models
             void LoadModels();
 

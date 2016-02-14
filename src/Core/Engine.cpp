@@ -79,6 +79,11 @@ TextureStore& Engine::GetTextureStore()
     return mTextureStore;
 }
 
+MaterialStore& Engine::GetMaterialStore()
+{
+    return mMaterialStore;
+}
+
 Renderer& Engine::GetRenderer()
 {
     return mRenderer;

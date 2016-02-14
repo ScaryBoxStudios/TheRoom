@@ -31,6 +31,9 @@ void LoadingScreen::LoadFromMem()
     // Load the textures
     LoadTextures();
 
+    // Load the materials
+    LoadMaterials();
+
     // Load the models
     LoadModels();
 
@@ -121,51 +124,76 @@ void LoadingScreen::LoadTextures()
     }
 }
 
+void LoadingScreen::LoadMaterials()
+{
+    auto& textureStore = mEngine->GetTextureStore();
+    auto& materialStore = mEngine->GetMaterialStore();
+
+    struct CommonMatData
+    {
+        std::string name,
+                    diff,
+                    spec,
+                    nmap;
+    };
+
+    // Create all 'standard' materials
+    std::vector<CommonMatData> materials = {
+        { "mahogany", "mahogany_wood", "mahogany_wood_spec", ""           } // Mahogany
+    ,   { "house",    "house_diff",    "house_spec",         "house_nmap" } // House
+    ,   { "well",     "well_diff",     "well_spec",          ""           } // Well
+    ,   { "wall",     "wall",          "",                   "wall_nmap"  } // Wall
+    };
+
+    for(auto& m : materials)
+    {
+        Material newMat;
+
+        // Add diffuse
+        if(m.diff.compare("") != 0)
+            newMat.SetDiffuseTexture(textureStore[m.diff]->texId);
+
+        // Add specular
+        if(m.spec.compare("") != 0)
+            newMat.SetSpecularTexture(textureStore[m.spec]->texId);
+
+        // Add normal map
+        if(m.nmap.compare("") != 0)
+            newMat.SetNormalMapTexture(textureStore[m.nmap]->texId);
+
+        materialStore.Load(m.name, newMat);
+    }
+
+    // Create non-standard materials
+    Material white;
+    white.SetDiffuseColor(glm::vec3(0xFF));
+    materialStore.Load("white", white);
+}
+
 void LoadingScreen::LoadModels()
 {
     // Retrieve the model and texture stores from the renderer
-    auto& renderer = mEngine->GetRenderer();
-    auto& modelStore = renderer.GetModelStore();
-    auto& textureStore = mEngine->GetTextureStore();
+    auto& renderer      = mEngine->GetRenderer();
+    auto& modelStore    = renderer.GetModelStore();
+    auto& materialStore = mEngine->GetMaterialStore();
 
     // Model loader instance
     ModelLoader modelLoader;
 
     struct MdlData
     {
-        std::string filepath;
-        std::string extension;
-        std::string name;
-        Material& material;
+        std::string filepath,
+                    extension,
+                    name,
+                    material;
     };
 
-    // Create materials
-    Material mahogany;
-    mahogany.SetDiffuseTexture(textureStore["mahogany_wood"]->texId);
-    mahogany.SetSpecularTexture(textureStore["mahogany_wood_spec"]->texId);
-
-    Material white;
-    white.SetDiffuseColor(glm::vec3(0xFF));
-
-    Material house;
-    house.SetDiffuseTexture(textureStore["house_diff"]->texId);
-    house.SetSpecularTexture(textureStore["house_spec"]->texId);
-    house.SetNormalMapTexture(textureStore["house_nmap"]->texId);
-
-    Material well;
-    well.SetDiffuseTexture(textureStore["well_diff"]->texId);
-    well.SetSpecularTexture(textureStore["well_spec"]->texId);
-
-    Material wall;
-    wall.SetDiffuseTexture(textureStore["wall"]->texId);
-    wall.SetNormalMapTexture(textureStore["wall_nmap"]->texId);
-
     std::vector<MdlData> models = {
-        { "ext/Cube/cube.obj",               "obj", "cube",   mahogany } // Cube
-    ,   { "ext/teapot.obj",                  "obj", "teapot", white    } // Teapot
-    ,   { "ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  house    } // House
-    ,   { "ext/Dungeon/Well.obj",            "obj", "well",   well     } // Well
-    ,   { "ext/Cube/cube.obj",               "obj", "wall",   wall     } // Wall
+        { "ext/Cube/cube.obj",               "obj", "cube",   "mahogany" } // Cube
+    ,   { "ext/teapot.obj",                  "obj", "teapot", "white"    } // Teapot
+    ,   { "ext/WoodenCabin/WoodenCabin.dae", "dae", "house",  "house"    } // House
+    ,   { "ext/Dungeon/Well.obj",            "obj", "well",   "well"     } // Well
+    ,   { "ext/Cube/cube.obj",               "obj", "wall",   "wall"     } // Wall
     };
 
     for(auto& m : models)
@@ -177,13 +205,13 @@ void LoadingScreen::LoadModels()
 
         modelStore.Load(m.name, std::move(model));
 
-        modelStore[m.name]->material = m.material;
+        modelStore[m.name]->material = *materialStore[m.material];
     }
 
     // Add sample UV Sphere
     ModelData sphereModel = GenUVSphere(1, 32, 32);
     modelStore.Load("sphere", std::move(sphereModel));
-    modelStore["sphere"]->material = mahogany;
+    modelStore["sphere"]->material = *materialStore["mahogany"];
 }
 
 void LoadingScreen::onUpdate(float dt)

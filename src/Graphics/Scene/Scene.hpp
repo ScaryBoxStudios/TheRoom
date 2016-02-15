@@ -64,12 +64,15 @@ class Scene
 
         /// Move the node and optionally its children too
         void Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren = false);
+        void Move(SceneNode* const node, const glm::vec3& pos, bool moveChildren = false);
 
         /// Rotate the node and optionally its children
         void Rotate(const std::string& uuid, RotationAxis axis, float angle, bool rotateChildren = false);
+        void Rotate(SceneNode* const node, RotationAxis axis, float angle, bool rotateChildren = false);
 
         /// Scale the node and optionally its children too
         void Scale(const std::string& uuid, const glm::vec3& scale, bool scaleChildren = false);
+        void Scale(SceneNode* const node, const glm::vec3& scale, bool scaleChildren = false);
 
         /// Get all nodes in their container
         const NodeBank& GetNodes() const;
@@ -77,13 +80,14 @@ class Scene
         /// Get all nodes in a useful category map
         const NodeCategoryMap& GetCategories() const;
 
+        /// Finds the node with the given uuid
+        SceneNode* FindNodeByUuid(const std::string& uuid);
+
     private:
         SceneNode* mRootNode;        /// Scene's root node
         NodeBank mNodes;             /// All nodes
         NodeCategoryMap mCategories; /// A map to find nodes by category
 
-        /// Finds the node with the given uuid
-        inline SceneNode* FindNodeByUuid(const std::string& uuid);
 }; // ! Scene
 
 #endif // ! _SCENE_HPP_

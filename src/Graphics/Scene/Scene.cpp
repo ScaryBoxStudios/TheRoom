@@ -62,8 +62,11 @@ void Scene::DetachFromParent(const std::string& childUuid, const std::string& pa
 
 void Scene::Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren /* = false */)
 {
-    SceneNode* node = FindNodeByUuid(uuid);
+    Move(FindNodeByUuid(uuid), pos, moveChildren);
+}
 
+void Scene::Move(SceneNode* const node, const glm::vec3& pos, bool moveChildren /* = false */)
+{
     if(node == nullptr)
         return;
     else
@@ -72,8 +75,11 @@ void Scene::Move(const std::string& uuid, const glm::vec3& pos, bool moveChildre
 
 void Scene::Rotate(const std::string& uuid, RotationAxis axis, float angle, bool rotateChildren /* = false */)
 {
-    SceneNode* node = FindNodeByUuid(uuid);
+    Rotate(FindNodeByUuid(uuid), axis, angle, rotateChildren);
+}
 
+void Scene::Rotate(SceneNode* const node, RotationAxis axis, float angle, bool rotateChildren /* = false */)
+{
     if(node == nullptr)
         return;
     else
@@ -82,8 +88,11 @@ void Scene::Rotate(const std::string& uuid, RotationAxis axis, float angle, bool
 
 void Scene::Scale(const std::string& uuid, const glm::vec3& scale, bool scaleChildren /* = false */)
 {
-    SceneNode* node = FindNodeByUuid(uuid);
+    Scale(FindNodeByUuid(uuid), scale, scaleChildren);
+}
 
+void Scene::Scale(SceneNode* const node, const glm::vec3& scale, bool scaleChildren /* = false */)
+{
     if(node == nullptr)
         return;
     else
@@ -100,10 +109,7 @@ const Scene::NodeCategoryMap& Scene::GetCategories() const
     return mCategories;
 }
 
-//--------------------------------------------------
-// Private functions
-//--------------------------------------------------
-inline SceneNode* Scene::FindNodeByUuid(const std::string& uuid)
+SceneNode* Scene::FindNodeByUuid(const std::string& uuid)
 {
     auto it = mNodes.find(uuid);
     return (it == std::end(mNodes)) ? nullptr : it->second.get();

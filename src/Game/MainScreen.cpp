@@ -55,6 +55,7 @@ void MainScreen::SetupWorld()
     // Normal objects
     //
     // Create various Cube instances in the world
+    SceneNode* node;
     std::vector<glm::vec3> cubePositions = {
         glm::vec3(0.0f, 0.0f, 0.0f),
         glm::vec3(4.0f, 10.0f, -20.0f),
@@ -72,30 +73,31 @@ void MainScreen::SetupWorld()
         const auto& pos = cubePositions[i];
 
         const std::string name = "cube" + std::to_string(i);
-        mScene->Move(name, pos);
-        mScene->Scale(name, glm::vec3(2.0f));
-        mScene->Rotate(name, RotationAxis::X, 20.0f * i);
-        mScene->Rotate(name, RotationAxis::Y, 7.0f * i);
-        mScene->Rotate(name, RotationAxis::Z, 10.0f * i);
+        node = mScene->FindNodeByUuid(name);
+        mScene->Move(node, pos);
+        mScene->Scale(node, glm::vec3(2.0f));
+        mScene->Rotate(node, RotationAxis::X, 20.0f * i);
+        mScene->Rotate(node, RotationAxis::Y, 7.0f * i);
+        mScene->Rotate(node, RotationAxis::Z, 10.0f * i);
     }
 
+    auto moveAndScale = [this](const std::string& id, const glm::vec3& move, const glm::vec3& scale)
+    {
+        SceneNode* const node = mScene->FindNodeByUuid(id);
+        mScene->Move(node, move);
+        mScene->Scale(node, scale);
+    };
+
     // Setup position
-    mScene->Move("house", glm::vec3(0.0f, -10.0f, -40.0f));
-    mScene->Scale("house", glm::vec3(0.3f));
+    //           Node id   Move vector                       Scale vector
+    moveAndScale("house",  glm::vec3( 0.0f, -10.0f, -40.0f), glm::vec3( 0.3f));
+    moveAndScale("well",   glm::vec3( 0.0f, - 5.0f, -10.0f), glm::vec3( 2.0f));
+    moveAndScale("wall",   glm::vec3(10.0f,   0.0f,   2.0f), glm::vec3( 3.0f));
+    moveAndScale("teapot", glm::vec3( 4.0f,   0.0f,   0.0f), glm::vec3( 0.3f));
+    moveAndScale("plane",  glm::vec3( 0.0f, -11.0f, -40.0f), glm::vec3(75.0f, 0.1f, 75.0f));
 
-    mScene->Move("well", glm::vec3(0.0f, -5.0f, -10.0f));
-    mScene->Scale("well", glm::vec3(2.0f));
-
-    mScene->Move("plane", glm::vec3(0.0f, -11.0f, -40.0f));
-    mScene->Scale("plane", glm::vec3(75.0f, 0.1f, 75.0f));
-
-    mScene->Move("wall", glm::vec3(10.0f, 0.0f, 2.0f));
-    mScene->Scale("wall", glm::vec3(3.0f, 3.0f, 3.0f));
-
-    mScene->Move("sphere", glm::vec3(0.0f, 3.0f, -2.0f));
-
-    mScene->Move("teapot", glm::vec3(4.0f, 0.0f, 0.0f));
-    mScene->Scale("teapot", glm::vec3(0.3f));
+    node = mScene->FindNodeByUuid("sphere");
+    mScene->Move(node, glm::vec3(0.0f, 3.0f, -2.0f));
 }
 
 std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
@@ -150,19 +152,20 @@ void MainScreen::onUpdate(float dt)
     mCamera.Move(CameraMoveDirections());
 
     // Update light position
+    SceneNode* teapot = scene->FindNodeByUuid("teapot");
     float increase = 0.7f;
     if(window.IsKeyPressed(Key::Kp8))
-        scene->Move("teapot", glm::vec3(0.0f, increase, 0.0f));
+        scene->Move(teapot, glm::vec3(0.0f, increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp4))
-        scene->Move("teapot", glm::vec3(-increase, 0.0f, 0.0f));
+        scene->Move(teapot, glm::vec3(-increase, 0.0f, 0.0f));
     if(window.IsKeyPressed(Key::Kp2))
-        scene->Move("teapot", glm::vec3(0.0f, -increase, 0.0f));
+        scene->Move(teapot, glm::vec3(0.0f, -increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp6))
-        scene->Move("teapot", glm::vec3(increase, 0.0f, 0.0f));
+        scene->Move(teapot, glm::vec3(increase, 0.0f, 0.0f));
     if(window.IsKeyPressed(Key::Kp5))
-        scene->Move("teapot", glm::vec3(0.0f, 0.0f, -increase));
+        scene->Move(teapot, glm::vec3(0.0f, 0.0f, -increase));
     if(window.IsKeyPressed(Key::Kp0))
-        scene->Move("teapot", glm::vec3(0.0f, 0.0f, increase));
+        scene->Move(teapot, glm::vec3(0.0f, 0.0f, increase));
 
     // Update cubes' rotations
     if (mRotationData.rotating)

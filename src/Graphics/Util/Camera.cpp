@@ -17,6 +17,11 @@ Camera::~Camera()
 {
 }
 
+const Camera::CameraState& Camera::GetCameraState() const
+{
+    return mState;
+}
+
 void Camera::SetPos(const glm::vec3& pos)
 {
     mState.position = pos;

@@ -56,6 +56,11 @@ class MainScreen : public Screen
         // The Scene
         std::unique_ptr<Scene> mScene;
 
+        // The node of the character
+        SceneNode* mCharacter;
+
+        void MoveCharacter();
+
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();

@@ -21,7 +21,7 @@ auto Font::Load(const BufferType& fontData) -> void
     FT_New_Memory_Face(ft, fontData.data(), static_cast<FT_Long>(fontData.size()), 0, &face);
 
     // Set the pixel size
-    FT_Set_Pixel_Sizes(face, 0, 48);
+    FT_Set_Pixel_Sizes(face, 0, 28);
 
     // Store current unpack alignment
     GLint pixelStoreAlignment;

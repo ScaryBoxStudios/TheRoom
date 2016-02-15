@@ -36,7 +36,7 @@ void MainScreen::onInit(ScreenContext& sc)
 void MainScreen::SetupWorld()
 {
     // Load sample scene file
-    std::string sceneFile= "ext/scene.json";
+    std::string sceneFile= "ext/Scenes/scene.json";
     auto sceneFileData = FileLoad<BufferType>(sceneFile);
     if(!sceneFileData)
         throw std::runtime_error("Couldn't load file (" + sceneFile+ ")");

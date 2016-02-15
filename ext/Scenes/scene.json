@@ -7,63 +7,63 @@
     "images": [
         {
             "uuid": "D080A9A6-2091-47A6-8B4B-8131352952C0",
-            "url" : "ext/Skybox/right.jpg"
+            "url" : "ext/Assets/Skybox/right.jpg"
         },
         {
             "uuid": "761515E5-8631-4855-B22D-77BDB0BA17A8",
-            "url" : "ext/Skybox/left.jpg"
+            "url" : "ext/Assets/Skybox/left.jpg"
         },
         {
             "uuid": "C163BE10-425F-4911-8426-1C974523838A",
-            "url" : "ext/Skybox/top.jpg"
+            "url" : "ext/Assets/Skybox/top.jpg"
         },
         {
             "uuid": "9DBF0DA2-8066-4571-AD47-4D9D8F5C5183",
-            "url" : "ext/Skybox/bottom.jpg"
+            "url" : "ext/Assets/Skybox/bottom.jpg"
         },
         {
             "uuid": "8F20974F-51FE-44CD-81E9-73A9F5E7FE98",
-            "url" : "ext/Skybox/back.jpg"
+            "url" : "ext/Assets/Skybox/back.jpg"
         },
         {
             "uuid": "E17C49A7-BD4E-40A7-B40D-2A1746C459DA",
-            "url" : "ext/Skybox/front.jpg"
+            "url" : "ext/Assets/Skybox/front.jpg"
         },
         {
             "uuid": "6ABEE30B-5334-4481-BD54-F24DA810664C",
-            "url" : "ext/mahogany_wood.jpg"
+            "url" : "ext/Assets/mahogany_wood.jpg"
         },
         {
             "uuid": "C853CF2F-920A-4C0D-AD96-9000FBE4F500",
-            "url" : "ext/mahogany_wood_spec.jpg"
+            "url" : "ext/Assets/mahogany_wood_spec.jpg"
         },
         {
             "uuid": "A60E1E94-F4A8-45D3-82E3-F2854E63581C",
-            "url" : "ext/WoodenCabin/WoodCabinDif.jpg"
+            "url" : "ext/Assets/WoodenCabin/WoodCabinDif.jpg"
         },
         {
             "uuid": "5CB3A686-351A-4902-B409-4823911616DB",
-            "url" : "ext/WoodenCabin/WoodCabinSM.jpg"
+            "url" : "ext/Assets/WoodenCabin/WoodCabinSM.jpg"
         },
         {
             "uuid": "50D62C7D-E442-4DDF-89C9-028BDE23DFE5",
-            "url" : "ext/WoodenCabin/WoodCabinNM.jpg"
+            "url" : "ext/Assets/WoodenCabin/WoodCabinNM.jpg"
         },
         {
             "uuid": "1A82F46C-A7A2-468A-8DBD-C9AA17489C1E",
-            "url" : "ext/brickwall.jpg"
+            "url" : "ext/Assets/brickwall.jpg"
         },
         {
             "uuid": "F2655EBC-924E-4178-9788-3A6366B1EC6C",
-            "url" : "ext/brickwall_NM.jpg"
+            "url" : "ext/Assets/brickwall_NM.jpg"
         },
         {
             "uuid": "0E5CA35B-63F9-4CAD-AA8C-0C9AEEC0FA31",
-            "url" : "ext/Dungeon/maps/Wall1_T.tga"
+            "url" : "ext/Assets/Dungeon/maps/Wall1_T.tga"
         },
         {
             "uuid": "CA60C4CB-2E51-404C-A1DF-7ED383F91A6A",
-            "url" : "ext/Dungeon/maps/Wall1_B.tga"
+            "url" : "ext/Assets/Dungeon/maps/Wall1_B.tga"
         }],
     "textures": [
         {
@@ -106,22 +106,22 @@
         {
             "uuid": "C85CC050-6FA3-46F2-A763-6D8D882CD905",
             "type": "cube",
-            "url" : "ext/Cube/cube.obj"
+            "url" : "ext/Assets/Cube/cube.obj"
         },
         {
             "uuid": "C5C37168-A654-4C80-98F3-D01FD1F5214F",
             "type": "teapot",
-            "url" : "ext/teapot.obj"
+            "url" : "ext/Assets/teapot.obj"
         },
         {
             "uuid": "F665FA2D-D0FF-4753-B2A2-089F9E735565",
             "type": "house",
-            "url" : "ext/WoodenCabin/WoodenCabin.dae"
+            "url" : "ext/Assets/WoodenCabin/WoodenCabin.dae"
         },
         {
             "uuid": "AF7A8A4E-F523-4308-AAD7-340DA1595764",
             "type": "well",
-            "url" : "ext/Dungeon/Well.obj"
+            "url" : "ext/Assets/Dungeon/Well.obj"
         },
         {
             "uuid": "63A3C6DF-78B7-4453-9129-2CE5B2EAF620",
@@ -131,7 +131,7 @@
         {
             "uuid": "F9078F31-39F2-450D-B34E-78CD6689B129",
             "type": "character",
-            "url" : "ext/Warrior/Warrior.obj"
+            "url" : "ext/Assets/Warrior/Warrior.obj"
         }],
     "materials": [
         {

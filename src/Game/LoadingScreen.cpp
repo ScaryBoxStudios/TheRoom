@@ -15,7 +15,7 @@ void LoadingScreen::onInit(ScreenContext& sc)
     mFileDataCache = sc.GetFileDataCache();
 
     // Load font
-    mEngine->GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/visitor.ttf");
+    mEngine->GetTextRenderer().GetFontStore().LoadFont("visitor", "ext/Assets/visitor.ttf");
 
     // Fire loader thread
     mFileCacheIsReady = false;
@@ -45,12 +45,12 @@ void LoadingScreen::LoadFromMem()
     ImageLoader imLoader;
     skybox->Load(
         {
-            { Skybox::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Skybox/right.jpg"], "jpg") },
-            { Skybox::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Skybox/left.jpg"],  "jpg") },
-            { Skybox::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Skybox/top.jpg"],   "jpg") },
-            { Skybox::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Skybox/bottom.jpg"],"jpg") },
-            { Skybox::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Skybox/back.jpg"],  "jpg") },
-            { Skybox::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Skybox/front.jpg"], "jpg") }
+            { Skybox::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Skybox/right.jpg"], "jpg") },
+            { Skybox::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Skybox/left.jpg"],  "jpg") },
+            { Skybox::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Skybox/top.jpg"],   "jpg") },
+            { Skybox::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Skybox/bottom.jpg"],"jpg") },
+            { Skybox::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Skybox/back.jpg"],  "jpg") },
+            { Skybox::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Skybox/front.jpg"], "jpg") }
         }
     );
     mEngine->SetSkybox(std::move(skybox));
@@ -64,27 +64,27 @@ void LoadingScreen::LoadFileData()
     std::vector<std::string> fileList =
     {
       // Skybox
-      "ext/Skybox/right.jpg"
-    , "ext/Skybox/left.jpg"
-    , "ext/Skybox/top.jpg"
-    , "ext/Skybox/bottom.jpg"
-    , "ext/Skybox/back.jpg"
-    , "ext/Skybox/front.jpg"
+      "ext/Assets/Skybox/right.jpg"
+    , "ext/Assets/Skybox/left.jpg"
+    , "ext/Assets/Skybox/top.jpg"
+    , "ext/Assets/Skybox/bottom.jpg"
+    , "ext/Assets/Skybox/back.jpg"
+    , "ext/Assets/Skybox/front.jpg"
       // Textures
-    , "ext/mahogany_wood.jpg"
-    , "ext/mahogany_wood_spec.jpg"
-    , "ext/WoodenCabin/WoodCabinDif.jpg"
-    , "ext/WoodenCabin/WoodCabinSM.jpg"
-    , "ext/WoodenCabin/WoodCabinNM.jpg"
-    , "ext/brickwall.jpg"
-    , "ext/brickwall_NM.jpg"
-    , "ext/Dungeon/maps/Wall1_T.tga"
-    , "ext/Dungeon/maps/Wall1_B.tga"
+    , "ext/Assets/mahogany_wood.jpg"
+    , "ext/Assets/mahogany_wood_spec.jpg"
+    , "ext/Assets/WoodenCabin/WoodCabinDif.jpg"
+    , "ext/Assets/WoodenCabin/WoodCabinSM.jpg"
+    , "ext/Assets/WoodenCabin/WoodCabinNM.jpg"
+    , "ext/Assets/brickwall.jpg"
+    , "ext/Assets/brickwall_NM.jpg"
+    , "ext/Assets/Dungeon/maps/Wall1_T.tga"
+    , "ext/Assets/Dungeon/maps/Wall1_B.tga"
       // Models
-    , "ext/Cube/cube.obj"
-    , "ext/teapot.obj"
-    , "ext/WoodenCabin/WoodenCabin.dae"
-    , "ext/Dungeon/Well.obj"
+    , "ext/Assets/Cube/cube.obj"
+    , "ext/Assets/teapot.obj"
+    , "ext/Assets/WoodenCabin/WoodenCabin.dae"
+    , "ext/Assets/Dungeon/Well.obj"
     };
 
     for (const auto& file : fileList)

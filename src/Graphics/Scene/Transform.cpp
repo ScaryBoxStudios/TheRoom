@@ -17,6 +17,11 @@ const glm::mat4& Transform::Get() const
     return mTransform;
 }
 
+void Transform::Set(const glm::mat4& mat)
+{
+    mTransform = mat;
+}
+
 void Transform::Update()
 {
     mOldTrans = mTransform;

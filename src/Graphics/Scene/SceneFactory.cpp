@@ -34,8 +34,7 @@ std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const SceneFile& sceneF
         const auto& initAABB = model->localAABB;
         scene->CreateNode(child.geometry.ToString(), child.material.ToString(), child.name, category, initAABB);
 
-        // Automatically setting starting positions is not working yet
-        //scene->SetTransformationMatrix(child.name, child.matrix);
+        scene->SetTransformation(child.name, child.matrix);
     }
     
     return std::move(scene);

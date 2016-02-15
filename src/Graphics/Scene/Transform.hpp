@@ -45,6 +45,9 @@ class Transform
         // Retrieves the current transformation matrix
         const glm::mat4& Get() const;
 
+        // Updates the current transformation matrix
+        void Set(const glm::mat4& mat);
+
         // Retrieves the current local position vector
         const glm::vec3& GetPosition() const;
 

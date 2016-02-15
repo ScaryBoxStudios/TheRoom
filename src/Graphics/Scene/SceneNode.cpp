@@ -107,6 +107,11 @@ Transform& SceneNode::GetTransformation()
     return mTransform;
 }
 
+void SceneNode::SetTransformation(const glm::mat4& mat)
+{
+    mTransform.Set(mat);
+}
+
 SceneNodeCategory SceneNode::GetCategory() const
 {
     return mCategory;

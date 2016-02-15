@@ -51,22 +51,19 @@ void MainScreen::SetupWorld()
         mFileDataCache);
     mScene = std::move(factory.CreateFromSceneFile(sf));
 
-    //
-    // Normal objects
-    //
-    // Create various Cube instances in the world
+    // Set positions for cubes
     SceneNode* node;
     std::vector<glm::vec3> cubePositions = {
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(4.0f, 10.0f, -20.0f),
-        glm::vec3(-3.0f, -4.4f, -5.0f),
-        glm::vec3(-7.6f, -4.0f, -14.0f),
-        glm::vec3(4.4f, -3.5f, -4.0f),
-        glm::vec3(-3.4f, 6.0f, -15.0f),
-        glm::vec3(2.6f, -4.0f, -17.0f),
-        glm::vec3(4.0f, 3.0f, -5.0f),
-        glm::vec3(3.0f, 0.4f, -12.0f),
-        glm::vec3(-3.5f, 2.0f, -3.0f)
+        glm::vec3( 0.0f,  0.0f,    0.0f),
+        glm::vec3( 4.0f, 10.0f,  -20.0f),
+        glm::vec3(-3.0f, -4.4f,  - 5.0f),
+        glm::vec3(-7.6f, -4.0f,  -14.0f),
+        glm::vec3( 4.4f, -3.5f,  - 4.0f),
+        glm::vec3(-3.4f,  6.0f,  -15.0f),
+        glm::vec3( 2.6f, -4.0f,  -17.0f),
+        glm::vec3( 4.0f,  3.0f,  - 5.0f),
+        glm::vec3( 3.0f,  0.4f,  -12.0f),
+        glm::vec3(-3.5f,  2.0f,  - 3.0f)
     };
     for(std::size_t i = 0; i < cubePositions.size(); ++i)
     {
@@ -80,24 +77,6 @@ void MainScreen::SetupWorld()
         mScene->Rotate(node, RotationAxis::Y, 7.0f * i);
         mScene->Rotate(node, RotationAxis::Z, 10.0f * i);
     }
-
-    auto moveAndScale = [this](const std::string& id, const glm::vec3& move, const glm::vec3& scale)
-    {
-        SceneNode* const node = mScene->FindNodeByUuid(id);
-        mScene->Move(node, move);
-        mScene->Scale(node, scale);
-    };
-
-    // Setup position
-    //           Node id   Move vector                       Scale vector
-    moveAndScale("house",  glm::vec3( 0.0f, -10.0f, -40.0f), glm::vec3( 0.3f));
-    moveAndScale("well",   glm::vec3( 0.0f, - 5.0f, -10.0f), glm::vec3( 2.0f));
-    moveAndScale("wall",   glm::vec3(10.0f,   0.0f,   2.0f), glm::vec3( 3.0f));
-    moveAndScale("teapot", glm::vec3( 4.0f,   0.0f,   0.0f), glm::vec3( 0.3f));
-    moveAndScale("plane",  glm::vec3( 0.0f, -11.0f, -40.0f), glm::vec3(75.0f, 0.1f, 75.0f));
-
-    node = mScene->FindNodeByUuid("sphere");
-    mScene->Move(node, glm::vec3(0.0f, 3.0f, -2.0f));
 }
 
 std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()

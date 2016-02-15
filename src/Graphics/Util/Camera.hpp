@@ -90,6 +90,15 @@ class Camera
         /// Moves the camera look for the given offset
         void Look(std::tuple<float, float> lookOffset);
 
+        /// Updates camera view matrix
+        void Update();
+
+        /// Retrieves the camera view matrix
+        const glm::mat4& View();
+
+        /// Retrieves the camera view matrix interpolated
+        glm::mat4 InterpolatedView(float interpolation);
+
         /// Retrieves an interpolated copy of the camera state
         CameraState Interpolate(std::vector<MoveDirection> md, std::tuple<float, float> lookOffset, float interpolation);
 
@@ -99,6 +108,9 @@ class Camera
 
         // The internal camera properties
         CameraProperties mProperties;
+
+        // The current and previous view matrix
+        glm::mat4 mCurView, mPrevView;
 
         // Returns the new camera state after performing the calculations for the given camera move and interpolation factor
         CameraState CalcMove(const CameraState& prevState, const CameraProperties& camProps, std::vector<MoveDirection> md, float interpolation);

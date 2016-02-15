@@ -1,5 +1,9 @@
 #include "Camera.hpp"
 
+WARN_GUARD_ON
+#include <glm/gtc/matrix_transform.hpp>
+WARN_GUARD_OFF
+
 Camera::Camera()
 {
     mState.position = glm::vec3(0, 0, 0);
@@ -30,6 +34,23 @@ void Camera::Move(std::vector<MoveDirection> md)
 void Camera::Look(std::tuple<float, float> lookOffset)
 {
     mState = CalcLook(mState, mProperties, lookOffset, 1.0f);
+}
+
+void Camera::Update()
+{
+    const auto& iCamState = mState;
+    mPrevView = mCurView;
+    mCurView = glm::lookAt(iCamState.position, iCamState.position + iCamState.front, iCamState.up);
+}
+
+const glm::mat4& Camera::View()
+{
+    return mCurView;
+}
+
+glm::mat4 Camera::InterpolatedView(float interpolation)
+{
+    return mPrevView + (mCurView - mPrevView) * interpolation;
 }
 
 auto Camera::Interpolate(std::vector<MoveDirection> md, std::tuple<float, float> lookOffset, float interpolation) -> CameraState

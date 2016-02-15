@@ -130,6 +130,9 @@ void MainScreen::onUpdate(float dt)
     // Update camera position
     mCamera.Move(CameraMoveDirections());
 
+    // Update the camera matrix
+    mCamera.Update();
+
     // Update light position
     SceneNode* teapot = scene->FindNodeByUuid("teapot");
     float increase = 0.7f;
@@ -159,13 +162,8 @@ void MainScreen::onUpdate(float dt)
 
 void MainScreen::onRender(float interpolation)
 {
-    // View calculation with camera
-    auto& window = mEngine->GetWindow();
-    auto lookOffset = window.MouseGrabEnabled() ? CameraLookOffset() : std::make_tuple(0.0f, 0.0f);
-    auto iCamState = mCamera.Interpolate(CameraMoveDirections(), lookOffset, interpolation);
-
-    // Create the view matrix and pass it to the renderer
-    glm::mat4 view = glm::lookAt(iCamState.position, iCamState.position + iCamState.front, iCamState.up);
+    // Get the view matrix and pass it to the renderer
+    glm::mat4 view = mCamera.InterpolatedView(interpolation);
 
     // Render
     mEngine->GetRenderer().SetView(view);

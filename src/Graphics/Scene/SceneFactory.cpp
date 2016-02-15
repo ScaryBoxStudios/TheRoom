@@ -49,7 +49,7 @@ void SceneFactory::LoadTextures(const std::vector<SceneFile::Texture>& textures,
     {
         // Ignore that texture if it has already been loaded
         if((*mTextureStore)[texture.uuid.ToString()] != nullptr)
-            break;
+            continue;
 
         // Find the coresponding image
         auto img = std::find_if(std::begin(images), std::end(images),
@@ -73,7 +73,7 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
     {
         // Ignore that material if it has already been loaded
         if((*mMaterialStore)[material.uuid.ToString()] != nullptr)
-            break;
+            continue;
 
         Material newMat;
 
@@ -108,7 +108,7 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
     {
         // Ignore that geometry if it has alredy been loaded
         if((*mModelStore)[geometry.uuid.ToString()] != nullptr)
-            break;
+            continue;
 
         auto& file = (*mFileDataCache)[geometry.url];
 

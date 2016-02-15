@@ -233,34 +233,37 @@ void Renderer::GeometryPass(float interpolation)
             // Get the model
             ModelDescription* mdl = mModelStore[gObj->GetModel()];
 
+            // Get the material
+            Material* material = (*mMaterialStore)[gObj->GetMaterial()];
+
             //
             // Upload material parameters
             //
             // Diffuse
-            const glm::vec3& diffCol = (*mMaterialStore)[gObj->GetMaterial()]->GetDiffuseColor();
+            const glm::vec3& diffCol = material->GetDiffuseColor();
             glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-            if ((*mMaterialStore)[gObj->GetMaterial()]->UsesDiffuseTexture())
+            if (material->UsesDiffuseTexture())
             {
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, (*mMaterialStore)[gObj->GetMaterial()]->GetDiffuseTexture());
+                glBindTexture(GL_TEXTURE_2D, material->GetDiffuseTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
             }
 
             // Specular
-            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), (*mMaterialStore)[gObj->GetMaterial()]->GetSpecularColor().x);
-            if ((*mMaterialStore)[gObj->GetMaterial()]->UsesSpecularTexture())
+            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), material->GetSpecularColor().x);
+            if (material->UsesSpecularTexture())
             {
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, (*mMaterialStore)[gObj->GetMaterial()]->GetSpecularTexture());
+                glBindTexture(GL_TEXTURE_2D, material->GetSpecularTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
             }
 
             // Normal map
-            if((*mMaterialStore)[gObj->GetMaterial()]->UsesNormalMapTexture())
+            if(material->UsesNormalMapTexture())
             {
                 glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
                 glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, (*mMaterialStore)[gObj->GetMaterial()]->GetNormalMapTexture());
+                glBindTexture(GL_TEXTURE_2D, material->GetNormalMapTexture());
                 glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
             }
             else

@@ -77,8 +77,6 @@ void MainScreen::SetupWorld()
         mScene->Rotate(node, RotationAxis::Y, 7.0f * i);
         mScene->Rotate(node, RotationAxis::Z, 10.0f * i);
     }
-
-    mCharacter = mScene->FindNodeByUuid("cube0");
 }
 
 std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
@@ -94,35 +92,6 @@ std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
     if(window.IsKeyPressed(Key::D))
         mds.push_back(Camera::MoveDirection::Right);
     return mds;
-}
-
-void MainScreen::MoveCharacter()
-{
-    auto& window = mEngine->GetWindow();
-
-    auto moveCharUpdateCam = [this](const glm::vec3& move)
-    {
-        // Move character
-        mScene->Move(mCharacter, move);
-
-        // Update camera
-        Camera::CameraState state = mCamera.GetCameraState();
-        mCamera.SetPos(state.position + move * glm::vec3(2.0));
-    };
-
-    float speed = 0.5f;
-    if(window.IsKeyPressed(Key::W))
-        moveCharUpdateCam(glm::vec3(0, 0, -speed));
-    if(window.IsKeyPressed(Key::A))
-        moveCharUpdateCam(glm::vec3(-speed, 0, 0));
-    if(window.IsKeyPressed(Key::S))
-        moveCharUpdateCam(glm::vec3(0, 0, speed));
-    if(window.IsKeyPressed(Key::D))
-        moveCharUpdateCam(glm::vec3(speed, 0, 0));
-    if(window.IsKeyPressed(Key::E))
-        moveCharUpdateCam(glm::vec3(0, speed, 0));
-    if(window.IsKeyPressed(Key::C))
-        moveCharUpdateCam(glm::vec3(0, -speed, 0));
 }
 
 std::tuple<float, float> MainScreen::CameraLookOffset()
@@ -159,10 +128,7 @@ void MainScreen::onUpdate(float dt)
         mCamera.Look(CameraLookOffset());
 
     // Update camera position
-    //mCamera.Move(CameraMoveDirections());
-
-    // Update character position
-    MoveCharacter();
+    mCamera.Move(CameraMoveDirections());
 
     // Update light position
     SceneNode* teapot = scene->FindNodeByUuid("teapot");

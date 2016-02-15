@@ -64,8 +64,8 @@ class SceneFactory
         // Load geometries
         void LoadGeometries(const std::vector<SceneFile::Geometry>& geometries);
 
-        // Load models
-        void LoadModels(const std::vector<SceneFile::Object::Child>& children);
+        // Create scene
+        void BakeScene(Scene* const sceneToBake, const std::vector<SceneFile::Object::Child>& children);
 };
 
 #endif // ! _SCENEFACTORY_HPP_

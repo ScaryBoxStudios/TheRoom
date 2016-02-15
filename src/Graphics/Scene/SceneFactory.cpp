@@ -20,23 +20,9 @@ std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const SceneFile& sceneF
     LoadTextures(sceneFile.textures, sceneFile.images);
     LoadMaterials(sceneFile.materials);
     LoadGeometries(sceneFile.geometries);
-    LoadModels(sceneFile.object.children);
-
-    // Add objects to scene
-    for(auto& child : sceneFile.object.children)
-    {
-        // Find the right geometry
-        ModelDescription* model = (*mModelStore)[child.geometry.ToString()];
-
-        // Find the right category
-        SceneNodeCategory category = (child.type.compare("Mesh") == 0) ? SceneNodeCategory::Normal : SceneNodeCategory::Light;
-
-        const auto& initAABB = model->localAABB;
-        scene->CreateNode(child.geometry.ToString(), child.material.ToString(), child.name, category, initAABB);
-
-        scene->SetTransformation(child.name, child.matrix);
-    }
     
+    BakeScene(scene.get(), sceneFile.object.children);
+
     return std::move(scene);
 }
 
@@ -126,14 +112,22 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
     }
 }
 
-void SceneFactory::LoadModels(const std::vector<SceneFile::Object::Child>& children)
+void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFile::Object::Child>& children)
 {
+    // Add objects to scene
     for(auto& child : children)
     {
         // Find the right geometry
         ModelDescription* model = (*mModelStore)[child.geometry.ToString()];
 
-        // Assert if no geometry with the given name exists
-        assert(model != nullptr);
+        // Find the right category
+        SceneNodeCategory category = (child.type.compare("Mesh") == 0) ? SceneNodeCategory::Normal : SceneNodeCategory::Light;
+
+        // Create Scene Node
+        const auto& initAABB = model->localAABB;
+        sceneToBake->CreateNode(child.geometry.ToString(), child.material.ToString(), child.name, category, initAABB);
+
+        // Set initial transformation
+        sceneToBake->SetTransformation(child.name, child.matrix);
     }
 }

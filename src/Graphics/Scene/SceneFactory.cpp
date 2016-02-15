@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "../Image/ImageLoader.hpp"
 #include "../Geometry/ModelLoader.hpp"
+#include "../../Util/FileLoad.hpp"
 
 SceneFactory::SceneFactory(TextureStore* tStore, ModelStore* mdlStore, MaterialStore* matStore, ScreenContext::FileDataCache* fdc)
     : mTextureStore(tStore)
@@ -96,6 +97,15 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
         if((*mModelStore)[geometry.uuid.ToString()] != nullptr)
             continue;
 
+        // Check if model is already loaded and if not, load it now!
+        if((*mFileDataCache).find(geometry.url) == std::end(*mFileDataCache))
+        {
+            mFileDataCache->emplace(geometry.url, FileLoad<BufferType>(geometry.url));
+            if(!(*mFileDataCache)[geometry.url])
+                throw std::runtime_error("Couldn't load file (" + geometry.url + ")");
+        }
+
+        // Find the file
         auto& file = (*mFileDataCache)[geometry.url];
 
         // Find file extension

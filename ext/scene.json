@@ -127,6 +127,11 @@
             "uuid": "63A3C6DF-78B7-4453-9129-2CE5B2EAF620",
             "type": "sphere",
             "url" : ""
+        },
+        {
+            "uuid": "F9078F31-39F2-450D-B34E-78CD6689B129",
+            "type": "character",
+            "url" : "ext/Warrior/Warrior.obj"
         }],
     "materials": [
         {
@@ -174,6 +179,17 @@
                    0,0,1,0,
                    0,0,0,1],
         "children": [
+            {
+                "uuid": "3ED503EB-96DF-4A6B-9D0E-B119586C30A0",
+                "type": "Mesh",
+                "name": "character",
+                "matrix": [3,0,0,0,
+                           0,3,0,0,
+                           0,0,3,0,
+                           0,0,0,1],
+                "material": "2DA97C2B-D7AF-47D3-B1B7-F3FFC2C37949",
+                "geometry": "F9078F31-39F2-450D-B34E-78CD6689B129"
+            },
             {
                 "uuid": "26F6A56B-0FFA-411E-AD55-A3A3D082082A",
                 "type": "Mesh",

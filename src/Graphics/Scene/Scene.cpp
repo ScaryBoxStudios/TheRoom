@@ -9,14 +9,14 @@ Scene::Scene()
     // TODO: decide model, uuid and position for root node
     //mRootNode = CreateNode("", "", SceneNodeCategory::Invalid, glm::vec3(0, 0, 0));
     // Create node
-    mNodes[""] = std::make_unique<SceneNode>("", "", "", SceneNodeCategory::Invalid, AABB());
+    //mNodes[""] = std::make_unique<SceneNode>("", "", "", SceneNodeCategory::Invalid, AABB());
 }
 
 SceneNode* Scene::CreateNode(
     const std::string& model,
     const std::string& material,
     const std::string& uuid,
-    SceneNodeCategory category,
+    Category category,
     const AABB& initAABB,
     bool isCulled /* = false */)
 {
@@ -24,16 +24,54 @@ SceneNode* Scene::CreateNode(
     std::unique_ptr<SceneNode> ptr =
         std::make_unique<SceneNode>(model, material, uuid, category, initAABB, isCulled);
 
-    // Save it to category map
-    mCategories[category].push_back(ptr.get());
-
     // Save the pointer
     SceneNode* rVal = ptr.get();
 
     // Move the unique pointer to node bank
     mNodes[rVal->GetUUID()] = std::move(ptr);
 
+    // If it is light, add it to lights
+    if(category == Category::Light)
+        mLights.push_back(rVal);
+
     return rVal;
+}
+
+void Scene::DeleteNode(const std::string& uuid, bool deleteChildren /* = false */)
+{
+    SceneNode* node = FindNodeByUuid(uuid);
+
+    // If node doesn't exist, do nothing
+    if(node == nullptr)
+        return;
+    else
+        DeleteNode(node, deleteChildren);
+}
+
+void Scene::DeleteNode(SceneNode* const node, bool deleteChildren /* = false */)
+{
+    // Erase it from lights vector if it is a light
+    if(node->GetCategory() == Category::Light)
+    {
+        auto light = std::find_if(std::begin(mLights), std::end(mLights),
+        [&node](SceneNode* lightNode) -> bool
+        {
+            return node->GetUUID().compare(lightNode->GetUUID()) == 0;
+        });
+
+        if(light != std::end(mLights))
+            mLights.erase(light);
+    }
+
+    // Delete children if necessary
+    if(deleteChildren)
+        for(SceneNode* child : node->GetChildren())
+            DeleteNode(child, deleteChildren);
+
+
+    // Erase node
+    auto nodeIt = mNodes.find(node->GetUUID());
+    mNodes.erase(nodeIt);
 }
 
 void Scene::AttachToParent(SceneNode* child, const std::string& parentUuid)
@@ -114,9 +152,9 @@ const Scene::NodeBank& Scene::GetNodes() const
     return mNodes;
 }
 
-const Scene::NodeCategoryMap& Scene::GetCategories() const
+const Scene::PointLights& Scene::GetLights() const
 {
-    return mCategories;
+    return mLights;
 }
 
 SceneNode* Scene::FindNodeByUuid(const std::string& uuid)

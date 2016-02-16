@@ -8,7 +8,7 @@ SceneNode::SceneNode(
     const std::string& model,
     const std::string& material,
     const std::string& uuid,
-    SceneNodeCategory category,
+    Category category,
     AABB localAABB,
     bool isCulled /* = false */,
     SceneNode* parent /* = nullptr */)
@@ -112,7 +112,7 @@ void SceneNode::SetTransformation(const glm::mat4& mat)
     mTransform.Set(mat);
 }
 
-SceneNodeCategory SceneNode::GetCategory() const
+Category SceneNode::GetCategory() const
 {
     return mCategory;
 }

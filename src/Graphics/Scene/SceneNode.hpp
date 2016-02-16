@@ -42,7 +42,7 @@ WARN_GUARD_ON
 WARN_GUARD_OFF
 
 /// Scene Object Categories
-enum class SceneNodeCategory
+enum class Category
 {
     Normal,
     Light,
@@ -66,7 +66,7 @@ class SceneNode
             const std::string& model,
             const std::string& material,
             const std::string& uuid,
-            SceneNodeCategory category,
+            Category category,
             AABB localAABB,
             bool isCulled = false,
             SceneNode* parent = nullptr);
@@ -99,7 +99,7 @@ class SceneNode
         void SetTransformation(const glm::mat4& mat);
 
         /// Get category
-        SceneNodeCategory GetCategory() const;
+        Category GetCategory() const;
 
         /// Get UUID
         const std::string& GetUUID() const;
@@ -117,7 +117,7 @@ class SceneNode
         std::string mModel;          /// Node's model name
         std::string mMaterial;       /// Node's material name
         Transform mTransform;        /// Node's current transformation
-        SceneNodeCategory mCategory; /// Node's category
+        Category mCategory;          /// Node's category
         std::string mUuid;           /// Node's unique id
         AABB mAABB;                  /// Node's AABB
         bool mCulled;                /// Is the node culled?

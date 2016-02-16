@@ -218,68 +218,66 @@ void Renderer::GeometryPass(float interpolation)
     auto viewId = glGetUniformLocation(progId, "view");
     glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
 
-    // Iterate through world objects by category
-    for (const auto& objCategory : mScene->GetCategories())
+    for(auto& p : mScene->GetNodes())
     {
-        for (const auto& gObj : objCategory.second)
+        SceneNode* node = p.second.get();
+
+        // Calculate the model matrix
+        glm::mat4 model = node->GetTransformation().GetInterpolated(interpolation);
+
+        // Upload it
+        auto modelId = glGetUniformLocation(progId, "model");
+        glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
+
+        // Get the model
+        ModelDescription* mdl = mModelStore[node->GetModel()];
+
+        // Get the material
+        Material* material = (*mMaterialStore)[node->GetMaterial()];
+
+        //
+        // Upload material parameters
+        //
+        // Diffuse
+        const glm::vec3& diffCol = material->GetDiffuseColor();
+        glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
+        if(material->UsesDiffuseTexture())
         {
-            // Calculate the model matrix
-            glm::mat4 model = gObj->GetTransformation().GetInterpolated(interpolation);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, material->GetDiffuseTexture());
+            glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
+        }
 
-            // Upload it
-            auto modelId = glGetUniformLocation(progId, "model");
-            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
+        // Specular
+        glUniform1f(glGetUniformLocation(progId, "material.specularColor"), material->GetSpecularColor().x);
+        if(material->UsesSpecularTexture())
+        {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, material->GetSpecularTexture());
+            glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
+        }
 
-            // Get the model
-            ModelDescription* mdl = mModelStore[gObj->GetModel()];
+        // Normal map
+        if(material->UsesNormalMapTexture())
+        {
+            glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, material->GetNormalMapTexture());
+            glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
+        }
+        else
+        {
+            glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
+        }
 
-            // Get the material
-            Material* material = (*mMaterialStore)[gObj->GetMaterial()];
-
-            //
-            // Upload material parameters
-            //
-            // Diffuse
-            const glm::vec3& diffCol = material->GetDiffuseColor();
-            glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-            if (material->UsesDiffuseTexture())
-            {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, material->GetDiffuseTexture());
-                glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
-            }
-
-            // Specular
-            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), material->GetSpecularColor().x);
-            if (material->UsesSpecularTexture())
-            {
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, material->GetSpecularTexture());
-                glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
-            }
-
-            // Normal map
-            if(material->UsesNormalMapTexture())
-            {
-                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
-                glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, material->GetNormalMapTexture());
-                glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
-            }
-            else
-            {
-                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
-            }
-
-            // Draw all its meshes
-            for (const auto& mesh : mdl->meshes)
-            {
-                glBindVertexArray(mesh.vaoId);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
-                glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                glBindVertexArray(0);
-            }
+        // Draw all its meshes
+        for(const auto& mesh : mdl->meshes)
+        {
+            glBindVertexArray(mesh.vaoId);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
+            glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
         }
     }
 
@@ -306,6 +304,8 @@ float CalcPointLightBSphere(const PointLight& light)
 
 void Renderer::LightPass(float interpolation)
 {
+    (void)interpolation;
+
     // Prepare GBuffer for the light pass
     mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
     glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
@@ -379,13 +379,6 @@ void Renderer::LightPass(float interpolation)
     // Set point light's properties
     PointLight& pLight = mLights.pointLights.front();
 
-    // Update changing position
-    auto& categories = mScene->GetCategories();
-    auto lightIt = categories.find(SceneNodeCategory::Light);
-    const glm::mat4& lTrans = lightIt->second[0]->GetTransformation().GetInterpolated(interpolation);
-    const glm::vec3 lightPos = glm::vec3(lTrans[3].x, lTrans[3].y, lTrans[3].z);
-    pLight.position = lightPos;
-
     // Make the stencil pass
     StencilPass(pLight);
     mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
@@ -396,13 +389,13 @@ void Renderer::LightPass(float interpolation)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
 
-    glUniform3fv(glGetUniformLocation(progId, "pLight.position"), 1, glm::value_ptr(pLight.position));
+    glUniform3fv(glGetUniformLocation(progId, "pLight.position"),            1, glm::value_ptr(pLight.position));
     glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
     glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
     glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
-    glUniform1f(glGetUniformLocation(progId, "pLight.attProps.constant"), pLight.attProps.constant);
-    glUniform1f(glGetUniformLocation(progId, "pLight.attProps.linear"), pLight.attProps.linear);
-    glUniform1f(glGetUniformLocation(progId, "pLight.attProps.quadratic"), pLight.attProps.quadratic);
+    glUniform1f(glGetUniformLocation( progId, "pLight.attProps.constant"),   pLight.attProps.constant);
+    glUniform1f(glGetUniformLocation( progId, "pLight.attProps.linear"),     pLight.attProps.linear);
+    glUniform1f(glGetUniformLocation( progId, "pLight.attProps.quadratic"),  pLight.attProps.quadratic);
 
     // Bounding sphere
     float scaleFactor = CalcPointLightBSphere(pLight);
@@ -491,3 +484,13 @@ ModelStore& Renderer::GetModelStore()
     return mModelStore;
 }
 
+void Renderer::SetPointLightPos(unsigned int index, const glm::vec3& pos)
+{
+    auto& pointLights = mLights.pointLights;
+
+    // Do nothing if index is invalid
+    if(pointLights.size() <= index)
+        return;
+
+    pointLights[index].position = pos;
+}

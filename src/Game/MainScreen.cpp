@@ -11,6 +11,24 @@ WARN_GUARD_OFF
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
 
+void UpdateLight(Renderer& renderer, Scene* const scene, const glm::vec3& move)
+{
+    auto& lights = scene->GetLights();
+
+    for(unsigned int i = 0; i < lights.size(); i++)
+    {
+        // Get light
+        SceneNode* curLight = lights[i];
+
+        // Move light in scene
+        scene->Move(curLight, move);
+
+        // Move light in renderer
+        auto trans = curLight->GetTransformation().GetInterpolated(1.0f);
+        renderer.SetPointLightPos(i, glm::vec3(trans[3].x, trans[3].y, trans[3].z));
+    }
+};
+
 void MainScreen::onInit(ScreenContext& sc)
 {
     // Store engine ref
@@ -77,6 +95,9 @@ void MainScreen::SetupWorld()
         mScene->Rotate(node, RotationAxis::Y, 7.0f * i);
         mScene->Rotate(node, RotationAxis::Z, 10.0f * i);
     }
+
+    // Update lights once to take their initial position
+    UpdateLight(mEngine->GetRenderer(), mScene.get(), glm::vec3(0));
 }
 
 std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
@@ -122,6 +143,7 @@ void MainScreen::onUpdate(float dt)
 
     auto& scene = mScene;
     auto& window = mEngine->GetWindow();
+    auto& renderer = mEngine->GetRenderer();
 
     // Update camera euler angles
     if (window.MouseGrabEnabled())
@@ -134,20 +156,25 @@ void MainScreen::onUpdate(float dt)
     mCamera.Update();
 
     // Update light position
-    SceneNode* teapot = scene->FindNodeByUuid("teapot");
+    //auto updLight = std::bind(updateLight, renderer, mScene.get(), std::placeholders::_1);
+    auto updLight = [&renderer, &scene](const glm::vec3& move)
+    {
+        UpdateLight(renderer, scene.get(), move);
+    };
+
     float increase = 0.7f;
     if(window.IsKeyPressed(Key::Kp8))
-        scene->Move(teapot, glm::vec3(0.0f, increase, 0.0f));
+        updLight(glm::vec3(0.0f, increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp4))
-        scene->Move(teapot, glm::vec3(-increase, 0.0f, 0.0f));
+        updLight(glm::vec3(-increase, 0.0f, 0.0f));
     if(window.IsKeyPressed(Key::Kp2))
-        scene->Move(teapot, glm::vec3(0.0f, -increase, 0.0f));
+        updLight(glm::vec3(0.0f, -increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp6))
-        scene->Move(teapot, glm::vec3(increase, 0.0f, 0.0f));
+        updLight(glm::vec3(increase, 0.0f, 0.0f));
     if(window.IsKeyPressed(Key::Kp5))
-        scene->Move(teapot, glm::vec3(0.0f, 0.0f, -increase));
+        updLight(glm::vec3(0.0f, 0.0f, -increase));
     if(window.IsKeyPressed(Key::Kp0))
-        scene->Move(teapot, glm::vec3(0.0f, 0.0f, increase));
+        updLight(glm::vec3(0.0f, 0.0f, increase));
 
     // Update cubes' rotations
     if (mRotationData.rotating)

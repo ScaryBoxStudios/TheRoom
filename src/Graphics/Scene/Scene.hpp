@@ -38,10 +38,9 @@
 
 class Scene
 {
-    //                               UUID               Unique Ptr to node
-    using NodeBank        = std::map<std::string,       std::unique_ptr<SceneNode>>;
-    //                               Category           Nodes that belong in that category
-    using NodeCategoryMap = std::map<SceneNodeCategory, std::vector<SceneNode*>>;
+    //                           UUID               Unique Ptr to node
+    using NodeBank    = std::map<std::string,       std::unique_ptr<SceneNode>>;
+    using PointLights = std::vector<SceneNode*>;
 
     public:
         /// Constructor
@@ -52,9 +51,13 @@ class Scene
             const std::string& model,
             const std::string& material,
             const std::string& uuid,
-            SceneNodeCategory category,
+            Category category,
             const AABB& initAABB,
             bool isCulled = false);
+
+        /// Deletes a node
+        void DeleteNode(const std::string& uuid, bool deleteChildren = false);
+        void DeleteNode(SceneNode* const node, bool deleteChildren = false);
 
         /// Attach child to parent
         void AttachToParent(SceneNode* child, const std::string& parentUuid);
@@ -81,16 +84,16 @@ class Scene
         /// Get all nodes in their container
         const NodeBank& GetNodes() const;
 
-        /// Get all nodes in a useful category map
-        const NodeCategoryMap& GetCategories() const;
+        /// Get all scene's lights
+        const PointLights& GetLights() const;
 
         /// Finds the node with the given uuid
         SceneNode* FindNodeByUuid(const std::string& uuid);
 
     private:
-        SceneNode* mRootNode;        /// Scene's root node
-        NodeBank mNodes;             /// All nodes
-        NodeCategoryMap mCategories; /// A map to find nodes by category
+        SceneNode*  mRootNode; /// Scene's root node
+        NodeBank    mNodes;    /// All nodes
+        PointLights mLights;   /// Scene's point lights
 
 }; // ! Scene
 

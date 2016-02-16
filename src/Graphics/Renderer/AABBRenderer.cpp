@@ -41,17 +41,16 @@ void AABBRenderer::Render(float interpolation)
     (void) interpolation;
 
     glUseProgram(mProgram->Id());
-    for (const auto& objCategory : mScene->GetCategories())
+    for(const auto& p : mScene->GetNodes())
     {
-        for (const auto& gObj : objCategory.second)
-        {
-            // Upload model, projection and view matrices
-            glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "projection"), 1, GL_FALSE, glm::value_ptr(mProjection));
-            glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "view"), 1, GL_FALSE, glm::value_ptr(mView));
+        SceneNode* const node = p.second.get();
 
-            // Draw the AABB
-            RenderBox(gObj->GetAABB());
-        }
+        // Upload model, projection and view matrices
+        glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "projection"), 1, GL_FALSE, glm::value_ptr(mProjection));
+        glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "view"), 1, GL_FALSE, glm::value_ptr(mView));
+
+        // Draw the AABB
+        RenderBox(node->GetAABB());
     }
     glUseProgram(0);
 }

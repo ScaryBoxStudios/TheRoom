@@ -131,7 +131,7 @@ void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFi
         ModelDescription* model = (*mModelStore)[child.geometry.ToString()];
 
         // Find the right category
-        SceneNodeCategory category = (child.type.compare("Mesh") == 0) ? SceneNodeCategory::Normal : SceneNodeCategory::Light;
+        Category category = (child.type.compare("Mesh") == 0) ? Category::Normal : Category::Light;
 
         // Create Scene Node
         const auto& initAABB = model->localAABB;

@@ -78,6 +78,9 @@ class Renderer
         /*! Toggles showing the AABBs */
         void ToggleShowAABBs();
 
+        /*! Sets the position of a Point Light */
+        void SetPointLightPos(unsigned int index, const glm::vec3& pos);
+
     private:
         // Performs the geometry pass rendering step
         void GeometryPass(float interpolation);

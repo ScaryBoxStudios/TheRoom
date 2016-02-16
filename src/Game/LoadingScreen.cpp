@@ -85,7 +85,7 @@ void LoadingScreen::LoadFileData()
     , "ext/Assets/Models/Teapot.obj"
     , "ext/Assets/Models/WoodenCabin.dae"
     , "ext/Assets/Models/Well.obj"
-    , "ext/Assets/Models/Warrior.obj"
+    , "ext/Assets/Models/Warrior.dae"
     };
 
     for (const auto& file : fileList)
@@ -102,7 +102,7 @@ void LoadingScreen::LoadTextures()
 }
 
 void LoadingScreen::LoadMaterials()
-{   
+{
 }
 
 void LoadingScreen::LoadModels()

@@ -32,6 +32,7 @@ void ModelStore::Load(const std::string& name, const ModelData& data)
     for (const auto& mesh : data.meshes)
     {
         MeshDescription meshDesc;
+        meshDesc.meshIndex = mesh.meshIndex;
         auto& vaoId = meshDesc.vaoId;
         auto& vboId = meshDesc.vboId;
         auto& eboId = meshDesc.eboId;

@@ -64,7 +64,8 @@
         {
             "uuid": "CA60C4CB-2E51-404C-A1DF-7ED383F91A6A",
             "url" : "ext/Assets/Textures/Models/Well/Wall1_B.tga"
-        }],
+        }
+    ],
     "textures": [
         {
             "uuid" : "F125FC15-080E-45F4-B761-19086A374999",
@@ -132,7 +133,8 @@
             "uuid": "F9078F31-39F2-450D-B34E-78CD6689B129",
             "type": "character",
             "url" : "ext/Assets/Models/Warrior.obj"
-        }],
+        }
+    ],
     "materials": [
         {
             "uuid"   : "518E850E-B8B9-489F-82F4-0E5AACD25D95",
@@ -187,7 +189,7 @@
                            0,3,0,0,
                            0.00477764383,0,-2.99999619,0,
                            0,-4.19999981,6.60000038,1],
-                "material": "2DA97C2B-D7AF-47D3-B1B7-F3FFC2C37949",
+                "materials": ["2DA97C2B-D7AF-47D3-B1B7-F3FFC2C37949"],
                 "geometry": "F9078F31-39F2-450D-B34E-78CD6689B129"
             },
             {
@@ -198,7 +200,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -209,7 +211,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -220,7 +222,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -231,7 +233,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -242,7 +244,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -253,7 +255,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -264,7 +266,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -275,7 +277,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -286,7 +288,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -297,7 +299,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,0,0,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -308,7 +310,7 @@
                            0,0.300000012,0,0,
                            0,0,0.300000012,0,
                            0,-10,-40,1],
-                "material": "E8E8E5A8-509A-4B73-9270-1393ED82E4D5",
+                "materials": ["E8E8E5A8-509A-4B73-9270-1393ED82E4D5"],
                 "geometry": "F665FA2D-D0FF-4753-B2A2-089F9E735565"
             },
             {
@@ -319,7 +321,7 @@
                            0,2,0,0,
                            0,0,2,-0,
                            0,-5,-10,1],
-                "material": "B6669D48-3B45-4D04-B93F-7556FC7B9DC3",
+                "materials": ["B6669D48-3B45-4D04-B93F-7556FC7B9DC3"],
                 "geometry": "AF7A8A4E-F523-4308-AAD7-340DA1595764"
             },
             {
@@ -330,7 +332,7 @@
                            0,3,0,0,
                            0,0,3,0,
                            10,0,2,1],
-                "material": "2DA97C2B-D7AF-47D3-B1B7-F3FFC2C37949",
+                "materials": ["2DA97C2B-D7AF-47D3-B1B7-F3FFC2C37949"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -341,7 +343,7 @@
                            0,0.1,0,0,
                            0,0,75,0,
                            0,-11,-40,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "C85CC050-6FA3-46F2-A763-6D8D882CD905"
             },
             {
@@ -352,7 +354,7 @@
                            0,1,0,0,
                            0,0,1,0,
                            0,3,-2,1],
-                "material": "518E850E-B8B9-489F-82F4-0E5AACD25D95",
+                "materials": ["518E850E-B8B9-489F-82F4-0E5AACD25D95"],
                 "geometry": "63A3C6DF-78B7-4453-9129-2CE5B2EAF620"
             },
             {
@@ -363,7 +365,7 @@
                            0,0.300000012,0,0,
                            0,0,0.300000012,0,
                            4,0,0,1],
-                "material": "D6AB1BA1-BD6E-475D-BB84-3810D9B0FFCB",
+                "materials": ["D6AB1BA1-BD6E-475D-BB84-3810D9B0FFCB"],
                 "geometry": "C5C37168-A654-4C80-98F3-D01FD1F5214F",
                 "color": 16777215,
                 "intensity": 1

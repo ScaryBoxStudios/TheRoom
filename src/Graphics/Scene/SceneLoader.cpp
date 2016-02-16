@@ -289,8 +289,18 @@ SceneFile SceneLoader::Load(const Buffer& data)
                 assert(StringToUUID(child["geometry"].GetString(), ch.geometry));
 
             // Material
-            if (child.HasMember("material"))
-                assert(StringToUUID(child["material"].GetString(), ch.material));
+            if (child.HasMember("materials"))
+            {
+                Value& mats = child["materials"];
+                assert(mats.IsArray());
+
+                ch.materials.resize(mats.Size());
+                for (SizeType j = 0; j < mats.Size(); ++j)
+                {
+                    Value& mat = mats[j];
+                    assert(StringToUUID(mat.GetString(), ch.materials[j]));
+                }
+            }
 
             // Add to list
             sc.object.children.push_back(ch);

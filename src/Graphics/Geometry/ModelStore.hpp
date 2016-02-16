@@ -48,6 +48,7 @@ struct MeshDescription
     GLuint vboId;
     GLuint eboId;
     GLsizei numIndices;
+    GLuint meshIndex;
 };
 
 // ModelDescription

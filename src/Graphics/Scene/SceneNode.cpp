@@ -6,14 +6,14 @@
 //--------------------------------------------------
 SceneNode::SceneNode(
     const std::string& model,
-    const std::string& material,
+    const std::vector<std::string>& materials,
     const std::string& uuid,
     Category category,
     AABB localAABB,
     bool isCulled /* = false */,
     SceneNode* parent /* = nullptr */)
     : mModel(model)
-    , mMaterial(material)
+    , mMaterials(materials)
     , mCategory(category)
     , mUuid(uuid)
     , mAABB(localAABB)
@@ -97,9 +97,9 @@ const std::string& SceneNode::GetModel() const
     return mModel;
 }
 
-const std::string& SceneNode::GetMaterial() const
+const std::vector<std::string>& SceneNode::GetMaterials() const
 {
-    return mMaterial;
+    return mMaterials;
 }
 
 Transform& SceneNode::GetTransformation()

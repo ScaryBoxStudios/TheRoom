@@ -64,7 +64,7 @@ class SceneNode
         /// Constructor
         SceneNode(
             const std::string& model,
-            const std::string& material,
+            const std::vector<std::string>& materials,
             const std::string& uuid,
             Category category,
             AABB localAABB,
@@ -90,7 +90,7 @@ class SceneNode
         const std::string& GetModel() const;
 
         /// Get material
-        const std::string& GetMaterial() const;
+        const std::vector<std::string>& GetMaterials() const;
 
         /// Get transformation
         Transform& GetTransformation();
@@ -114,16 +114,16 @@ class SceneNode
         const ChildrenList& GetChildren() const;
 
     private:
-        std::string mModel;          /// Node's model name
-        std::string mMaterial;       /// Node's material name
-        Transform mTransform;        /// Node's current transformation
-        Category mCategory;          /// Node's category
-        std::string mUuid;           /// Node's unique id
-        AABB mAABB;                  /// Node's AABB
-        bool mCulled;                /// Is the node culled?
+        std::string mModel;                  /// Node's model name
+        std::vector<std::string> mMaterials; /// Node's materials name (per mesh)
+        Transform mTransform;                /// Node's current transformation
+        Category mCategory;                  /// Node's category
+        std::string mUuid;                   /// Node's unique id
+        AABB mAABB;                          /// Node's AABB
+        bool mCulled;                        /// Is the node culled?
 
-        SceneNode* mParent;          /// Node's parent object
-        ChildrenList mChildren;      /// Node's children objects
+        SceneNode* mParent;                  /// Node's parent object
+        ChildrenList mChildren;              /// Node's children objects
 
         /// Moves all children of this node
         void MoveChildren(const glm::vec3& pos);

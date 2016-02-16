@@ -135,7 +135,10 @@ void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFi
 
         // Create Scene Node
         const auto& initAABB = model->localAABB;
-        sceneToBake->CreateNode(child.geometry.ToString(), child.material.ToString(), child.name, category, initAABB);
+        std::vector<std::string> materials;
+        for (const auto& mat : child.materials)
+            materials.push_back(mat.ToString());
+        sceneToBake->CreateNode(child.geometry.ToString(), materials, child.name, category, initAABB);
 
         // Set initial transformation
         sceneToBake->SetTransformation(child.name, child.matrix);

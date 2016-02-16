@@ -14,7 +14,7 @@ Scene::Scene()
 
 SceneNode* Scene::CreateNode(
     const std::string& model,
-    const std::string& material,
+    const std::vector<std::string>& material,
     const std::string& uuid,
     Category category,
     const AABB& initAABB,

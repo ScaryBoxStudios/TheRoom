@@ -50,6 +50,7 @@ struct MeshData
 {
     std::vector<VertexData> data;
     std::vector<uint32_t> indices;
+    std::uint32_t meshIndex;
 };
 
 struct ModelData

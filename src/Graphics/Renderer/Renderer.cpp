@@ -232,47 +232,49 @@ void Renderer::GeometryPass(float interpolation)
         // Get the model
         ModelDescription* mdl = mModelStore[node->GetModel()];
 
-        // Get the material
-        Material* material = (*mMaterialStore)[node->GetMaterial()];
+        // Get the material names per mesh
+        const auto mats = node->GetMaterials();
 
-        //
-        // Upload material parameters
-        //
-        // Diffuse
-        const glm::vec3& diffCol = material->GetDiffuseColor();
-        glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-        if(material->UsesDiffuseTexture())
-        {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, material->GetDiffuseTexture());
-            glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
-        }
-
-        // Specular
-        glUniform1f(glGetUniformLocation(progId, "material.specularColor"), material->GetSpecularColor().x);
-        if(material->UsesSpecularTexture())
-        {
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, material->GetSpecularTexture());
-            glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
-        }
-
-        // Normal map
-        if(material->UsesNormalMapTexture())
-        {
-            glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, material->GetNormalMapTexture());
-            glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
-        }
-        else
-        {
-            glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
-        }
 
         // Draw all its meshes
         for(const auto& mesh : mdl->meshes)
         {
+            // Get the material
+            Material* material = (*mMaterialStore)[mats[mesh.meshIndex]];
+
+            //
+            // Upload material parameters
+            //
+            // Diffuse
+            const glm::vec3& diffCol = material->GetDiffuseColor();
+            glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
+            if(material->UsesDiffuseTexture())
+            {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, material->GetDiffuseTexture());
+                glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
+            }
+
+            // Specular
+            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), material->GetSpecularColor().x);
+            if(material->UsesSpecularTexture())
+            {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, material->GetSpecularTexture());
+                glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
+            }
+
+            // Normal map
+            if(material->UsesNormalMapTexture())
+            {
+                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, material->GetNormalMapTexture());
+                glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
+            }
+            else
+                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
+
             glBindVertexArray(mesh.vaoId);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
             glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);

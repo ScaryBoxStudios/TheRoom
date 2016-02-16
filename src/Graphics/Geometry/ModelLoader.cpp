@@ -86,6 +86,9 @@ ModelData ModelLoader::Load(const std::vector<std::uint8_t>& fileData, const cha
             if (vert.z > maxPoint.z)
                 maxPoint.z = vert.z;
 
+            // Material index
+            mData.meshIndex = mesh->mMaterialIndex;
+
             mData.data.push_back(vertexData);
         }
 

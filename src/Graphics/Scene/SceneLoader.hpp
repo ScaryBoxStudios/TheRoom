@@ -119,7 +119,7 @@ struct SceneFile
             std::string name; // "name"
             glm::mat4 matrix; // "matrix"
             rUUID geometry;   // "geometry"
-            rUUID material;   // "material"
+            std::vector<rUUID> materials; // "materials"
         };
         std::vector<Child> children; // "children"
     };

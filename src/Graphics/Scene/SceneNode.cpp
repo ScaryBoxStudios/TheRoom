@@ -140,25 +140,25 @@ const SceneNode::ChildrenList& SceneNode::GetChildren() const
 //--------------------------------------------------
 // Private functions
 //--------------------------------------------------
-inline void SceneNode::MoveChildren(const glm::vec3& pos)
+void SceneNode::MoveChildren(const glm::vec3& pos)
 {
     for(SceneNode* child : mChildren)
         child->Move(pos, true);
 }
 
-inline void SceneNode::RotateChildren(RotationAxis axis, float angle)
+void SceneNode::RotateChildren(RotationAxis axis, float angle)
 {
     for(SceneNode* child : mChildren)
         child->Rotate(axis, angle, true);
 }
 
-inline void SceneNode::ScaleChildren(const glm::vec3& scale)
+void SceneNode::ScaleChildren(const glm::vec3& scale)
 {
     for(SceneNode* child : mChildren)
         child->Scale(scale, true);
 }
 
-inline SceneNode::ChildrenList::iterator SceneNode::FindChildByUuid(const std::string& uuid)
+SceneNode::ChildrenList::iterator SceneNode::FindChildByUuid(const std::string& uuid)
 {
     return std::find_if(std::begin(mChildren),
               std::end(mChildren),

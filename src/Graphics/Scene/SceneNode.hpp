@@ -126,16 +126,16 @@ class SceneNode
         ChildrenList mChildren;      /// Node's children objects
 
         /// Moves all children of this node
-        inline void MoveChildren(const glm::vec3& pos);
+        void MoveChildren(const glm::vec3& pos);
 
         /// Rotates all children of this node
-        inline void RotateChildren(RotationAxis axis, float angle);
+        void RotateChildren(RotationAxis axis, float angle);
 
         /// Scales all children of this node
-        inline void ScaleChildren(const glm::vec3& scale);
+        void ScaleChildren(const glm::vec3& scale);
 
         /// Find if there is a child with the given uuid
-        inline ChildrenList::iterator FindChildByUuid(const std::string& uuid);
+        ChildrenList::iterator FindChildByUuid(const std::string& uuid);
 }; // ! SceneNode
 
 #endif // ! _SCENENODE_HPP_

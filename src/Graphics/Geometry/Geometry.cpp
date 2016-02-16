@@ -75,10 +75,14 @@ ModelData GenUVSphere(float radius, std::uint32_t rings = 32, std::uint32_t sect
         meshData.data.emplace_back(VertexData {
             vertices[i].x, vertices[i].y, vertices[i].z,
             normals[i].x, normals[i].y, normals[i].z,
-            texCoords[i].x, texCoords[i].y
+            texCoords[i].x, texCoords[i].y,
+            0.0f, 0.0f, 0.0f
         });
     }
     meshData.indices = std::move(indices);
+
+    // Add the mesh index
+    meshData.meshIndex = 0;
 
     // Calculate the AABB
     AABB boundingBox(glm::vec3(-radius), glm::vec3(radius));

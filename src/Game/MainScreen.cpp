@@ -197,6 +197,26 @@ void MainScreen::onUpdate(float dt)
                 scene->Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
         }
     }
+
+    // Update physics
+    UpdatePhysics(dt);
+}
+
+void MainScreen::UpdatePhysics(float dt)
+{
+    (void) dt;
+
+    auto& scene = mScene;
+    SceneNode* teapot = mScene->FindNodeByUuid("teapot");
+    for(auto& p : scene->GetNodes())
+    {
+        SceneNode* cur = p.second.get();
+        if(cur->GetUUID() == teapot->GetUUID())
+            continue;
+
+        if(Intersects(teapot->GetAABB(), cur->GetAABB()))
+            scene->Move(teapot, CalcCollisionResponce(teapot->GetAABB(), cur->GetAABB()));
+    }
 }
 
 void MainScreen::onRender(float interpolation)

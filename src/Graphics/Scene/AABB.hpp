@@ -53,6 +53,8 @@ class AABB
 
         glm::vec3 MinPoint() const;
         glm::vec3 MaxPoint() const;
+        glm::vec3 Center() const;
+        glm::vec3 Size() const;
 
         void Update(const glm::vec3& transl, const glm::vec3& scale, const glm::vec3& rotation);
 
@@ -60,5 +62,9 @@ class AABB
         glm::vec3 localMin, cachedMin;
         glm::vec3 localMax, cachedMax;
 };
+
+bool Intersects(const glm::vec3&, const AABB& aabb);
+bool Intersects(const AABB& aabb1, const AABB& aabb2);
+glm::vec3 CalcCollisionResponce(const AABB& aabb1, const AABB& aabb2);
 
 #endif // ! _AABB_HPP_

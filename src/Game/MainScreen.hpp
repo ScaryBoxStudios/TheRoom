@@ -47,6 +47,9 @@ class MainScreen : public Screen
         // Called during initialization to setup the world
         void SetupWorld();
 
+        //
+        void UpdatePhysics(float dt);
+
         // Engine ref
         Engine* mEngine;
 

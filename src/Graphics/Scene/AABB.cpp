@@ -26,6 +26,15 @@ float AABB::MaxZ() const { return MaxPoint().z; }
 
 glm::vec3 AABB::MinPoint() const { return cachedMin; }
 glm::vec3 AABB::MaxPoint() const { return cachedMax; }
+glm::vec3 AABB::Center() const { return (MinPoint() + MaxPoint()) * 0.5f; }
+glm::vec3 AABB::Size() const
+{
+    return glm::vec3(
+        MaxX() - MinX(),
+        MaxY() - MinY(),
+        MaxZ() - MinZ()
+    );
+}
 
 void AABB::Update(const glm::vec3& transl, const glm::vec3& scale, const glm::vec3& rotation)
 {
@@ -70,4 +79,46 @@ void AABB::Update(const glm::vec3& transl, const glm::vec3& scale, const glm::ve
     transform = glm::scale(transform, scale);
     cachedMin = glm::vec3(transform * glm::vec4(cachedMin, 1.0f));
     cachedMax = glm::vec3(transform * glm::vec4(cachedMax, 1.0f));
+}
+
+bool Intersects(const glm::vec3& p, const AABB& box)
+{
+    return p.x > box.MinX() && p.x < box.MaxX()
+        && p.y > box.MinY() && p.y < box.MaxY()
+        && p.z > box.MinZ() && p.x < box.MaxZ();
+}
+
+bool Intersects(const AABB& aabb1, const AABB& aabb2)
+{
+    bool xCollide = aabb1.MaxX() > aabb2.MinX()
+                 && aabb1.MinX() < aabb2.MaxX();
+    bool yCollide = aabb1.MaxY() > aabb2.MinY()
+                 && aabb1.MinY() < aabb2.MaxY();
+    bool zCollide = aabb1.MaxZ() > aabb2.MinZ()
+                 && aabb1.MinZ() < aabb2.MaxZ();
+    return xCollide && yCollide && zCollide;
+    /*
+    return aabb1.MaxX() > aabb2.MinX()
+        && aabb1.MinX() < aabb2.MaxX()
+        && aabb1.MaxY() > aabb2.MinY()
+        && aabb1.MinY() < aabb2.MaxY()
+        && aabb1.MaxZ() > aabb2.MinZ()
+        && aabb1.MinZ() < aabb2.MaxZ();
+    */
+}
+
+glm::vec3 CalcCollisionResponce(const AABB& aabb1, const AABB& aabb2)
+{
+    bool xCollide = aabb1.MaxX() > aabb2.MinX();
+    bool yCollide = aabb1.MaxY() > aabb2.MinY();
+    bool zCollide = aabb1.MaxZ() > aabb2.MinZ();
+
+    glm::vec3 resolution = {};
+    if (xCollide)
+        resolution.x = aabb1.Center().x - aabb2.Center().x + (aabb1.Size().x + aabb2.Size().x) * 0.5f;
+    if (yCollide)
+        resolution.y = aabb1.Center().y - aabb2.Center().y + (aabb1.Size().y + aabb2.Size().y) * 0.5f;
+    if (zCollide)
+        resolution.z = aabb1.Center().z - aabb2.Center().z + (aabb1.Size().z + aabb2.Size().z) * 0.5f;
+    return resolution;
 }

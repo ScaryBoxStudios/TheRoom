@@ -41,12 +41,38 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
+template<typename T>
+struct Maybe
+{
+    T data;
+    bool valid;
+};
+
+template<typename T>
+bool operator==(const Maybe<T>& m1, const Maybe<T>& m2)
+{
+    return m1.data == m2.data;
+}
+
+namespace std
+{
+    template<typename T>
+    std::string to_string(const Maybe<T>& m)
+    {
+        if(m.valid)
+            return std::to_string(m.data);
+        else
+            return std::string("");
+    }
+}
+
 //
 // On the right side comments are listed the
 // json keys used in the scene file format
 //
 struct SceneFile
 {
+    using Id = Maybe<std::uint32_t>;
     struct
     {
         std::string version;   // "version"
@@ -56,7 +82,7 @@ struct SceneFile
 
     struct Geometry
     {
-        rUUID uuid;       // "uuid"
+        Id id;       // "id"
         std::string type; // "type"
         std::string url;  // "url"
     };
@@ -64,7 +90,7 @@ struct SceneFile
 
     struct Image
     {
-        rUUID uuid;      // "uuid"
+        Id id;           // "id"
         std::string url; // "url"
     };
     std::vector<Image> images; // "images"
@@ -74,8 +100,8 @@ struct SceneFile
 
     struct Texture
     {
-        rUUID uuid;  // "uuid"
-        rUUID image; // "image"
+        Id id;    // "id"
+        Id image; // "image"
         enum class WrapMode
         {
             ClampToEdge,
@@ -90,7 +116,7 @@ struct SceneFile
 
     struct Material
     {
-        rUUID uuid;       // "uuid"
+        Id id;            // "id"
         std::string name; // "name"
         std::string type; // "type" - Can be MeshPhongMaterial | ???
         Color color;      // "color"
@@ -101,9 +127,9 @@ struct SceneFile
         float opacity;    // "opacity"
         bool transparent; // "transparent"
         bool wireframe;   // "wireframe"
-        rUUID map;        // "map" - Diffuse map
-        rUUID specMap;    // "specMap" - Specular map
-        rUUID nmap;       // "nmap" - Normal map
+        Id map;           // "map" - Diffuse map
+        Id specMap;       // "specMap" - Specular map
+        Id nmap;          // "nmap" - Normal map
     };
     std::vector<Material> materials; // "materials"
 
@@ -115,17 +141,17 @@ struct SceneFile
             glm::vec3 rotation; // "rotation"
             glm::vec3 scale;    // "scale"
         };
-        rUUID uuid;       // "uuid"
-        std::string type; // "type" - Can be Scene|Mesh|PointLight|SpotLight|DirectionalLight
+        Id id;               // "id"
+        std::string type;    // "type" - Can be Scene|Mesh|PointLight|SpotLight|DirectionalLight
         Transform transform; // "transform"
         struct Child
         {
-            rUUID uuid;       // "uuid"
+            Id id;       // "id"
             std::string type; // "type"
             std::string name; // "name"
             Transform transform; // "transform"
-            rUUID geometry;   // "geometry"
-            std::vector<rUUID> materials; // "materials"
+            Id geometry;   // "geometry"
+            std::vector<Id> materials; // "materials"
         };
         std::vector<Child> children; // "children"
     };

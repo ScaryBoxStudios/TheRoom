@@ -23,6 +23,9 @@ SceneFile SceneLoader::Load(const Buffer& data)
     // Root
     assert(doc.IsObject());
 
+    // Id parse helper
+    auto parseId = [](Value& v) -> SceneFile::Id { return SceneFile::Id { v.GetUint(), true }; };
+
     // Parse metadata
     if(doc.HasMember("metadata"))
     {
@@ -63,8 +66,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
             Value& g = geometries[i];
             SceneFile::Geometry gd = {};
 
-            // UUID
-            assert(StringToUUID(g["uuid"].GetString(), gd.uuid));
+            // Id
+            gd.id = parseId(g["id"]);
 
             // Type
             gd.type = g["type"].GetString();
@@ -89,8 +92,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
             Value& im = images[i];
             SceneFile::Image img = {};
 
-            // UUID
-            assert(StringToUUID(im["uuid"].GetString(), img.uuid));
+            // Id
+            img.id = parseId(im["id"]);
 
             // Url
             img.url = im["url"].GetString();
@@ -123,11 +126,11 @@ SceneFile SceneLoader::Load(const Buffer& data)
             Value& t = textures[i];
             SceneFile::Texture tex = {};
 
-            // UUID
-            assert(StringToUUID(t["uuid"].GetString(), tex.uuid));
+            // Id
+            tex.id = parseId(t["id"]);
 
             // Image
-            assert(StringToUUID(t["image"].GetString(), tex.image));
+            tex.image = parseId(t["image"]);
 
             // WrapMode
             if(t.HasMember("wrap"))
@@ -171,8 +174,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
             Value& m = materials[i];
             SceneFile::Material mt = {};
 
-            // UUID
-            assert(StringToUUID(m["uuid"].GetString(), mt.uuid));
+            // Id
+            mt.id = parseId(m["id"]);
 
             // Name
             if(m.HasMember("name"))
@@ -206,25 +209,19 @@ SceneFile SceneLoader::Load(const Buffer& data)
                 mt.wireframe = m["wireframe"].GetBool();
 
             // Map
+            mt.map.valid = false;
             if (m.HasMember("map"))
-                if(strcmp(m["map"].GetString(), "") == 0)
-                    mt.map.SetUuid("");
-                else
-                    assert(StringToUUID(m["map"].GetString(), mt.map));
+                mt.map = parseId(m["map"]);
 
             // SpecMap
+            mt.specMap.valid = false;
             if (m.HasMember("specMap"))
-                if(strcmp(m["specMap"].GetString(), "") == 0)
-                    mt.specMap.SetUuid("");
-                else
-                    assert(StringToUUID(m["specMap"].GetString(), mt.specMap));
+                mt.specMap = parseId(m["specMap"]);
 
             // Nmap
+            mt.nmap.valid = false;
             if(m.HasMember("nmap"))
-                if(strcmp(m["nmap"].GetString(), "") == 0)
-                    mt.nmap.SetUuid("");
-                else
-                    assert(StringToUUID(m["nmap"].GetString(), mt.nmap));
+                mt.nmap = parseId(m["nmap"]);
 
             // Add parsed material to the list
             sc.materials.push_back(mt);
@@ -236,8 +233,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
     {
         Value& object = doc["object"];
 
-        // UUID
-        assert(StringToUUID(object["uuid"].GetString(), sc.object.uuid));
+        // Id
+        sc.object.id = parseId(object["id"]);
 
         // Type
         sc.object.type = object["type"].GetString();
@@ -291,8 +288,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
             Value& child = children[i];
             SceneFile::Object::Child ch;
 
-            // UUID
-            assert(StringToUUID(child["uuid"].GetString(), ch.uuid));
+            // Id
+            ch.id = parseId(child["id"]);
 
             // Type
             ch.type = child["type"].GetString();
@@ -305,7 +302,7 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // Geometry
             if (child.HasMember("geometry"))
-                assert(StringToUUID(child["geometry"].GetString(), ch.geometry));
+                ch.geometry = parseId(child["geometry"]);
 
             // Material
             if (child.HasMember("materials"))
@@ -317,7 +314,7 @@ SceneFile SceneLoader::Load(const Buffer& data)
                 for (SizeType j = 0; j < mats.Size(); ++j)
                 {
                     Value& mat = mats[j];
-                    assert(StringToUUID(mat.GetString(), ch.materials[j]));
+                    ch.materials[j] = parseId(mat);
                 }
             }
 

@@ -113,7 +113,7 @@ void LoadingScreen::LoadModels()
 
     // Add sample UV Sphere
     ModelData sphereModel = GenUVSphere(1, 32, 32);
-    modelStore.Load("63a3c6df-78b7-4453-9129-2ce5b2eaf620", std::move(sphereModel));
+    modelStore.Load("4", std::move(sphereModel));
 }
 
 void LoadingScreen::onUpdate(float dt)

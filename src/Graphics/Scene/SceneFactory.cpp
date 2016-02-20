@@ -35,22 +35,23 @@ void SceneFactory::LoadTextures(const std::vector<SceneFile::Texture>& textures,
     for(auto& texture : textures)
     {
         // Ignore that texture if it has already been loaded
-        if((*mTextureStore)[texture.uuid.ToString()] != nullptr)
+        if((*mTextureStore)[std::to_string(texture.id)] != nullptr)
             continue;
 
         // Find the coresponding image
         auto img = std::find_if(std::begin(images), std::end(images),
             [&texture](const SceneFile::Image& image)->bool
             {
-                return texture.image == image.uuid;
-            });
+                return texture.image == image.id;
+            }
+        );
 
         // Assert if no image with the given UUID exists in scene file
         assert(img != std::end(images));
 
         std::string ext = img->url.substr(img->url.find_last_of(".") + 1);
         RawImage<> pb = imageLoader.Load(*(*mFileDataCache)[img->url], ext);
-        mTextureStore->Load(texture.uuid.ToString(), pb);
+        mTextureStore->Load(std::to_string(texture.id), pb);
     }
 }
 
@@ -59,14 +60,14 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
     for(auto& material : materials)
     {
         // Ignore that material if it has already been loaded
-        if((*mMaterialStore)[material.uuid.ToString()] != nullptr)
+        if((*mMaterialStore)[std::to_string(material.id)] != nullptr)
             continue;
 
         Material newMat;
 
-        const std::string& diffId      = material.map.ToString();
-        const std::string& specId      = material.specMap.ToString();
-        const std::string& normalMapId = material.nmap.ToString();
+        const std::string& diffId      = std::to_string(material.map);
+        const std::string& specId      = std::to_string(material.specMap);
+        const std::string& normalMapId = std::to_string(material.nmap);
 
         if(diffId.compare("") != 0)
             newMat.SetDiffuseTexture((*mTextureStore)[diffId]->texId);
@@ -82,7 +83,7 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
         // Add color
         newMat.SetDiffuseColor(glm::vec3(material.color.r, material.color.g, material.color.b));
 
-        mMaterialStore->Load(material.uuid.ToString(), newMat);
+        mMaterialStore->Load(std::to_string(material.id), newMat);
     }
 }
 
@@ -94,7 +95,11 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
     for(auto& geometry : geometries)
     {
         // Ignore that geometry if it has alredy been loaded
-        if((*mModelStore)[geometry.uuid.ToString()] != nullptr)
+        if((*mModelStore)[std::to_string(geometry.id)] != nullptr)
+            continue;
+
+        // Check if path not empty
+        if(geometry.url.empty())
             continue;
 
         // Check if model is already loaded and if not, load it now!
@@ -116,7 +121,7 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
         if(model.meshes.size() == 0)
             throw std::runtime_error("Couldn't load model (" + geometry.url + ")");
 
-        mModelStore->Load(geometry.uuid.ToString(), std::move(model));
+        mModelStore->Load(std::to_string(geometry.id), std::move(model));
 
         //(*mModelStore)[geometry.uuid.ToString()]->material = *(*mMaterialStore)[m.material];
     }
@@ -128,7 +133,7 @@ void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFi
     for(auto& child : children)
     {
         // Find the right geometry
-        ModelDescription* model = (*mModelStore)[child.geometry.ToString()];
+        ModelDescription* model = (*mModelStore)[std::to_string(child.geometry)];
 
         // Find the right category
         Category category = (child.type.compare("Mesh") == 0) ? Category::Normal : Category::Light;
@@ -137,8 +142,8 @@ void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFi
         const auto& initAABB = model->localAABB;
         std::vector<std::string> materials;
         for (const auto& mat : child.materials)
-            materials.push_back(mat.ToString());
-        sceneToBake->CreateNode(child.geometry.ToString(), materials, child.name, category, initAABB);
+            materials.push_back(std::to_string(mat));
+        sceneToBake->CreateNode(std::to_string(child.geometry), materials, child.name, category, initAABB);
 
         // Set initial transformation
         SceneNode* node = sceneToBake->FindNodeByUuid(child.name);

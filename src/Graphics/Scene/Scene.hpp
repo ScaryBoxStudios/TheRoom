@@ -65,10 +65,6 @@ class Scene
         /// Detach child from parent
         void DetachFromParent(const std::string& childUuid, const std::string& parentUuid);
 
-        /// Manually set the transformation for a node
-        void SetTransformation(const std::string& uuid, const glm::mat4& mat);
-        void SetTransformation(SceneNode* const node, const glm::mat4& mat);
-
         /// Move the node and optionally its children too
         void Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren = false);
         void Move(SceneNode* const node, const glm::vec3& pos, bool moveChildren = false);

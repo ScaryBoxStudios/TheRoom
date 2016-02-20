@@ -98,16 +98,6 @@ void Scene::DetachFromParent(const std::string& childUuid, const std::string& pa
     parent->RemoveChild(childUuid);
 }
 
-void Scene::SetTransformation(const std::string& uuid, const glm::mat4& mat)
-{
-    SetTransformation(FindNodeByUuid(uuid), mat);
-}
-
-void Scene::SetTransformation(SceneNode* const node, const glm::mat4& mat)
-{
-    node->SetTransformation(mat);
-}
-
 void Scene::Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren /* = false */)
 {
     Move(FindNodeByUuid(uuid), pos, moveChildren);

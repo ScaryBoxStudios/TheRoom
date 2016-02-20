@@ -109,15 +109,21 @@ struct SceneFile
 
     struct Object
     {
+        struct Transform
+        {
+            glm::vec3 position; // "position"
+            glm::vec3 rotation; // "rotation"
+            glm::vec3 scale;    // "scale"
+        };
         rUUID uuid;       // "uuid"
         std::string type; // "type" - Can be Scene|Mesh|PointLight|SpotLight|DirectionalLight
-        glm::mat4 matrix; // "matrix"
+        Transform transform; // "transform"
         struct Child
         {
             rUUID uuid;       // "uuid"
             std::string type; // "type"
             std::string name; // "name"
-            glm::mat4 matrix; // "matrix"
+            Transform transform; // "transform"
             rUUID geometry;   // "geometry"
             std::vector<rUUID> materials; // "materials"
         };

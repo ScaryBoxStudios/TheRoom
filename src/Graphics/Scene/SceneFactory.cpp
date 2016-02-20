@@ -141,6 +141,11 @@ void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFi
         sceneToBake->CreateNode(child.geometry.ToString(), materials, child.name, category, initAABB);
 
         // Set initial transformation
-        sceneToBake->SetTransformation(child.name, child.matrix);
+        SceneNode* node = sceneToBake->FindNodeByUuid(child.name);
+        node->Move(child.transform.position);
+        node->Scale(child.transform.scale);
+        node->Rotate(RotationAxis::X, child.transform.rotation.x);
+        node->Rotate(RotationAxis::Y, child.transform.rotation.y);
+        node->Rotate(RotationAxis::Z, child.transform.rotation.z);
     }
 }

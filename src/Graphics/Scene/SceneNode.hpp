@@ -95,9 +95,6 @@ class SceneNode
         /// Get transformation
         Transform& GetTransformation();
 
-        /// Set transformation
-        void SetTransformation(const glm::mat4& mat);
-
         /// Get category
         Category GetCategory() const;
 

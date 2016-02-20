@@ -243,25 +243,44 @@ SceneFile SceneLoader::Load(const Buffer& data)
         sc.object.type = object["type"].GetString();
 
         // Helpers
-        auto parseMatrix = [](std::vector<float> v) -> glm::mat4
+        auto parseTransform = [](Value& t) -> SceneFile::Object::Transform
         {
-            glm::mat4 mat;
-            for (int i = 0; i < 4; ++i)
-                for (int j = 0; j < 4; ++j)
-                    mat[i][j] = v[i * 4 + j];
-            return mat;
-        };
-        auto arrayToVector = [](Value& a) -> std::vector<float>
-        {
-            assert(a.IsArray());
-            std::vector<float> v;
-            for (SizeType i = 0; i < a.Size(); ++i)
-                v.push_back(static_cast<float>(a[i].GetDouble()));
-            return v;
+            SceneFile::Object::Transform transform = {};
+            transform.scale = glm::vec3(1.0f);
+
+            // Position
+            if (t.HasMember("position"))
+            {
+                Value& pos = t["position"];
+                assert(pos.IsArray());
+                transform.position.x = static_cast<float>(pos[0].GetDouble());
+                transform.position.y = static_cast<float>(pos[1].GetDouble());
+                transform.position.z = static_cast<float>(pos[2].GetDouble());
+            }
+
+            // Scale
+            if (t.HasMember("scale"))
+            {
+                Value& sc = t["scale"];
+                assert(sc.IsArray());
+                transform.scale.x = static_cast<float>(sc[0].GetDouble());
+                transform.scale.y = static_cast<float>(sc[1].GetDouble());
+                transform.scale.z = static_cast<float>(sc[2].GetDouble());
+            }
+
+            // Rotation
+            if (t.HasMember("rotation"))
+            {
+                Value& rot = t["rotation"];
+                transform.rotation.x = static_cast<float>(rot[0].GetDouble());
+                transform.rotation.y = static_cast<float>(rot[1].GetDouble());
+                transform.rotation.z = static_cast<float>(rot[2].GetDouble());
+            }
+            return transform;
         };
 
-        // Matrix
-        sc.object.matrix = parseMatrix(arrayToVector(object["matrix"]));
+        // Transform
+        sc.object.transform = parseTransform(object["transform"]);
 
         // Children
         Value& children = object["children"];
@@ -282,7 +301,7 @@ SceneFile SceneLoader::Load(const Buffer& data)
             ch.name = child["name"].GetString();
 
             // Matrix
-            ch.matrix = parseMatrix(arrayToVector(child["matrix"]));
+            ch.transform = parseTransform(child["transform"]);
 
             // Geometry
             if (child.HasMember("geometry"))

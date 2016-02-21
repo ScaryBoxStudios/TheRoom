@@ -66,6 +66,42 @@
         {
             "id": 14,
             "url" : "ext/Assets/Textures/Models/Well/Wall1_B.tga"
+        },
+        {
+            "id": 15,
+            "url" : "ext/Assets/Textures/Models/Warrior/cuirassplate_B.tga"
+        },
+        {
+            "id": 16,
+            "url" : "ext/Assets/Textures/Models/Warrior/cuirassplate_N.tga"
+        },
+        {
+            "id": 17,
+            "url": "ext/Assets/Textures/Models/Warrior/cuirassplate_T.tga"
+        },
+        {
+            "id": 18,
+            "url": "ext/Assets/Textures/Models/Warrior/gauntletsplate_B.tga"
+        },
+        {
+            "id": 19,
+            "url": "ext/Assets/Textures/Models/Warrior/gauntletsplate_N.tga"
+        },
+        {
+            "id": 20,
+            "url": "ext/Assets/Textures/Models/Warrior/gauntletsplate_T.tga"
+        },
+        {
+            "id": 21,
+            "url": "ext/Assets/Textures/Models/Warrior/helmetplate01_B.tga"
+        },
+        {
+            "id": 22,
+            "url": "ext/Assets/Textures/Models/Warrior/helmetplate01_N.tga"
+        },
+        {
+            "id": 23,
+            "url": "ext/Assets/Textures/Models/Warrior/helmetplate01_T.tga"
         }
     ],
     "textures":
@@ -129,6 +165,42 @@
         {
             "id" : 14,
             "image": 14
+        },
+        {
+            "id" : 15,
+            "image": 15
+        },
+        {
+            "id" : 16,
+            "image": 16
+        },
+        {
+            "id" : 17,
+            "image": 17
+        },
+        {
+            "id" : 18,
+            "image": 18
+        },
+        {
+            "id" : 19,
+            "image": 19
+        },
+        {
+            "id" : 20,
+            "image": 20
+        },
+        {
+            "id" : 21,
+            "image": 21
+        },
+        {
+            "id" : 22,
+            "image": 22
+        },
+        {
+            "id" : 23,
+            "image": 23
         }
     ],
     "geometries":
@@ -196,6 +268,27 @@
             "map": 11,
             "specMap": 14,
             "nmap": 12
+        },
+        {
+            "id": 5,
+            "type": "cuirassplate",
+            "map": 17,
+            "specMap": 15,
+            "nmap": 16
+        },
+        {
+            "id": 6,
+            "type": "gauintletsplate",
+            "map": 20,
+            "specMap": 18,
+            "nmap": 19
+        },
+        {
+            "id": 7,
+            "type": "helmetplate",
+            "map": 23,
+            "specMap": 21,
+            "nmap": 22
         }
     ],
     "object":
@@ -215,7 +308,7 @@
                     "rotation": [0, 3.14, 0],
                     "scale": [3, 3, 3]
                 },
-                "materials": [4, 0, 1],
+                "materials": [7, 5, 6],
                 "geometry": 5
             },
             {

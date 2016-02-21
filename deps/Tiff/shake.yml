@@ -39,6 +39,7 @@ Sources:
   - "src/tif_warning.c"
   - "src/tif_write.c"
   - "src/tif_zip.c"
+  - "src/tif_stream.cxx"
 OSSources:
   Windows:
     - "src/tif_win32.c"

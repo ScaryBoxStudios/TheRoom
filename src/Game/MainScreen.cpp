@@ -49,6 +49,9 @@ void MainScreen::onInit(ScreenContext& sc)
 
     // Pass the current scene to renderer
     mEngine->GetRenderer().SetScene(mScene.get());
+
+    // Cam shouldn't follow character initially
+    mFollowingCharacter = false;
 }
 
 void MainScreen::SetupWorld()
@@ -107,6 +110,21 @@ void MainScreen::SetupWorld()
     }
 }
 
+std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
+{
+    auto& window = mEngine->GetWindow();
+    std::vector<Camera::MoveDirection> mds;
+    if(window.IsKeyPressed(Key::W))
+        mds.push_back(Camera::MoveDirection::Forward);
+    if(window.IsKeyPressed(Key::A))
+        mds.push_back(Camera::MoveDirection::Left);
+    if(window.IsKeyPressed(Key::S))
+        mds.push_back(Camera::MoveDirection::BackWard);
+    if(window.IsKeyPressed(Key::D))
+        mds.push_back(Camera::MoveDirection::Right);
+    return mds;
+}
+
 void MainScreen::MoveCharacter() const
 {
     auto& window = mEngine->GetWindow();
@@ -141,6 +159,8 @@ void MainScreen::onKey(Key k, KeyAction ka)
         renderer.ToggleShowAABBs();
     if(k == Key::R && ka == KeyAction::Release)
         mRotationData.rotating = !mRotationData.rotating;
+    if(k == Key::F && ka == KeyAction::Release)
+        mFollowingCharacter = !mFollowingCharacter;
 }
 
 void MainScreen::onUpdate(float dt)
@@ -157,12 +177,20 @@ void MainScreen::onUpdate(float dt)
     if (window.MouseGrabEnabled())
         mCamera.Look(CameraLookOffset());
 
-    // Update character position
-    MoveCharacter();
+    if (mFollowingCharacter)
+    {
+        // Update character position
+        MoveCharacter();
 
-    // Move Camera following character
-    auto trans = mCharacter->GetTransformation().GetInterpolated(1.0f);
-    mCamera.SetPos(glm::vec3(trans[3].x, trans[3].y + 4, trans[3].z + 4));
+        // Move Camera following character
+        auto trans = mCharacter->GetTransformation().GetInterpolated(1.0f);
+        mCamera.SetPos(glm::vec3(trans[3].x, trans[3].y + 4, trans[3].z + 4));
+    }
+    else
+    {
+        // Update camera position
+        mCamera.Move(CameraMoveDirections());
+    }
 
     // Update the camera matrix
     mCamera.Update();

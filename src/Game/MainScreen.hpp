@@ -60,8 +60,10 @@ class MainScreen : public Screen
         void MoveCharacter() const;
         std::unique_ptr<Scene> mScene;
         SceneNode* mCharacter;
+        bool mFollowingCharacter;
 
         // The camera view
+        std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();
         Camera mCamera;
 

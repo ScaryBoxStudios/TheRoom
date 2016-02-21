@@ -98,21 +98,29 @@ void MainScreen::SetupWorld()
 
     // Update lights once to take their initial position
     UpdateLight(mEngine->GetRenderer(), mScene.get(), glm::vec3(0));
+
+    // Find character Node
+    for (auto& p : mScene->GetNodes())
+    {
+        if (p.first == "character")
+            mCharacter = p.second.get();
+    }
 }
 
-std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
+void MainScreen::MoveCharacter() const
 {
     auto& window = mEngine->GetWindow();
-    std::vector<Camera::MoveDirection> mds;
+
+    float speed = 0.3f;
+
     if(window.IsKeyPressed(Key::W))
-        mds.push_back(Camera::MoveDirection::Forward);
-    if(window.IsKeyPressed(Key::A))
-        mds.push_back(Camera::MoveDirection::Left);
+        mScene->Move(mCharacter, glm::vec3(0, 0, -speed));
     if(window.IsKeyPressed(Key::S))
-        mds.push_back(Camera::MoveDirection::BackWard);
+        mScene->Move(mCharacter, glm::vec3(0, 0, speed));
+    if(window.IsKeyPressed(Key::A))
+        mScene->Move(mCharacter, glm::vec3(-speed, 0, 0));
     if(window.IsKeyPressed(Key::D))
-        mds.push_back(Camera::MoveDirection::Right);
-    return mds;
+        mScene->Move(mCharacter, glm::vec3(speed, 0, 0));
 }
 
 std::tuple<float, float> MainScreen::CameraLookOffset()
@@ -149,8 +157,12 @@ void MainScreen::onUpdate(float dt)
     if (window.MouseGrabEnabled())
         mCamera.Look(CameraLookOffset());
 
-    // Update camera position
-    mCamera.Move(CameraMoveDirections());
+    // Update character position
+    MoveCharacter();
+
+    // Move Camera following character
+    auto trans = mCharacter->GetTransformation().GetInterpolated(1.0f);
+    mCamera.SetPos(glm::vec3(trans[3].x, trans[3].y + 4, trans[3].z + 4));
 
     // Update the camera matrix
     mCamera.Update();

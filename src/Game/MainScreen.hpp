@@ -54,10 +54,11 @@ class MainScreen : public Screen
         ScreenContext::FileDataCache* mFileDataCache;
 
         // The Scene
+        void MoveCharacter() const;
         std::unique_ptr<Scene> mScene;
+        SceneNode* mCharacter;
 
         // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();
         Camera mCamera;
 

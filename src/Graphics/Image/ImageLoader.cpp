@@ -9,6 +9,7 @@ WARN_GUARD_ON
 #include "Png/Png.hpp"
 #include "Jpeg/JpegLoader.hpp"
 #include "Tga/TgaLoader.hpp"
+#include "Tiff/TiffLoader.hpp"
 WARN_GUARD_OFF
 
 // Helper to access a Buffer type using an istream
@@ -56,6 +57,11 @@ auto ImageLoader::Load(const Buffer& buf, const std::string& hint) -> RawImage<B
                 static_cast<uint8_t>(PngBufferType::pixel_traits_t::get_channels())
             }
         );
+    }
+    else if (hint == "tif")
+    {
+        TiffLoader tifLoader;
+        return tifLoader.Load(buf);
     }
     return RawImage<>({}, {0,0,0});
 }

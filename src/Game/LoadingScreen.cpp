@@ -89,12 +89,15 @@ void LoadingScreen::LoadFileData()
     , "ext/Assets/Textures/Models/Warrior/helmetplate01_B.tga"
     , "ext/Assets/Textures/Models/Warrior/helmetplate01_N.tga"
     , "ext/Assets/Textures/Models/Warrior/helmetplate01_T.tga"
+    , "ext/Assets/Textures/Models/Barrel/barrel2.tif"
+    , "ext/Assets/Textures/Models/Barrel/barrel2_nmp.tif"
       // Models
     , "ext/Assets/Models/Cube.obj"
     , "ext/Assets/Models/Teapot.obj"
     , "ext/Assets/Models/WoodenCabin.dae"
     , "ext/Assets/Models/Well.obj"
     , "ext/Assets/Models/Warrior.dae"
+    , "ext/Assets/Models/Barrel2.fbx"
     };
 
     for (const auto& file : fileList)

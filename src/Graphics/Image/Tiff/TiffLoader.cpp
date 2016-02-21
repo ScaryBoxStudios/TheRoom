@@ -83,7 +83,7 @@ auto TiffLoader::Load(BufferType fileData) -> RawImage<BufferType>
     ImageProperties imProps;
     imProps.width = width;
     imProps.height = height;
-    imProps.channels = 3;
+    imProps.channels = 4;
 
     // Return the RawImage structure
     return RawImage<>(std::move(imageData), imProps);

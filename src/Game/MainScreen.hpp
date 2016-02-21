@@ -61,6 +61,7 @@ class MainScreen : public Screen
         std::unique_ptr<Scene> mScene;
         SceneNode* mCharacter;
         bool mFollowingCharacter;
+        int mMovingLightIndex;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

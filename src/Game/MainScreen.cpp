@@ -11,22 +11,19 @@ WARN_GUARD_OFF
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
 
-void UpdateLight(Renderer& renderer, Scene* const scene, const glm::vec3& move)
+void UpdateLight(Renderer& renderer, Scene* const scene, int index, const glm::vec3& move)
 {
     auto& lights = scene->GetLights();
 
-    for(unsigned int i = 0; i < lights.size(); i++)
-    {
-        // Get light
-        SceneNode* curLight = lights[i];
+    // Get light
+    SceneNode* curLight = lights[index];
 
-        // Move light in scene
-        scene->Move(curLight, move);
+    // Move light in scene
+    scene->Move(curLight, move);
 
-        // Move light in renderer
-        auto trans = curLight->GetTransformation().GetInterpolated(1.0f);
-        renderer.SetPointLightPos(i, glm::vec3(trans[3].x, trans[3].y, trans[3].z));
-    }
+    // Move light in renderer
+    auto trans = curLight->GetTransformation().GetInterpolated(1.0f);
+    renderer.SetPointLightPos(index, glm::vec3(trans[3].x, trans[3].y, trans[3].z));
 };
 
 void MainScreen::onInit(ScreenContext& sc)
@@ -52,6 +49,9 @@ void MainScreen::onInit(ScreenContext& sc)
 
     // Cam shouldn't follow character initially
     mFollowingCharacter = false;
+
+    // Initial choosen moving light
+    mMovingLightIndex = 0;
 }
 
 void MainScreen::SetupWorld()
@@ -100,7 +100,8 @@ void MainScreen::SetupWorld()
     }
 
     // Update lights once to take their initial position
-    UpdateLight(mEngine->GetRenderer(), mScene.get(), glm::vec3(0));
+    for (int i = 0; i < 2; i++)
+        UpdateLight(mEngine->GetRenderer(), mScene.get(), i, glm::vec3(0));
 
     // Find character Node
     for (auto& p : mScene->GetNodes())
@@ -161,6 +162,13 @@ void MainScreen::onKey(Key k, KeyAction ka)
         mRotationData.rotating = !mRotationData.rotating;
     if(k == Key::F && ka == KeyAction::Release)
         mFollowingCharacter = !mFollowingCharacter;
+    if(k == Key::L && ka == KeyAction::Release)
+    {
+        if (mMovingLightIndex == 0)
+            mMovingLightIndex = 1;
+        else if (mMovingLightIndex == 1)
+            mMovingLightIndex = 0;
+    }
 }
 
 void MainScreen::onUpdate(float dt)
@@ -197,9 +205,9 @@ void MainScreen::onUpdate(float dt)
 
     // Update light position
     //auto updLight = std::bind(updateLight, renderer, mScene.get(), std::placeholders::_1);
-    auto updLight = [&renderer, &scene](const glm::vec3& move)
+    auto updLight = [this, &renderer, &scene](const glm::vec3& move)
     {
-        UpdateLight(renderer, scene.get(), move);
+        UpdateLight(renderer, scene.get(), mMovingLightIndex, move);
     };
 
     float increase = 0.7f;

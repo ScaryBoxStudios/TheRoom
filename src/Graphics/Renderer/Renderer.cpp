@@ -87,15 +87,18 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
     mLights.dirLights.push_back(dirLight);
 
-    // Add point light
-    PointLight pointLight;
-    pointLight.properties.ambient  = glm::vec3(0.2f, 0.2f, 0.2f);
-    pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
-    pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-    pointLight.attProps.constant   = 1.0f;
-    pointLight.attProps.linear     = 0.09f;
-    pointLight.attProps.quadratic  = 0.032f;
-    mLights.pointLights.push_back(pointLight);
+    // Add point lights
+    for (int i = 0; i < 2; ++i)
+    {
+        PointLight pointLight;
+        pointLight.properties.ambient  = glm::vec3(0.2f, 0.2f, 0.2f);
+        pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
+        pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+        pointLight.attProps.constant   = 1.0f;
+        pointLight.attProps.linear     = 0.09f;
+        pointLight.attProps.quadratic  = 0.032f;
+        mLights.pointLights.push_back(pointLight);
+    }
 }
 
 void Renderer::Update(float dt)
@@ -379,40 +382,41 @@ void Renderer::LightPass(float interpolation)
     glEnable(GL_STENCIL_TEST);
 
     // Set point light's properties
-    PointLight& pLight = mLights.pointLights.front();
+    for (const PointLight& pLight : mLights.pointLights)
+    {
+        // Make the stencil pass
+        StencilPass(pLight);
+        mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
+        glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
 
-    // Make the stencil pass
-    StencilPass(pLight);
-    mGBuffer->PrepareFor(GBuffer::Mode::LightPass);
-    glBindFramebuffer(GL_FRAMEBUFFER, mGBuffer->Id());
+        //
+        glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
 
-    //
-    glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+        glUniform3fv(glGetUniformLocation(progId, "pLight.position"),            1, glm::value_ptr(pLight.position));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
+        glUniform1f(glGetUniformLocation( progId, "pLight.attProps.constant"),   pLight.attProps.constant);
+        glUniform1f(glGetUniformLocation( progId, "pLight.attProps.linear"),     pLight.attProps.linear);
+        glUniform1f(glGetUniformLocation( progId, "pLight.attProps.quadratic"),  pLight.attProps.quadratic);
 
-    glUniform3fv(glGetUniformLocation(progId, "pLight.position"),            1, glm::value_ptr(pLight.position));
-    glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
-    glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
-    glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
-    glUniform1f(glGetUniformLocation( progId, "pLight.attProps.constant"),   pLight.attProps.constant);
-    glUniform1f(glGetUniformLocation( progId, "pLight.attProps.linear"),     pLight.attProps.linear);
-    glUniform1f(glGetUniformLocation( progId, "pLight.attProps.quadratic"),  pLight.attProps.quadratic);
+        // Bounding sphere
+        float scaleFactor = CalcPointLightBSphere(pLight);
+        glm::mat4 bsMdl = glm::mat4();
+        bsMdl = glm::translate(bsMdl, pLight.position);
+        bsMdl = glm::scale(bsMdl, glm::vec3(scaleFactor));
+        mvp = mProjection * mView * bsMdl;
+        glUniformMatrix4fv(glGetUniformLocation(progId, "MVP"), 1, GL_FALSE, glm::value_ptr(mvp));
 
-    // Bounding sphere
-    float scaleFactor = CalcPointLightBSphere(pLight);
-    glm::mat4 bsMdl = glm::mat4();
-    bsMdl = glm::translate(bsMdl, pLight.position);
-    bsMdl = glm::scale(bsMdl, glm::vec3(scaleFactor));
-    mvp = mProjection * mView * bsMdl;
-    glUniformMatrix4fv(glGetUniformLocation(progId, "MVP"), 1, GL_FALSE, glm::value_ptr(mvp));
+        // Render
+        glUniform1i(glGetUniformLocation(progId, "lMode"), 2);
+        RenderSphere();
 
-    // Render
-    glUniform1i(glGetUniformLocation(progId, "lMode"), 2);
-    RenderSphere();
-
-    glCullFace(GL_BACK);
-    glDisable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glDisable(GL_CULL_FACE);
+    }
 
     // Disable and unbind things
     glDisable(GL_STENCIL_TEST);

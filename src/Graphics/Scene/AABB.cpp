@@ -115,10 +115,32 @@ glm::vec3 CalcCollisionResponce(const AABB& aabb1, const AABB& aabb2)
 
     glm::vec3 resolution = {};
     if (xCollide)
-        resolution.x = aabb1.Center().x - aabb2.Center().x + (aabb1.Size().x + aabb2.Size().x) * 0.5f;
+        resolution.x = ((aabb2.Center().x - aabb1.Center().x) / fabs(aabb1.Center().x - aabb2.Center().x))
+            * (fabs(aabb1.Center().x - aabb2.Center().x) - ((aabb1.Size().x + aabb2.Size().x) * 0.5f));
+
     if (yCollide)
-        resolution.y = aabb1.Center().y - aabb2.Center().y + (aabb1.Size().y + aabb2.Size().y) * 0.5f;
+        resolution.y = ((aabb2.Center().y - aabb1.Center().y) / fabs(aabb1.Center().y - aabb2.Center().y))
+            * (fabs(aabb1.Center().y - aabb2.Center().y) - ((aabb1.Size().y + aabb2.Size().y) * 0.5f));
+
     if (zCollide)
-        resolution.z = aabb1.Center().z - aabb2.Center().z + (aabb1.Size().z + aabb2.Size().z) * 0.5f;
+        resolution.z = ((aabb2.Center().z - aabb1.Center().z) / fabs(aabb1.Center().z - aabb2.Center().z))
+            * (fabs(aabb1.Center().z - aabb2.Center().z) - ((aabb1.Size().z + aabb2.Size().z) * 0.5f));
+
+    // Keep only the min resolution
+    float minResolution = std::fminf(
+        std::fminf(
+            fabs(resolution.x),
+            fabs(resolution.y)
+        )
+        , fabs(resolution.z)
+    );
+
+    if (fabs(resolution.x) != minResolution)
+        resolution.x = 0.0f;
+    if (fabs(resolution.y) != minResolution)
+        resolution.y = 0.0f;
+    if (fabs(resolution.z) != minResolution)
+        resolution.z = 0.0f;
+
     return resolution;
 }

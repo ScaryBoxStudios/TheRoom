@@ -7,6 +7,8 @@
 #ifndef _TIFFCONF_
 #define _TIFFCONF_
 
+#include <stdint.h>
+
 /* Signed 16-bit type */
 #define TIFF_INT16_T signed short
 
@@ -32,10 +34,10 @@
 #define TIFF_UINT8_T unsigned char
 
 /* Unsigned size type */
-#define TIFF_SIZE_T unsigned int
+#define TIFF_SIZE_T uintptr_t
 
 /* Signed size type */
-#define TIFF_SSIZE_T signed int
+#define TIFF_SSIZE_T intptr_t
 
 /* Pointer difference type */
 #define TIFF_PTRDIFF_T ptrdiff_t

@@ -331,7 +331,7 @@
                 "type": "Mesh",
                 "name": "character",
                 "transform": {
-                    "position": [0, -4.3, 6.6],
+                    "position": [0, -4.3, -6.6],
                     "rotation": [0, 0, 0],
                     "scale": [3, 3, 3]
                 },

@@ -28,54 +28,37 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MAIN_SCREEN_HPP_
-#define _MAIN_SCREEN_HPP_
+#ifndef _CHARACTER_HPP_
+#define _CHARACTER_HPP_
 
-#include "Screen.hpp"
-#include "Character.hpp"
-#include "../Graphics/Util/Camera.hpp"
+#include "../Window/Window.hpp"
 #include "../Graphics/Scene/Scene.hpp"
 
-class MainScreen : public Screen
+class Character
 {
     public:
-        void onInit(ScreenContext& sc);
-        void onUpdate(float dt);
-        void onKey(Key k, KeyAction ka);
-        void onRender(float interpolation);
-        void onShutdown();
-    private:
-        // Called during initialization to setup the world
-        void SetupWorld();
-
-        //
-        void UpdatePhysics(float dt);
-
-        // Engine ref
-        Engine* mEngine;
-
-        // File Data Cache ref
-        ScreenContext::FileDataCache* mFileDataCache;
-
-        // The Scene
-        void MoveCharacter() const;
-        std::unique_ptr<Scene> mScene;
-        bool mFollowingCharacter;
-        int mMovingLightIndex;
-        Character mCharacter;
-
-        // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
-        std::tuple<float, float> CameraLookOffset();
-        Camera mCamera;
-
-        // The data needed for rotating the cubes
-        struct RotationData
+        struct Stats
         {
-            float degreesInc;
-            bool rotating;
+            float speed = 0.3f;
+            float rotationSpeed = 0.5f;
         };
-        RotationData mRotationData;
+
+        // Constructor
+        void Init(Window* const window, Scene* const scene);
+
+        // Update character (position, rotation, etc..)
+        void Update();
+
+        // Get character node
+        SceneNode* GetCharacterNode() const;
+
+    private:
+       Window* mWindow;       // Pointer to window
+       Scene*  mScene;        // Pointer to scene
+       SceneNode* mCharacter; // Pointer to SceneNode that represents the character 
+
+       Stats mStats;          // Character's stats
+       float mRotation;       // Character's rotation
 };
 
-#endif // ! _MAIN_SCREEN_HPP_
+#endif // ! _CHARACTER_HPP_

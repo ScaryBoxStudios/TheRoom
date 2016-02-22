@@ -40,7 +40,7 @@ class Character
         struct Stats
         {
             float speed = 0.3f;
-            float rotationSpeed = 0.5f;
+            float rotationSpeed = 0.2f;
         };
 
         // Constructor

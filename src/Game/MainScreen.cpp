@@ -1,4 +1,5 @@
 #include "MainScreen.hpp"
+#include <cmath>
 #include "../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
@@ -54,7 +55,7 @@ void MainScreen::onInit(ScreenContext& sc)
     mMovingLightIndex = 0;
 
     // Init character
-    mCharacter.Init(&mEngine->GetWindow(), mScene.get());
+    mCharacter.Init(&mEngine->GetWindow(), mScene.get(), glm::vec3(0, -1, -6.6));
 }
 
 void MainScreen::SetupWorld()
@@ -105,6 +106,9 @@ void MainScreen::SetupWorld()
     // Update lights once to take their initial position
     for (int i = 0; i < 2; i++)
         UpdateLight(mEngine->GetRenderer(), mScene.get(), i, glm::vec3(0));
+
+    mRotationTrigger.threshold = 10.0f;
+    mRotationTrigger.position  = {10, -1, 2};
 }
 
 std::vector<Camera::MoveDirection> MainScreen::CameraMoveDirections()
@@ -233,6 +237,18 @@ void MainScreen::UpdatePhysics(float dt)
         if(Intersects(teapot->GetAABB(), cur->GetAABB()))
             scene->Move(teapot, CalcCollisionResponce(teapot->GetAABB(), cur->GetAABB()));
     }
+
+    // Trigger check
+    auto& cPos = mCharacter.GetPosition();
+    auto& tPos = mRotationTrigger.position;
+    float threshold = mRotationTrigger.threshold;
+
+    double powX = std::pow(cPos.x - tPos.x, 2);
+    double powY = std::pow(cPos.y - tPos.y, 2);
+    double powZ = std::pow(cPos.z - tPos.z, 2);
+
+    double distance = std::sqrt(powX + powY + powZ);
+    mRotationData.rotating = distance <= threshold;
 }
 
 void MainScreen::onRender(float interpolation)

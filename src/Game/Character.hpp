@@ -33,6 +33,11 @@
 
 #include "../Window/Window.hpp"
 #include "../Graphics/Scene/Scene.hpp"
+#include "../Util/WarnGuard.hpp"
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+WARN_GUARD_OFF
 
 class Character
 {
@@ -44,13 +49,19 @@ class Character
         };
 
         // Constructor
-        void Init(Window* const window, Scene* const scene);
+        void Init(Window* const window, Scene* const scene, glm::vec3 pos = {0, 0, 0});
 
         // Update character (position, rotation, etc..)
         void Update();
 
         // Get character node
         SceneNode* GetCharacterNode() const;
+
+        // Get character's rotation
+        float GetRotation() const;
+
+        // Get character's position
+        const glm::vec3& GetPosition() const;
 
     private:
        Window* mWindow;       // Pointer to window
@@ -59,6 +70,7 @@ class Character
 
        Stats mStats;          // Character's stats
        float mRotation;       // Character's rotation
+       glm::vec3 mPosition;   // Character's current position
 };
 
 #endif // ! _CHARACTER_HPP_

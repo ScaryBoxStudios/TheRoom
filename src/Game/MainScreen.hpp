@@ -45,6 +45,12 @@ class MainScreen : public Screen
         void onRender(float interpolation);
         void onShutdown();
     private:
+        struct Trigger
+        {
+            float threshold;
+            glm::vec3 position;
+        };
+
         // Called during initialization to setup the world
         void SetupWorld();
 
@@ -63,6 +69,7 @@ class MainScreen : public Screen
         bool mFollowingCharacter;
         int mMovingLightIndex;
         Character mCharacter;
+        Trigger mRotationTrigger;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

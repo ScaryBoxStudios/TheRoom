@@ -12,7 +12,7 @@ Window::Window() :
     mCursorY(0),
     mPrevCursorX(0),
     mPrevCursorY(0),
-    mShowFPS(false),
+    mShowStats(false),
     mPrevTimeTicks(0)
 {
 }
@@ -273,21 +273,21 @@ std::tuple<double, double> Window::GetCursorDiff() const
     return std::make_tuple<double, double>(mCursorX - mPrevCursorX, mCursorY - mPrevCursorY);
 }
 
-void Window::UpdateTitleFPS()
+void Window::UpdateTitleStats()
 {
     double elapsedMs = (glfwGetTime() * 1000) - mPrevTimeTicks;
     int FPS = static_cast<int>(elapsedMs != 0 ? 1000 / elapsedMs : -1);
 
     std::stringstream ss;
-    ss << mTitle << " | " << "FPS: " << std::setw(4) << FPS;
+    ss << mTitle << " | " << "FPS: " << std::setw(4) << FPS << " Ms: " << elapsedMs;
 
     glfwSetWindowTitle(mWindow, ss.str().c_str());
     mPrevTimeTicks = glfwGetTime() * 1000;
 }
 
-void Window::SetShowFPS(bool show)
+void Window::SetShowStats(bool show)
 {
-    mShowFPS = show;
+    mShowStats = show;
     // Reset title in case show == false
     if (!show)
         glfwSetWindowTitle(mWindow, mTitle.c_str());
@@ -295,8 +295,8 @@ void Window::SetShowFPS(bool show)
 
 void Window::SwapBuffers()
 {
-    if(mShowFPS)
-        UpdateTitleFPS();
+    if(mShowStats)
+        UpdateTitleStats();
 
     glfwSwapBuffers(mWindow);
 }

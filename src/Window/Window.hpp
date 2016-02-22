@@ -148,8 +148,8 @@ class Window
         /// Retrieves the relative movement difference of the cursor from the last frame
         std::tuple<double, double> GetCursorDiff() const;
 
-        /// Enables debug option that appends current window fps to the window title
-        void SetShowFPS(bool show);
+        /// Enables debug option that appends current fps and frame ms to the window title
+        void SetShowStats(bool show);
 
         /// Swaps the back with the front frame buffer
         void SwapBuffers();
@@ -173,14 +173,14 @@ class Window
         MouseScrollCb mMouseScrollCb;
         KeyPressedCb mKeyPressCb;
 
-        // Appends current FPS to the window title if mShowFPS is true
-        void UpdateTitleFPS();
+        // Appends current statistics to the window title if flag is true
+        void UpdateTitleStats();
 
         // Stores the cursor position from the last two frames
         double mCursorX, mCursorY, mPrevCursorX, mPrevCursorY;
 
-        // State variables used by the window title FPS debugging feature
-        bool mShowFPS;
+        // State variables used by the window title stats debugging feature
+        bool mShowStats;
         double mPrevTimeTicks;
 };
 

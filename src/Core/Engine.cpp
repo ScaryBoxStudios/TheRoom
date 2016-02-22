@@ -12,7 +12,7 @@ void Engine::Init()
     if (!success)
         throw std::runtime_error(GetLastGlfwError().GetDescription());
 
-    mWindow.SetShowFPS(true);
+    mWindow.SetShowStats(true);
 
     // Load the needed shaders
     LoadShaders();

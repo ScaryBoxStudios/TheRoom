@@ -48,7 +48,9 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <io.h> header file. */
+#ifdef _WIN32
 #define HAVE_IO_H 1
+#endif
 
 /* Define to 1 if you have the `isascii' function. */
 #define HAVE_ISASCII 1
@@ -228,7 +230,9 @@
 #define TM_IN_SYS_TIME 1
 
 /* define to use win32 IO system */
+#ifdef _WIN32
 #define USE_WIN32_FILEIO 1
+#endif
 
 /* Version number of package */
 #define VERSION ""
@@ -246,7 +250,7 @@
 #endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-#define _FILE_OFFSET_BITS 
+/* #define _FILE_OFFSET_BITS */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */

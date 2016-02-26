@@ -40,10 +40,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mGeometryPassProgId = gPassProgId;
     mLightingPassProgId = lPassProgId;
 
-    // Store the screen size
-    mScreenWidth = width;
-    mScreenHeight = height;
-
     // Set the clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -51,15 +47,8 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    // Create the projection matrix
-    mProjection = glm::perspective(
-        45.0f,
-        static_cast<float>(mScreenWidth) / mScreenHeight,
-        0.1f, 300.0f
-    );
-
-    // Create the GBuffer
-    mGBuffer = std::make_unique<GBuffer>(mScreenWidth, mScreenHeight);
+    // Initialize screen size dependent values
+    Resize(width, height);
 
     // Initialize the null program used by stencil passes
     Shader vert(nullVShader, Shader::Type::Vertex);
@@ -99,6 +88,18 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
         pointLight.attProps.quadratic  = 0.032f;
         mLights.pointLights.push_back(pointLight);
     }
+}
+
+void Renderer::Resize(int width, int height)
+{
+    mScreenWidth = width;
+    mScreenHeight = height;
+    mProjection = glm::perspective(
+        45.0f,
+        static_cast<float>(mScreenWidth) / mScreenHeight,
+        0.1f, 300.0f
+    );
+    mGBuffer = std::make_unique<GBuffer>(width, height);
 }
 
 void Renderer::Update(float dt)

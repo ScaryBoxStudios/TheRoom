@@ -54,6 +54,9 @@ class Renderer
         /*! Initializes the renderer */
         void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId, MaterialStore* materialStore);
 
+        /*! Called when window is resized */
+        void Resize(int width, int height);
+
         /*! Called when updating the game state */
         void Update(float dt);
 

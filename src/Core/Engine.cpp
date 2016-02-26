@@ -13,6 +13,13 @@ void Engine::Init()
         throw std::runtime_error(GetLastGlfwError().GetDescription());
 
     mWindow.SetShowStats(true);
+    mWindow.SetFramebufferResizeHandler(
+        [this](int w, int h)
+        {
+            glViewport(0, 0, w, h);
+            mRenderer.Resize(w, h);
+        }
+    );
 
     // Load the needed shaders
     LoadShaders();

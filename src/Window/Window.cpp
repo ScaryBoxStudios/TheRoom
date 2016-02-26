@@ -147,6 +147,22 @@ Window::ResizeCb Window::GetResizeHandler() const
     return mResizeCb;
 }
 
+void Window::SetFramebufferResizeHandler(ResizeCb cb)
+{
+    mFramebufferResizeCb = cb;
+    GLFWwindowsizefun f = [](GLFWwindow* w, int width, int height)
+    {
+        Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
+        wnd->GetFramebufferResizeHandler()(width, height);
+    };
+    glfwSetFramebufferSizeCallback(mWindow, f);
+}
+
+Window::ResizeCb Window::GetFramebufferResizeHandler() const
+{
+    return mFramebufferResizeCb;
+}
+
 void Window::SetCloseHandler(CloseCb cb)
 {
     mCloseCb = cb;

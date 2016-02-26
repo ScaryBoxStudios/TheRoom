@@ -103,6 +103,12 @@ class Window
         /// Sets the window close callback handler
         void SetCloseHandler(CloseCb cb);
 
+        /// Retrieves the framebuffer resize callback handler
+        ResizeCb GetFramebufferResizeHandler() const;
+
+        /// Sets the window framebuffer resize callback handler
+        void SetFramebufferResizeHandler(ResizeCb cb);
+
         /// Retrieves the window close callback handler
         CloseCb GetCloseHandler() const;
 
@@ -166,6 +172,7 @@ class Window
         // The stored callback handlers
         PositionChangedCb mPosCb;
         ResizeCb mResizeCb;
+        ResizeCb mFramebufferResizeCb;
         CloseCb mCloseCb;
         FocusChangedCb mFocusChCb;
         MouseButtonPressedCb mMouseBtnPressCb;

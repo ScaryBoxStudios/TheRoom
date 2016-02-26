@@ -11,21 +11,6 @@ WARN_GUARD_OFF
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
 
-void UpdateLight(Renderer& renderer, Scene* const scene, int index, const glm::vec3& move)
-{
-    auto& lights = scene->GetLights();
-
-    // Get light
-    SceneNode* curLight = lights[index];
-
-    // Move light in scene
-    scene->Move(curLight, move);
-
-    // Move light in renderer
-    auto trans = curLight->GetTransformation().GetInterpolated(1.0f);
-    renderer.SetPointLightPos(index, glm::vec3(trans[3].x, trans[3].y, trans[3].z));
-};
-
 void MainScreen::onInit(ScreenContext& sc)
 {
     // Store engine ref
@@ -44,8 +29,8 @@ void MainScreen::onInit(ScreenContext& sc)
     // Create world objects
     SetupWorld();
 
-    // Pass the current scene to renderer
-    mEngine->GetRenderer().SetScene(mScene.get());
+    // Create world lights
+    SetupLights();
 
     // Cam shouldn't follow character initially
     mFollowingCharacter = false;
@@ -55,6 +40,9 @@ void MainScreen::onInit(ScreenContext& sc)
 
     // Init character
     mCharacter.Init(&mEngine->GetWindow(), mScene.get());
+
+    // Pass the current scene to renderer
+    mEngine->GetRenderer().SetScene(mScene.get());
 }
 
 void MainScreen::SetupWorld()
@@ -100,6 +88,48 @@ void MainScreen::SetupWorld()
         mScene->Rotate(node, RotationAxis::X, 20.0f * i);
         mScene->Rotate(node, RotationAxis::Y, 7.0f * i);
         mScene->Rotate(node, RotationAxis::Z, 10.0f * i);
+    }
+}
+
+void UpdateLight(Renderer& renderer, Scene* const scene, int index, const glm::vec3& move)
+{
+    auto& lights = scene->GetLights();
+
+    // Get light
+    SceneNode* curLight = lights[index];
+
+    // Move light in scene
+    scene->Move(curLight, move);
+
+    // Move light in renderer
+    auto trans = curLight->GetTransformation().GetInterpolated(1.0f);
+    renderer.GetLights().pointLights[index].position = glm::vec3(trans[3].x, trans[3].y, trans[3].z);
+};
+
+void MainScreen::SetupLights()
+{
+    // Setup scene lights
+    Lights& lights = mEngine->GetRenderer().GetLights();
+
+    // Add directional light
+    DirLight dirLight;
+    dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
+    dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    dirLight.properties.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
+    dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    lights.dirLights.push_back(dirLight);
+
+    // Add point lights
+    for (int i = 0; i < 2; ++i)
+    {
+        PointLight pointLight;
+        pointLight.properties.ambient  = glm::vec3(0.2f, 0.2f, 0.2f);
+        pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
+        pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+        pointLight.attProps.constant   = 1.0f;
+        pointLight.attProps.linear     = 0.09f;
+        pointLight.attProps.quadratic  = 0.032f;
+        lights.pointLights.push_back(pointLight);
     }
 
     // Update lights once to take their initial position

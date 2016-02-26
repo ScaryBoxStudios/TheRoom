@@ -60,27 +60,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Set the material store
     mMaterialStore = materialStore;
-
-    // Add main directional light
-    DirLight dirLight;
-    dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
-    dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    dirLight.properties.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
-    dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
-    mLights.dirLights.push_back(dirLight);
-
-    // Add point lights
-    for (int i = 0; i < 2; ++i)
-    {
-        PointLight pointLight;
-        pointLight.properties.ambient  = glm::vec3(0.2f, 0.2f, 0.2f);
-        pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
-        pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-        pointLight.attProps.constant   = 1.0f;
-        pointLight.attProps.linear     = 0.09f;
-        pointLight.attProps.quadratic  = 0.032f;
-        mLights.pointLights.push_back(pointLight);
-    }
 }
 
 void Renderer::Resize(int width, int height)
@@ -479,18 +458,12 @@ void Renderer::ToggleShowAABBs()
     mShowAABBs = !mShowAABBs;
 }
 
+Lights& Renderer::GetLights()
+{
+    return mLights;
+}
+
 ModelStore& Renderer::GetModelStore()
 {
     return mModelStore;
-}
-
-void Renderer::SetPointLightPos(unsigned int index, const glm::vec3& pos)
-{
-    auto& pointLights = mLights.pointLights;
-
-    // Do nothing if index is invalid
-    if(pointLights.size() <= index)
-        return;
-
-    pointLights[index].position = pos;
 }

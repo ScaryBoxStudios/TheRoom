@@ -75,14 +75,14 @@ class Renderer
         /*! Sets the current rendering scene */
         void SetScene(const Scene* scene);
 
+        /*! Retrieves the renderer's Lights */
+        Lights& GetLights();
+
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
 
         /*! Toggles showing the AABBs */
         void ToggleShowAABBs();
-
-        /*! Sets the position of a Point Light */
-        void SetPointLightPos(unsigned int index, const glm::vec3& pos);
 
     private:
         // Performs the geometry pass rendering step

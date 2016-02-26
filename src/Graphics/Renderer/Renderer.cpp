@@ -33,19 +33,12 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     // Skybox is initially unset
     mSkybox = nullptr;
 
-    // Scenen is initially unset
+    // Scene is initially unset
     mScene = nullptr;
 
     // Store the needed program id's
     mGeometryPassProgId = gPassProgId;
     mLightingPassProgId = lPassProgId;
-
-    // Set the clear color
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Enable the depth buffer
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
 
     // Initialize screen size dependent values
     Resize(width, height);

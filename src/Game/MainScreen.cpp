@@ -192,6 +192,16 @@ void MainScreen::onUpdate(float dt)
     auto& window = mEngine->GetWindow();
     auto& renderer = mEngine->GetRenderer();
 
+    // Update interpolation variables
+    for (auto& obj : mScene->GetNodes())
+    {
+        Transform& trans = obj.second->GetTransformation();
+        trans.Update();
+
+        AABB& aabb = obj.second->GetAABB();
+        aabb.Update(trans.GetPosition(), trans.GetScale(), trans.GetRotation());
+    }
+
     // Update camera euler angles
     if (window.MouseGrabEnabled())
         mCamera.Look(CameraLookOffset());

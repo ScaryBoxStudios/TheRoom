@@ -71,18 +71,6 @@ void Renderer::Resize(int width, int height)
 void Renderer::Update(float dt)
 {
     (void) dt;
-    if (!mScene)
-        return;
-
-    // Update interpolation variables
-    for (auto& obj : mScene->GetNodes())
-    {
-        Transform& trans = obj.second->GetTransformation();
-        trans.Update();
-
-        AABB& aabb = obj.second->GetAABB();
-        aabb.Update(trans.GetPosition(), trans.GetScale(), trans.GetRotation());
-    }
 }
 
 void Renderer::Render(float interpolation)

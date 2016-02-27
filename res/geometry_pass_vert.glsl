@@ -13,8 +13,14 @@ out VS_OUT
     mat3 TBN;
 } vsOut;
 
-uniform mat4 projection;
-uniform mat4 view;
+// On 420 version and later:
+//layout (std140, binding = 0) uniform Matrices
+layout (std140) uniform Matrices
+{
+    mat4 projection;
+    mat4 view;
+};
+
 uniform mat4 model;
 
 void main(void)

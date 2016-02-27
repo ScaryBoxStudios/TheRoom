@@ -123,6 +123,10 @@ class Renderer
 
         // The shadow map rendering utility
         ShadowRenderer mShadowRenderer;
+
+        // Uniform Buffer objects
+        GLuint mUboMatrices;
+        GLuint mGeometryPassUboIndex;
 };
 
 #endif // ! _RENDERER_HPP_

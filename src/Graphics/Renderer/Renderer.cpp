@@ -50,6 +50,20 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(8096, 8096);
+
+    // Get ubo index
+    mGeometryPassUboIndex = glGetUniformBlockIndex(mGeometryPassProgId, "Matrices");
+    // Link block to its binding point
+    glUniformBlockBinding(mGeometryPassProgId, mGeometryPassUboIndex, 0);
+
+    // Create UBO buffer
+    glGenBuffers(1, &mUboMatrices);
+    glBindBuffer(GL_UNIFORM_BUFFER, mUboMatrices);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), NULL, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    // Define the range of the buffer that links to a uniform binding point
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, mUboMatrices, 0, 2 * sizeof(glm::mat4));
 }
 
 void Renderer::Resize(int width, int height)
@@ -73,6 +87,14 @@ void Renderer::Render(float interpolation)
 {
     // Setup clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    //
+    // Set view and projection matrices in UBO
+    //
+    glBindBuffer(GL_UNIFORM_BUFFER, mUboMatrices);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mProjection));
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(mView));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     //
     // Render the shadow map
@@ -148,18 +170,9 @@ void Renderer::GeometryPass(float interpolation)
     // Clear the current framebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Get the view matrix
-    const auto& view = mView;
-
     // Use the geometry pass program
     GLuint progId = mGeometryPassProgId;
     glUseProgram(progId);
-
-    // Upload projection and view matrices
-    auto projectionId = glGetUniformLocation(progId, "projection");
-    glUniformMatrix4fv(projectionId, 1, GL_FALSE, glm::value_ptr(mProjection));
-    auto viewId = glGetUniformLocation(progId, "view");
-    glUniformMatrix4fv(viewId, 1, GL_FALSE, glm::value_ptr(view));
 
     for(auto& p : mScene->GetNodes())
     {

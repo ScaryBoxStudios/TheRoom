@@ -52,9 +52,9 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mShadowRenderer.Init(8096, 8096);
 
     // Get ubo index
-    mGeometryPassUboIndex = glGetUniformBlockIndex(mGeometryPassProgId, "Matrices");
+    GLuint geometryPassUboIndex = glGetUniformBlockIndex(mGeometryPassProgId, "Matrices");
     // Link block to its binding point
-    glUniformBlockBinding(mGeometryPassProgId, mGeometryPassUboIndex, 0);
+    glUniformBlockBinding(mGeometryPassProgId, geometryPassUboIndex, 0);
 
     // Create UBO buffer
     glGenBuffers(1, &mUboMatrices);

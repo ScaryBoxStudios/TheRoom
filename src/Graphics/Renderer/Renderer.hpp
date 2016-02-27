@@ -126,7 +126,6 @@ class Renderer
 
         // Uniform Buffer objects
         GLuint mUboMatrices;
-        GLuint mGeometryPassUboIndex;
 };
 
 #endif // ! _RENDERER_HPP_

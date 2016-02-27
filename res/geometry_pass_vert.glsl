@@ -5,10 +5,13 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 uvCoords;
 layout (location = 3) in vec3 tangent;
 
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 UVCoords;
-out mat3 TBN;
+out VS_OUT
+{
+    vec3 FragPos;
+    vec3 Normal;
+    vec2 UVCoords;
+    mat3 TBN;
+} vsOut;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -16,10 +19,10 @@ uniform mat4 model;
 
 void main(void)
 {
-    UVCoords = uvCoords;
+    vsOut.UVCoords = uvCoords;
 
     mat3 normalMatrix = mat3(transpose(inverse(model)));
-    Normal = normalMatrix * normal;
+    vsOut.Normal = normalMatrix * normal;
 
     // Calcullate TBN
     vec3 T = normalize(vec3(model * vec4(tangent,   0.0)));
@@ -32,9 +35,9 @@ void main(void)
     vec3 B = cross(T, N);
 
     // Generate TBN matrix
-    TBN = mat3(T, B, N);
+    vsOut.TBN = mat3(T, B, N);
 
     vec4 worldPos = model * vec4(position, 1.0f);
-    FragPos = worldPos.xyz;
+    vsOut.FragPos = worldPos.xyz;
     gl_Position = projection * view * worldPos;
 }

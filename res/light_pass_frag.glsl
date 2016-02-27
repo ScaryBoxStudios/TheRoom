@@ -77,13 +77,22 @@ float CalcPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
     return spec;
 }
 
+// Calculates specular intensity according to the Blinn - Phong model
+float CalcBlinnPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
+{
+    vec3 halfDir = normalize(lightDir + viewDir);
+    float specAngle = max(dot(halfDir, normal), 0.0);
+    float spec = pow(specAngle, shininess * 4);
+    return spec;
+}
+
 // Internal func used by other Calc Light functions
 vec3 CalcLight(LightProps lightProps, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
 {
     // Diffuse shading (Lambertian reflectance)
     float diff = max(dot(normal, lightDir), 0.0);
     // Specular shading (Phong model)
-    float spec = CalcPhongSpec(normal, lightDir, viewDir, material.shininess);
+    float spec = CalcBlinnPhongSpec(normal, lightDir, viewDir, material.shininess);
     // Combine results
     vec3 ambient  = lightProps.ambient  * material.diffuse;
     vec3 diffuse  = lightProps.diffuse  * diff * material.diffuse * (1.0 - shadowFactor);

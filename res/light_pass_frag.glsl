@@ -71,9 +71,9 @@ float CalcAttenuationValue(AttenuationProps attProps, vec3 lightPos, vec3 fragPo
 // Internal func used by other Calc Light functions
 vec3 CalcLight(LightProps lightProps, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
 {
-    // Diffuse shading
+    // Diffuse shading (Lambertian reflectance)
     float diff = max(dot(normal, lightDir), 0.0);
-    // Specular shading
+    // Specular shading (Phong model)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
     // Combine results

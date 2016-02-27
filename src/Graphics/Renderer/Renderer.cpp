@@ -199,7 +199,7 @@ void Renderer::GeometryPass(float interpolation)
             MaterialDescription* matDesc = (*mMaterialStore)[mats[mesh.meshIndex]];
 
             // Pass the material index in the material buffer object
-            glUniform1i(glGetUniformLocation(progId, "matIdx"), matDesc->matIndex);
+            glUniform1ui(glGetUniformLocation(progId, "matIdx"), matDesc->matIndex);
 
             //
             // Upload material parameters

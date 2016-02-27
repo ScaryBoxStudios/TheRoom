@@ -31,6 +31,7 @@ void MaterialStore::Load(const std::string& name, const Material& material)
     struct MatData
     {
         float shininess;
+        float padding[3];
     };
 
     // Construct the data to be uploaded
@@ -38,7 +39,7 @@ void MaterialStore::Load(const std::string& name, const Material& material)
     for (const auto& matDesc : mMaterialDescs)
     {
         MatData md = {};
-        md.shininess = 32.0f;
+        md.shininess = matDesc.material.GetShininess();
         matData.push_back(md);
     }
 

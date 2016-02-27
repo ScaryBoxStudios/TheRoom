@@ -263,59 +263,68 @@
             "id": 0,
             "type": "mahogany",
             "map": 6,
-            "specMap": 7
+            "specMap": 7,
+            "shininess": 32
         },
         {
             "id": 1,
             "type": "white",
-            "color": 16777215
+            "color": 16777215,
+            "shininess": 32
         },
         {
             "id": 2,
             "type": "house",
             "map": 8,
             "specMap": 9,
-            "nmap": 10
+            "nmap": 10,
+            "shininess": 16
         },
         {
             "id": 3,
             "type": "well",
             "map": 13,
-            "specMap": 14
+            "specMap": 14,
+            "shininess": 32
         },
         {
             "id": 4,
             "type": "stone",
             "map": 11,
             "specMap": 14,
-            "nmap": 12
+            "nmap": 12,
+            "shininess": 16
         },
         {
             "id": 5,
             "type": "cuirassplate",
             "map": 17,
             "specMap": 15,
-            "nmap": 16
+            "nmap": 16,
+            "shininess": 32
         },
         {
             "id": 6,
             "type": "gauintletsplate",
             "map": 20,
             "specMap": 18,
-            "nmap": 19
+            "nmap": 19,
+            "shininess": 32
         },
         {
             "id": 7,
             "type": "helmetplate",
             "map": 23,
             "specMap": 21,
-            "nmap": 22
+            "nmap": 22,
+            "shininess": 32
         },
         {
             "id": 8,
             "type": "barrel",
             "map": 24,
-            "nmap": 25
+            "nmap": 25,
+            "shininess": 8
         }
     ],
     "object":

@@ -4,7 +4,7 @@ out vec4 color;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
-uniform sampler2D gMatIdx;
+uniform usampler2D gMatIdx;
 uniform ivec2 gScreenSize;
 uniform vec3 viewPos;
 
@@ -193,7 +193,7 @@ void main(void)
     vec3 Normal = texture(gNormal, UVCoords).rgb;
     vec3 Diffuse = texture(gAlbedoSpec, UVCoords).rgb;
     float Specular = texture(gAlbedoSpec, UVCoords).a;
-    int MatIdx = int(texture(gMatIdx, UVCoords).r);
+    uint MatIdx = texture(gMatIdx, UVCoords).r;
 
     // Calculate the fragment light space position
     vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);

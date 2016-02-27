@@ -5,6 +5,7 @@ Material::Material()
   , mDiffTexture(0)
   , mSpecColor(glm::vec3(0.0f))
   , mSpecTexture(0)
+  , mShininess(0)
   , mNMapTexture(0)
 {
 }
@@ -63,6 +64,16 @@ void Material::SetSpecularTexture(GLuint id)
 bool Material::UsesSpecularTexture() const
 {
     return mSpecTexture != 0;
+}
+
+float Material::GetShininess() const
+{
+    return mShininess;
+}
+
+void Material::SetShininess(float s)
+{
+    mShininess = s;
 }
 
 //

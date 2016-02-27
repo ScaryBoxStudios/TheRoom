@@ -21,7 +21,7 @@ std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const SceneFile& sceneF
     LoadTextures(sceneFile.textures, sceneFile.images);
     LoadMaterials(sceneFile.materials);
     LoadGeometries(sceneFile.geometries);
-    
+
     BakeScene(scene.get(), sceneFile.object.children);
 
     return std::move(scene);
@@ -82,6 +82,7 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
 
         // Add color
         newMat.SetDiffuseColor(glm::vec3(material.color.r, material.color.g, material.color.b));
+        newMat.SetShininess(material.shininess);
 
         mMaterialStore->Load(std::to_string(material.id), newMat);
     }

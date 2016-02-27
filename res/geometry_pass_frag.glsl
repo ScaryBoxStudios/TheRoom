@@ -25,7 +25,7 @@ uniform Material material;
 
 uniform sampler2D normalMap;
 uniform bool useNormalMaps;
-uniform int matIdx;
+uniform uint matIdx;
 
 void main(void)
 {
@@ -51,6 +51,6 @@ void main(void)
     gAlbedoSpec.a = material.specularColor + texture(material.specularTexture, fsIn.UVCoords).r;
 
     // Store the material index
-    gMatIdx.r = matIdx;
+    gMatIdx = matIdx;
 }
 

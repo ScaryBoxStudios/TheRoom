@@ -61,6 +61,10 @@ class Material
         void SetSpecularTexture(GLuint id);
         bool UsesSpecularTexture() const;
 
+        // Shininesss
+        float GetShininess() const;
+        void SetShininess(float s);
+
         // Normal Map texture
         GLuint GetNormalMapTexture() const;
         void SetNormalMapTexture(GLuint id);
@@ -74,6 +78,9 @@ class Material
         // Specular properties
         glm::vec3 mSpecColor;
         GLuint mSpecTexture;
+
+        // Shininess
+        float mShininess;
 
         // Normal mapping properties
         GLuint mNMapTexture;

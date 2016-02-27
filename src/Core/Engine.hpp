@@ -57,6 +57,9 @@ class Engine
         // Retrieves the window instance
         Window& GetWindow();
 
+        // Retrieves the ModelStore instance
+        ModelStore& GetModelStore();
+
         // Retrieves the TextureStore instance
         TextureStore& GetTextureStore();
 
@@ -85,18 +88,17 @@ class Engine
         // The Game Window
         Window mWindow;
 
+        // Stores the geometry data loaded in the gpu
+        ModelStore mModelStore;
         // Stores the textures loaded in the gpu
         TextureStore mTextureStore;
-
         // Stores the loaded materials
         MaterialStore mMaterialStore;
 
         // The Renderer
         Renderer mRenderer;
-
         // The AABB rendering utility
         AABBRenderer mAABBRenderer;
-
         // The Text Renderer
         TextRenderer mTextRenderer;
 

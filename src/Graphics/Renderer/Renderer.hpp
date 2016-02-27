@@ -65,6 +65,9 @@ class Renderer
         /*! Deinitializes the renderer */
         void Shutdown();
 
+        /*! Sets the various data stores that hold the GPU handles to data */
+        void SetDataStores(ModelStore* mdlStore, MaterialStore* matStore);
+
         /*! Sets the view matrix */
         void SetView(const glm::mat4& view);
 
@@ -76,9 +79,6 @@ class Renderer
 
         /*! Retrieves the renderer's Lights */
         Lights& GetLights();
-
-        /*! Retrieves the renderer's ModelStore */
-        ModelStore& GetModelStore();
 
     private:
         // Performs the geometry pass rendering step
@@ -105,10 +105,8 @@ class Renderer
         // The lights that are rendered
         Lights mLights;
 
-        // Stores the models loaded in the gpu
-        ModelStore mModelStore;
-
-        // Stores the materials
+        // References to various data stores
+        ModelStore* mModelStore;
         MaterialStore* mMaterialStore;
 
         // Shader programIds of the geometry pass and the lighting pass

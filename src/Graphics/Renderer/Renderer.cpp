@@ -50,7 +50,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(8096, 8096);
-    mShadowRenderer.SetModelStore(&mModelStore);
 
     // Set the material store
     mMaterialStore = materialStore;
@@ -136,9 +135,6 @@ void Renderer::Shutdown()
 
     // Destroy GBuffer
     mGBuffer.reset();
-
-    // Explicitly deallocate GPU data
-    mModelStore.Clear();
 }
 
 void Renderer::GeometryPass(float interpolation)
@@ -180,7 +176,7 @@ void Renderer::GeometryPass(float interpolation)
         glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
 
         // Get the model
-        ModelDescription* mdl = mModelStore[node->GetModel()];
+        ModelDescription* mdl = (*mModelStore)[node->GetModel()];
 
         // Get the material names per mesh
         const auto mats = node->GetMaterials();
@@ -425,12 +421,14 @@ void Renderer::SetView(const glm::mat4& view)
     mView = view;
 }
 
+void Renderer::SetDataStores(ModelStore* mdlStore, MaterialStore* matStore)
+{
+    mModelStore = mdlStore;
+    mMaterialStore = matStore;
+    mShadowRenderer.SetModelStore(mModelStore);
+}
+
 Lights& Renderer::GetLights()
 {
     return mLights;
-}
-
-ModelStore& Renderer::GetModelStore()
-{
-    return mModelStore;
 }

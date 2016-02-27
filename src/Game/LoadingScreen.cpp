@@ -120,8 +120,7 @@ void LoadingScreen::LoadMaterials()
 void LoadingScreen::LoadModels()
 {
     // Retrieve the model and texture stores from the renderer
-    auto& renderer      = mEngine->GetRenderer();
-    auto& modelStore    = renderer.GetModelStore();
+    auto& modelStore = mEngine->GetModelStore();
 
     // Add sample UV Sphere
     ModelData sphereModel = GenUVSphere(1, 32, 32);

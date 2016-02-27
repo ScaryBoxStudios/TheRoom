@@ -41,8 +41,16 @@ void MainScreen::onInit(ScreenContext& sc)
     // Init character
     mCharacter.Init(&mEngine->GetWindow(), mScene.get());
 
+    // Setup the scene renderer
+    auto& renderer = mEngine->GetRenderer();
+    auto& mdlStore = mEngine->GetModelStore();
+    auto& matStore = mEngine->GetMaterialStore();
+
     // Pass the current scene to renderer
-    mEngine->GetRenderer().SetScene(mScene.get());
+    renderer.SetScene(mScene.get());
+
+    // Pass the data store instances to renderer
+    renderer.SetDataStores(&mdlStore, &matStore);
 
     // Do not show AABBs by default
     mShowAABBs = false;
@@ -61,7 +69,7 @@ void MainScreen::SetupWorld()
 
     SceneFactory factory(
         &mEngine->GetTextureStore(),
-        &mEngine->GetRenderer().GetModelStore(),
+        &mEngine->GetModelStore(),
         &mEngine->GetMaterialStore(),
         mFileDataCache);
     mScene = std::move(factory.CreateFromSceneFile(sf));

@@ -285,7 +285,7 @@ void Renderer::LightPass(float interpolation)
 
     // Setup material index buffer
     GLuint blockIndex = glGetUniformBlockIndex(progId, "MaterialDataBlock");
-    GLuint bindingPointIndex = 0;
+    GLuint bindingPointIndex = 1;
     glBindBufferBase(GL_UNIFORM_BUFFER, bindingPointIndex, mMaterialStore->DataId());
     glUniformBlockBinding(progId, blockIndex, bindingPointIndex);
 

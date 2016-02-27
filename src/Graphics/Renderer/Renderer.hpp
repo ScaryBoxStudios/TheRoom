@@ -36,7 +36,6 @@
 #include "Light.hpp"
 #include "Skybox.hpp"
 #include "TextRenderer.hpp"
-#include "AABBRenderer.hpp"
 #include "ShadowRenderer.hpp"
 #include "../Geometry/ModelStore.hpp"
 #include "../Scene/Scene.hpp"
@@ -81,9 +80,6 @@ class Renderer
         /*! Retrieves the renderer's ModelStore */
         ModelStore& GetModelStore();
 
-        /*! Toggles showing the AABBs */
-        void ToggleShowAABBs();
-
     private:
         // Performs the geometry pass rendering step
         void GeometryPass(float interpolation);
@@ -127,14 +123,8 @@ class Renderer
         // The root Skybox used
         const Skybox* mSkybox;
 
-        // The AABB rendering utility
-        AABBRenderer mAABBRenderer;
-
         // The shadow map rendering utility
         ShadowRenderer mShadowRenderer;
-
-        // When flag on AABBs are shown
-        bool mShowAABBs;
 };
 
 #endif // ! _RENDERER_HPP_

@@ -43,6 +43,9 @@ void MainScreen::onInit(ScreenContext& sc)
 
     // Pass the current scene to renderer
     mEngine->GetRenderer().SetScene(mScene.get());
+
+    // Do not show AABBs by default
+    mShowAABBs = false;
 }
 
 void MainScreen::SetupWorld()
@@ -164,10 +167,8 @@ std::tuple<float, float> MainScreen::CameraLookOffset()
 
 void MainScreen::onKey(Key k, KeyAction ka)
 {
-    auto& renderer = mEngine->GetRenderer();
-
     if(k == Key::B && ka == KeyAction::Release)
-        renderer.ToggleShowAABBs();
+        mShowAABBs = !mShowAABBs;
     if(k == Key::R && ka == KeyAction::Release)
         mRotationData.rotating = !mRotationData.rotating;
     if(k == Key::F && ka == KeyAction::Release)
@@ -273,6 +274,15 @@ void MainScreen::onRender(float interpolation)
     // Render
     mEngine->GetRenderer().SetView(view);
     mEngine->GetRenderer().Render(interpolation);
+
+    // Render the AABBs if enabled
+    if (mShowAABBs)
+    {
+        AABBRenderer& aabbRenderer = mEngine->GetAABBRenderer();
+        aabbRenderer.SetView(view);
+        aabbRenderer.SetScene(mScene.get());
+        aabbRenderer.Render(interpolation);
+    }
 
     // Render sample text
     mEngine->GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");

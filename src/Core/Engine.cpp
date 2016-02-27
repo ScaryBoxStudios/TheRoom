@@ -2,6 +2,10 @@
 #include "../Window/GlfwError.hpp"
 #include "../Util/FileLoad.hpp"
 
+WARN_GUARD_ON
+#include <glm/gtc/matrix_transform.hpp>
+WARN_GUARD_OFF
+
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
 
@@ -31,6 +35,16 @@ void Engine::Init()
         mShaderPrograms.at("geometry_pass").Id(),
         mShaderPrograms.at("light_pass").Id(),
         &mMaterialStore
+    );
+
+    // Initialize the AABBRenderer
+    mAABBRenderer.Init();
+    mAABBRenderer.SetProjection(
+        glm::perspective(
+            45.0f,
+            static_cast<float>(mWindow.GetWidth()) / mWindow.GetHeight(),
+            0.1f, 300.0f
+        )
     );
 
     // Initialize the TextRenderer
@@ -67,6 +81,9 @@ void Engine::Shutdown()
     // TextRenderer
     mTextRenderer.Shutdown();
 
+    // AABBRenderer
+    mAABBRenderer.Shutdown();
+
     // Renderer
     mRenderer.Shutdown();
 
@@ -95,6 +112,11 @@ MaterialStore& Engine::GetMaterialStore()
 Renderer& Engine::GetRenderer()
 {
     return mRenderer;
+}
+
+AABBRenderer& Engine::GetAABBRenderer()
+{
+    return mAABBRenderer;
 }
 
 TextRenderer& Engine::GetTextRenderer()

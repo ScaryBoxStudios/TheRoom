@@ -48,12 +48,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     Shader frag(nullFShader, Shader::Type::Fragment);
     mNullProgram = std::make_unique<ShaderProgram>(vert.Id(), frag.Id());
 
-    // Initialize the AABBRenderer
-    mAABBRenderer.Init();
-    mAABBRenderer.SetProjection(mProjection);
-    // Do not show AABBs by default
-    mShowAABBs = false;
-
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(8096, 8096);
     mShadowRenderer.SetModelStore(&mModelStore);
@@ -144,21 +138,13 @@ void Renderer::Render(float interpolation)
         // Render the skybox
         if (mSkybox)
             mSkybox->Render(mProjection, mView);
-
-        // Render the AABBs if enabled
-        if (mShowAABBs)
-            mAABBRenderer.Render(interpolation);
     }
-    glDisable(GL_DEPTH_TEST);
 }
 
 void Renderer::Shutdown()
 {
     // Shutdown the ShadowRenderer
     mShadowRenderer.Shutdown();
-
-    // Shutdown the AABBRenderer
-    mAABBRenderer.Shutdown();
 
     // Destroy GBuffer
     mGBuffer.reset();
@@ -444,18 +430,11 @@ void Renderer::SetSkybox(const Skybox* skybox)
 void Renderer::SetScene(const Scene* scene)
 {
     mScene = scene;
-    mAABBRenderer.SetScene(scene);
 }
 
 void Renderer::SetView(const glm::mat4& view)
 {
     mView = view;
-    mAABBRenderer.SetView(view);
-}
-
-void Renderer::ToggleShowAABBs()
-{
-    mShowAABBs = !mShowAABBs;
 }
 
 Lights& Renderer::GetLights()

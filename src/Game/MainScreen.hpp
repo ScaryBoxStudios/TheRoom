@@ -79,6 +79,9 @@ class MainScreen : public Screen
             bool rotating;
         };
         RotationData mRotationData;
+
+        // When flag on AABBs are shown
+        bool mShowAABBs;
 };
 
 #endif // ! _MAIN_SCREEN_HPP_

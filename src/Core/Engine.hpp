@@ -34,6 +34,7 @@
 #include "../Window/Window.hpp"
 #include "../Graphics/Texture/TextureStore.hpp"
 #include "../Graphics/Renderer/Renderer.hpp"
+#include "../Graphics/Renderer/AABBRenderer.hpp"
 #include "../Graphics/Renderer/Skybox.hpp"
 #include "../Graphics/Shader/Shader.hpp"
 #include "../Graphics/Material/MaterialStore.hpp"
@@ -65,6 +66,9 @@ class Engine
         // Retrieves the renderer instance
         Renderer& GetRenderer();
 
+        // Retrieves the AABB renderer instance
+        AABBRenderer& GetAABBRenderer();
+
         // Retrieves the text renderer instance
         TextRenderer& GetTextRenderer();
 
@@ -89,6 +93,9 @@ class Engine
 
         // The Renderer
         Renderer mRenderer;
+
+        // The AABB rendering utility
+        AABBRenderer mAABBRenderer;
 
         // The Text Renderer
         TextRenderer mTextRenderer;

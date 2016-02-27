@@ -195,37 +195,40 @@ void Renderer::GeometryPass(float interpolation)
         // Draw all its meshes
         for(const auto& mesh : mdl->meshes)
         {
-            // Get the material
-            Material* material = (*mMaterialStore)[mats[mesh.meshIndex]];
+            // Get the material description
+            MaterialDescription* matDesc = (*mMaterialStore)[mats[mesh.meshIndex]];
+
+            // Pass the material index in the material buffer object
+            glUniform1i(glGetUniformLocation(progId, "matIdx"), matDesc->matIndex);
 
             //
             // Upload material parameters
             //
             // Diffuse
-            const glm::vec3& diffCol = material->GetDiffuseColor();
+            const glm::vec3& diffCol = matDesc->material.GetDiffuseColor();
             glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-            if(material->UsesDiffuseTexture())
+            if(matDesc->material.UsesDiffuseTexture())
             {
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, material->GetDiffuseTexture());
+                glBindTexture(GL_TEXTURE_2D, matDesc->material.GetDiffuseTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
             }
 
             // Specular
-            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), material->GetSpecularColor().x);
-            if(material->UsesSpecularTexture())
+            glUniform1f(glGetUniformLocation(progId, "material.specularColor"), matDesc->material.GetSpecularColor().x);
+            if(matDesc->material.UsesSpecularTexture())
             {
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, material->GetSpecularTexture());
+                glBindTexture(GL_TEXTURE_2D, matDesc->material.GetSpecularTexture());
                 glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
             }
 
             // Normal map
-            if(material->UsesNormalMapTexture())
+            if(matDesc->material.UsesNormalMapTexture())
             {
                 glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
                 glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, material->GetNormalMapTexture());
+                glBindTexture(GL_TEXTURE_2D, matDesc->material.GetNormalMapTexture());
                 glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
             }
             else
@@ -280,6 +283,12 @@ void Renderer::LightPass(float interpolation)
     GLuint progId = mLightingPassProgId;
     glUseProgram(progId);
 
+    // Setup material index buffer
+    GLuint blockIndex = glGetUniformBlockIndex(progId, "MaterialDataBlock");
+    GLuint bindingPointIndex = 0;
+    glBindBufferBase(GL_UNIFORM_BUFFER, bindingPointIndex, mMaterialStore->DataId());
+    glUniformBlockBinding(progId, blockIndex, bindingPointIndex);
+
     // Bind the data textures
     GLuint gPosId = glGetUniformLocation(progId, "gPosition");
     glUniform1i(gPosId, 0);
@@ -287,17 +296,16 @@ void Renderer::LightPass(float interpolation)
     glUniform1i(gNormId, 1);
     GLuint gAlbSpecId = glGetUniformLocation(progId, "gAlbedoSpec");
     glUniform1i(gAlbSpecId, 2);
+    GLuint gMatIdxId = glGetUniformLocation(progId, "gMatIdx");
+    glUniform1i(gMatIdxId, 3);
 
     // Bind the shadow map
-    glActiveTexture(GL_TEXTURE3);
+    glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
-    glUniform1i(glGetUniformLocation(progId, "shadowMap"), 3);
+    glUniform1i(glGetUniformLocation(progId, "shadowMap"), 4);
 
     // Pass the screen size
     glUniform2i(glGetUniformLocation(progId, "gScreenSize"), mScreenWidth, mScreenHeight);
-
-    // Set material properties
-    glUniform1f(glGetUniformLocation(progId, "shininess"), 32.0f);
 
     // Pass the light space matrix
     glUniformMatrix4fv(

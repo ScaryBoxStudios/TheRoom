@@ -32,8 +32,16 @@
 #define _MATERIALSTORE_HPP_
 
 #include <string>
+#include <vector>
 #include <unordered_map>
+#include <glad/glad.h>
 #include "Material.hpp"
+
+struct MaterialDescription
+{
+    GLuint matIndex;
+    Material material;
+};
 
 class MaterialStore
 {
@@ -56,13 +64,18 @@ class MaterialStore
         void Load(const std::string& name, const Material& material);
 
         // Retrieves a pointer to a loaded material object
-        Material* operator[](const std::string& name);
+        MaterialDescription* operator[](const std::string& name);
 
         // Unloads every material in the store
         void Clear();
 
+        // Retrieves the GPU data id
+        GLuint DataId() const;
+
     private:
-        std::unordered_map<std::string, Material> mMaterials;
+        GLuint mUBO;
+        std::unordered_map<std::string, std::size_t> mMaterials;
+        std::vector<MaterialDescription> mMaterialDescs;
 };
 
 #endif // ! _MATERIALSTORE_HPP_

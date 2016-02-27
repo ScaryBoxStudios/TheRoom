@@ -67,11 +67,16 @@ class GBuffer
         // Retrieves the albedo-specular buffer id
         GLuint AlbedoSpecId() const;
 
+        // Retrieves the material index buffer id
+        GLuint MatIndexId() const;
+
     private:
         // The GBuffer's framebuffer id
         GLuint mGBufferId;
         // The position, normal and albedo + specular buffer ids'
         GLuint mPositionBufId, mNormalBufId, mAlbedoSpecBufId;
+        // The material index buffer id
+        GLuint mMatIndexBufId;
         // The depth + stencil buffer id
         GLuint mDepthStencilBufId;
         // The final buffer

@@ -3,6 +3,7 @@
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
+layout (location = 4) out vec3 gMatIdx;
 
 in VS_OUT
 {
@@ -24,6 +25,7 @@ uniform Material material;
 
 uniform sampler2D normalMap;
 uniform bool useNormalMaps;
+uniform int matIdx;
 
 void main(void)
 {
@@ -47,5 +49,8 @@ void main(void)
 
     // Store specular intensity in gAlbedoSpec's alpha component
     gAlbedoSpec.a = material.specularColor + texture(material.specularTexture, fsIn.UVCoords).r;
+
+    // Store the material index
+    gMatIdx.r = matIdx;
 }
 

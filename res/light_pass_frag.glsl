@@ -4,8 +4,8 @@ out vec4 color;
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAlbedoSpec;
+uniform sampler2D gMatIdx;
 uniform ivec2 gScreenSize;
-uniform float shininess;
 uniform vec3 viewPos;
 
 uniform mat4 lightSpaceMatrix;
@@ -16,6 +16,16 @@ struct Material
     vec3 diffuse;
     vec3 specular;
     float shininess;
+};
+
+struct MaterialProperties
+{
+    float shininess;
+};
+
+layout (std140) uniform MaterialDataBlock
+{
+    MaterialProperties materialProps[16];
 };
 
 // General light properties
@@ -183,6 +193,7 @@ void main(void)
     vec3 Normal = texture(gNormal, UVCoords).rgb;
     vec3 Diffuse = texture(gAlbedoSpec, UVCoords).rgb;
     float Specular = texture(gAlbedoSpec, UVCoords).a;
+    int MatIdx = int(texture(gMatIdx, UVCoords).r);
 
     // Calculate the fragment light space position
     vec4 FragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
@@ -191,7 +202,7 @@ void main(void)
     Material material;
     material.diffuse = Diffuse;
     material.specular = vec3(Specular);
-    material.shininess = shininess;
+    material.shininess = materialProps[MatIdx].shininess;
 
     // Properties
     vec3 norm = normalize(Normal);

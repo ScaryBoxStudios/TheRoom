@@ -31,8 +31,16 @@ GBuffer::GBuffer(unsigned int width, unsigned int height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, mAlbedoSpecBufId, 0);
 
-    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-    glDrawBuffers(3, attachments);
+    // - Material index buffer
+    glGenTextures(1, &mMatIndexBufId);
+    glBindTexture(GL_TEXTURE_2D, mMatIndexBufId);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT4, GL_TEXTURE_2D, mMatIndexBufId, 0);
+
+    GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT4 };
+    glDrawBuffers(4, attachments);
 
     // - Depth + stencil buffer
     glGenTextures(1, &mDepthStencilBufId);
@@ -61,8 +69,8 @@ GBuffer::GBuffer(unsigned int width, unsigned int height)
 
 GBuffer::~GBuffer()
 {
-    GLuint textures[5] = { mPositionBufId, mNormalBufId, mAlbedoSpecBufId, mDepthStencilBufId, mFinalBufId };
-    glDeleteTextures(5, textures);
+    GLuint textures[6] = { mPositionBufId, mNormalBufId, mAlbedoSpecBufId, mMatIndexBufId, mDepthStencilBufId, mFinalBufId };
+    glDeleteTextures(6, textures);
     glDeleteFramebuffers(1, &mGBufferId);
 }
 
@@ -73,12 +81,13 @@ void GBuffer::PrepareFor(Mode mode)
         case Mode::GeometryPass:
         {
             glBindFramebuffer(GL_FRAMEBUFFER, mGBufferId);
-            GLuint attachments[3] = {
+            GLuint attachments[4] = {
                 GL_COLOR_ATTACHMENT0
               , GL_COLOR_ATTACHMENT1
               , GL_COLOR_ATTACHMENT2
+              , GL_COLOR_ATTACHMENT4
             };
-            glDrawBuffers(3, attachments);
+            glDrawBuffers(4, attachments);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             break;
         }
@@ -90,10 +99,11 @@ void GBuffer::PrepareFor(Mode mode)
             GLuint textureIds[] = {
                 mPositionBufId,
                 mNormalBufId,
-                mAlbedoSpecBufId
+                mAlbedoSpecBufId,
+                mMatIndexBufId
             };
 
-            for (unsigned int i = 0; i < 3; ++i)
+            for (unsigned int i = 0; i < 4; ++i)
             {
                 glActiveTexture(GL_TEXTURE0 + i);
                 glBindTexture(GL_TEXTURE_2D, textureIds[i]);
@@ -143,4 +153,9 @@ GLuint GBuffer::NormalId() const
 GLuint GBuffer::AlbedoSpecId() const
 {
     return mAlbedoSpecBufId;
+}
+
+GLuint GBuffer::MatIndexId() const
+{
+    return mMatIndexBufId;
 }

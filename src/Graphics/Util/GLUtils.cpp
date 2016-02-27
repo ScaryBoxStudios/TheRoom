@@ -43,11 +43,11 @@ std::string GetLastLinkError(GLuint progId)
     {
         // Gather error string
         GLint logLength;
-        glGetShaderiv(progId, GL_INFO_LOG_LENGTH, &logLength);
+        glGetProgramiv(progId, GL_INFO_LOG_LENGTH, &logLength);
         if (logLength != 0)
         {
             std::vector<GLchar> buf(logLength, 0);
-            glGetShaderInfoLog(progId, logLength, 0, buf.data());
+            glGetProgramInfoLog(progId, logLength, 0, buf.data());
             return std::string(std::begin(buf), std::end(buf));
         }
     }

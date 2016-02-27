@@ -51,7 +51,7 @@ class Renderer
 {
     public:
         /*! Initializes the renderer */
-        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId, MaterialStore* materialStore);
+        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
 
         /*! Called when window is resized */
         void Resize(int width, int height);

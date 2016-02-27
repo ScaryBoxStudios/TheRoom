@@ -33,9 +33,11 @@ void Engine::Init()
         mWindow.GetWidth(),
         mWindow.GetHeight(),
         mShaderPrograms.at("geometry_pass").Id(),
-        mShaderPrograms.at("light_pass").Id(),
-        &mMaterialStore
+        mShaderPrograms.at("light_pass").Id()
     );
+
+    // Pass the data store instances to renderer
+    mRenderer.SetDataStores(&mModelStore, &mMaterialStore);
 
     // Initialize the AABBRenderer
     mAABBRenderer.Init();

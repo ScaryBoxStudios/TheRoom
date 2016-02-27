@@ -28,7 +28,7 @@ void main()
 }
 )foo";
 
-void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId, MaterialStore* materialStore)
+void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId)
 {
     // Skybox is initially unset
     mSkybox = nullptr;
@@ -50,9 +50,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(8096, 8096);
-
-    // Set the material store
-    mMaterialStore = materialStore;
 }
 
 void Renderer::Resize(int width, int height)

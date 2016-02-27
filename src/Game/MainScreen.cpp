@@ -41,16 +41,8 @@ void MainScreen::onInit(ScreenContext& sc)
     // Init character
     mCharacter.Init(&mEngine->GetWindow(), mScene.get());
 
-    // Setup the scene renderer
-    auto& renderer = mEngine->GetRenderer();
-    auto& mdlStore = mEngine->GetModelStore();
-    auto& matStore = mEngine->GetMaterialStore();
-
     // Pass the current scene to renderer
-    renderer.SetScene(mScene.get());
-
-    // Pass the data store instances to renderer
-    renderer.SetDataStores(&mdlStore, &matStore);
+    mEngine->GetRenderer().SetScene(mScene.get());
 
     // Do not show AABBs by default
     mShowAABBs = false;

@@ -155,7 +155,7 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // BorderColor
             if(t.HasMember("borderColor"))
-                tex.borderColor = parseColor(t["borderColor"].GetInt());
+                tex.borderColor = parseColor(t["borderColor"].GetUint());
 
             // Add parsed texture to the list
             sc.textures.push_back(tex);
@@ -186,13 +186,13 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // Colors
             if(m.HasMember("color"))
-                mt.color = parseColor(m["color"].GetInt());
+                mt.color = parseColor(m["color"].GetUint());
             if (m.HasMember("ambient"))
-                mt.ambient = parseColor(m["ambient"].GetInt());
+                mt.ambient = parseColor(m["ambient"].GetUint());
             if (m.HasMember("emissive"))
-                mt.emissive = parseColor(m["emissive"].GetInt());
+                mt.emissive = parseColor(m["emissive"].GetUint());
             if (m.HasMember("specular"))
-                mt.specular = parseColor(m["specular"].GetInt());
+                mt.specular = parseColor(m["specular"].GetUint());
             if (m.HasMember("shininess"))
                 mt.shininess = static_cast<float>(m["shininess"].GetDouble());
 

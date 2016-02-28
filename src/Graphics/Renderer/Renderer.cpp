@@ -174,6 +174,11 @@ void Renderer::GeometryPass(float interpolation)
     GLuint progId = mGeometryPassProgId;
     glUseProgram(progId);
 
+    // Set sampler locations
+    glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
+    glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
+    glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
+
     for(auto& p : mScene->GetNodes())
     {
         SceneNode* node = p.second.get();
@@ -190,7 +195,6 @@ void Renderer::GeometryPass(float interpolation)
 
         // Get the material names per mesh
         const auto mats = node->GetMaterials();
-
 
         // Draw all its meshes
         for(const auto& mesh : mdl->meshes)
@@ -211,7 +215,6 @@ void Renderer::GeometryPass(float interpolation)
             {
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, matDesc->material.GetDiffuseTexture());
-                glUniform1i(glGetUniformLocation(progId, "material.diffuseTexture"), 0);
             }
 
             // Specular
@@ -220,7 +223,6 @@ void Renderer::GeometryPass(float interpolation)
             {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, matDesc->material.GetSpecularTexture());
-                glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
             }
 
             // Normal map
@@ -229,7 +231,6 @@ void Renderer::GeometryPass(float interpolation)
                 glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
                 glActiveTexture(GL_TEXTURE2);
                 glBindTexture(GL_TEXTURE_2D, matDesc->material.GetNormalMapTexture());
-                glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
             }
             else
                 glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);

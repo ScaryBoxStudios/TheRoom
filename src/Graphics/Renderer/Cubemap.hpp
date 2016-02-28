@@ -28,42 +28,41 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SKYBOX_HPP_
-#define _SKYBOX_HPP_
+#ifndef _CUBEMAP_HPP_
+#define _CUBEMAP_HPP_
 
 #include <unordered_map>
-#include <memory>
 #include <glad/glad.h>
-#include <GL/gl.h>
-#include "Cubemap.hpp"
 #include "../Image/RawImage.hpp"
-#include "../Shader/Shader.hpp"
-#include "../../Util/WarnGuard.hpp"
-#include "../../Util/Hash.hpp"
 
-WARN_GUARD_ON
-#include <glm/glm.hpp>
-WARN_GUARD_OFF
-
-class Skybox
+class Cubemap
 {
     public:
+        // The face of the Cubemap
+        enum class Target
+        {
+            Right  = GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+            Left   = GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+            Top    = GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+            Bottom = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            Back   = GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+            Front  = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+        };
+
         // Constructor
-        Skybox();
+        Cubemap();
 
         // Destructor
-        ~Skybox();
+        ~Cubemap();
 
-        // Loads the given image data to the current Skybox
-        void Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images);
+        // Retrieves the cubemap handle
+        GLuint Id() const;
 
-        // Renders the current Skybox
-        void Render(const glm::mat4& projection, const glm::mat4& view) const;
+        // Loads the given image data to the current Cubemap
+        void SetData(const std::unordered_map<Target, RawImage<>>& images);
 
     private:
-        GLuint mVao, mVbo;
-        std::unique_ptr<Cubemap> mCubemap;
-        std::unique_ptr<ShaderProgram> mProgram;
+        GLuint mTextureId;
 };
 
-#endif // ! _SKYBOX_HPP_
+#endif // ! _CUBEMAP_HPP_

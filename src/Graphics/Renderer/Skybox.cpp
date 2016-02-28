@@ -96,34 +96,18 @@ Skybox::Skybox()
     }
     glBindVertexArray(0);
 
-    glGenTextures(1, &mTextureId);
+    mCubemap = std::make_unique<Cubemap>();
 }
 
 Skybox::~Skybox()
 {
-    glDeleteTextures(1, &mTextureId);
-
     glDeleteBuffers(1, &mVbo);
     glDeleteVertexArrays(1, &mVao);
 }
 
-void Skybox::Load(const std::unordered_map<Target, RawImage<>>& images)
+void Skybox::Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images)
 {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
-
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    for (const auto& p : images)
-        glTexImage2D(static_cast<GLenum>(p.first), 0, GL_RGB,
-                     p.second.GetProperties().width,
-                     p.second.GetProperties().height,
-                     0, GL_RGB, GL_UNSIGNED_BYTE, p.second.Data());
-
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    mCubemap->SetData(images);
 }
 
 void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
@@ -141,7 +125,7 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
         glUniform1i(glGetUniformLocation(mProgram->Id(), "skybox"), 0);
 
         glBindVertexArray(mVao);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemap->Id());
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glBindVertexArray(0);

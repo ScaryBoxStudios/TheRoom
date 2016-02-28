@@ -211,19 +211,15 @@ void Renderer::GeometryPass(float interpolation)
             // Diffuse
             const glm::vec3& diffCol = matDesc->material.GetDiffuseColor();
             glUniform3f(glGetUniformLocation(progId, "material.diffuseColor"), diffCol.r, diffCol.g, diffCol.b);
-            if(matDesc->material.UsesDiffuseTexture())
-            {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, matDesc->material.GetDiffuseTexture());
-            }
+            GLuint diffTexId = matDesc->material.UsesDiffuseTexture() ? matDesc->material.GetDiffuseTexture() : 0;
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, diffTexId);
 
             // Specular
             glUniform1f(glGetUniformLocation(progId, "material.specularColor"), matDesc->material.GetSpecularColor().x);
-            if(matDesc->material.UsesSpecularTexture())
-            {
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, matDesc->material.GetSpecularTexture());
-            }
+            GLuint specTexId = matDesc->material.UsesSpecularTexture() ? matDesc->material.GetSpecularTexture() : 0;
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, specTexId);
 
             // Normal map
             if(matDesc->material.UsesNormalMapTexture())

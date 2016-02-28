@@ -32,6 +32,10 @@ void MaterialStore::Load(const std::string& name, const Material& material)
     {
         float shininess;
         float padding[3];
+        float diffCol[3];
+        float padding2;
+        float specCol[3];
+        float padding3;
     };
 
     // Construct the data to be uploaded
@@ -40,6 +44,12 @@ void MaterialStore::Load(const std::string& name, const Material& material)
     {
         MatData md = {};
         md.shininess = matDesc.material.GetShininess();
+        md.diffCol[0] = matDesc.material.GetDiffuseColor().r / 255.0f;
+        md.diffCol[1] = matDesc.material.GetDiffuseColor().g / 255.0f;
+        md.diffCol[2] = matDesc.material.GetDiffuseColor().b / 255.0f;
+        md.specCol[0] = matDesc.material.GetSpecularColor().r / 255.0f;
+        md.specCol[1] = matDesc.material.GetSpecularColor().g / 255.0f;
+        md.specCol[2] = matDesc.material.GetSpecularColor().b / 255.0f;
         matData.push_back(md);
     }
 

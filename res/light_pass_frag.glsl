@@ -21,11 +21,13 @@ struct Material
 struct MaterialProperties
 {
     float shininess;
+    vec3 diffCol;
+    vec3 specCol;
 };
 
 layout (std140) uniform MaterialDataBlock
 {
-    MaterialProperties materialProps[16];
+    MaterialProperties materialProps[64];
 };
 
 // General light properties
@@ -200,8 +202,8 @@ void main(void)
 
     // Fill material struct
     Material material;
-    material.diffuse = Diffuse;
-    material.specular = vec3(Specular);
+    material.diffuse = materialProps[MatIdx].diffCol + Diffuse;
+    material.specular = materialProps[MatIdx].specCol + vec3(Specular);
     material.shininess = materialProps[MatIdx].shininess;
 
     // Properties

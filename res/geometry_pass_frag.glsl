@@ -15,9 +15,7 @@ in VS_OUT
 
 struct Material
 {
-    vec3 diffuseColor;
     sampler2D diffuseTexture;
-    float specularColor;
     sampler2D specularTexture;
 };
 
@@ -45,10 +43,10 @@ void main(void)
     }
 
     // And the diffuse per-fragment color
-    gAlbedoSpec.rgb = material.diffuseColor + texture(material.diffuseTexture, fsIn.UVCoords).rgb;
+    gAlbedoSpec.rgb = texture(material.diffuseTexture, fsIn.UVCoords).rgb;
 
     // Store specular intensity in gAlbedoSpec's alpha component
-    gAlbedoSpec.a = material.specularColor + texture(material.specularTexture, fsIn.UVCoords).r;
+    gAlbedoSpec.a = texture(material.specularTexture, fsIn.UVCoords).r;
 
     // Store the material index
     gMatIdx = matIdx;

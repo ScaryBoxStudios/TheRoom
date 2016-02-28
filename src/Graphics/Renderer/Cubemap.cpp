@@ -31,5 +31,6 @@ void Cubemap::SetData(const std::unordered_map<Target, RawImage<>>& images)
                      p.second.GetProperties().height,
                      0, GL_RGB, GL_UNSIGNED_BYTE, p.second.Data());
 
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }

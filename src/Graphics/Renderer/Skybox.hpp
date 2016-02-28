@@ -60,6 +60,9 @@ class Skybox
         // Renders the current Skybox
         void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
+        // Retrieves the cubemap instance that the skybox uses
+        const Cubemap* GetCubemap() const;
+
     private:
         GLuint mVao, mVbo;
         std::unique_ptr<Cubemap> mCubemap;

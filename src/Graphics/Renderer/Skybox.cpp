@@ -134,3 +134,8 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 }
+
+const Cubemap* Skybox::GetCubemap() const
+{
+    return mCubemap.get();
+}

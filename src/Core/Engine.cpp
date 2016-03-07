@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "../Window/GlfwError.hpp"
 #include "../Util/FileLoad.hpp"
+#include "../Graphics/Shader/ShaderPreprocessor.hpp"
 
 WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>
@@ -147,6 +148,39 @@ void Engine::SetSkybox(std::unique_ptr<Skybox> skybox)
 
 void Engine::LoadShaders()
 {
+    // Load the shader files
+    std::vector<std::string> shaderFiles =
+    {
+        "res/geometry_pass_vert.glsl"
+      , "res/geometry_pass_frag.glsl"
+      , "res/light_pass_vert.glsl"
+      , "res/light_pass_frag.glsl"
+      , "res/lighting.glsl"
+    };
+
+    std::unordered_map<std::string, std::string> loadedShaders;
+    for (const auto& filepath : shaderFiles)
+    {
+        // Load file
+        auto shaderFile = FileLoad<BufferType>(filepath);
+        if (!shaderFile)
+            throw std::runtime_error("Could not find shader file: \n" + filepath);
+
+        // Convert it to std::string containter
+        std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
+
+        // Store it to the loaded shader data vector
+        loadedShaders.insert({filepath, shaderSrc});
+    }
+
+    // Preprocess them
+    ShaderPreprocessor shaderPreprocessor;
+    std::vector<std::string> deps;
+    for (const auto& dep : loadedShaders)
+        deps.push_back(dep.second);
+    for (auto& shs : loadedShaders)
+        shs.second = shaderPreprocessor.Preprocess(shs.second, deps);
+
     // The shader map
     std::unordered_map<std::string, std::vector<std::pair<Shader::Type, std::string>>> shadersLoc =
     {
@@ -173,13 +207,8 @@ void Engine::LoadShaders()
         std::unordered_map<Shader::Type, Shader> shaders;
         for (const auto& f : p.second)
         {
-            // Load file
-            auto shaderFile = FileLoad<BufferType>(f.second);
-            if (!shaderFile)
-                throw std::runtime_error("Could not find shader file: \n" + f.second);
-
-            // Convert it to std::string containter
-            std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
+            // Get the source
+            std::string shaderSrc = loadedShaders[f.second];
 
             // Create shader from source
             Shader shader(shaderSrc, f.first);

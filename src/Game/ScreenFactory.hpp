@@ -28,41 +28,27 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _LOADING_SCREEN_HPP_
-#define _LOADING_SCREEN_HPP_
+#ifndef _SCREEN_FACTORY_HPP_
+#define _SCREEN_FACTORY_HPP_
 
+#include <memory>
 #include "Screen.hpp"
-#include <functional>
-#include <unordered_map>
 
-class LoadingScreen : public Screen
+class ScreenFactory
 {
     public:
-        // Screen interface
-        void onInit(ScreenContext& sc);
-        void onUpdate(float dt);
-        void onRender(float interpolation);
-        void onShutdown();
-    private:
-        // Loads file data into memory cache
-        void LoadFileData();
-        // Master load function called when file data have been loaded in cache
-        void LoadFromMem();
-            // Called during initialization to load textures
-            void LoadTextures();
-            // Called during initialization to load materials
-            void LoadMaterials();
-            // Called during initialization to load models
-            void LoadModels();
+        // Alias for shorter definitions
+        using ScreenPtr = std::unique_ptr<Screen>;
 
-        // Engine ref
-        Engine* mEngine;
-        // FileDataCache ref
-        ScreenContext::FileDataCache* mFileDataCache;
-        // Indicates that data files have been loaded to cache
-        bool mFileCacheIsReady;
-        // Holds the currently loading file
-        std::string mCurrentlyLoading;
+        // Enum containing all the available game states
+        enum class ScreenName
+        {
+            LoadingScreen = 0,
+            MainScreen
+        };
+
+        // Factory function
+        ScreenPtr CreateScreen(ScreenName name);
 };
 
-#endif // ! _LOADING_SCREEN_HPP_
+#endif // ! _SCREEN_FACTORY_HPP_

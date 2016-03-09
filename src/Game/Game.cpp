@@ -1,7 +1,6 @@
 #include "Game.hpp"
 #include <algorithm>
-#include "LoadingScreen.hpp"
-#include "MainScreen.hpp"
+#include "ScreenFactory.hpp"
 
 ///==============================================================
 ///= Game
@@ -18,13 +17,20 @@ void Game::Init()
     // Setup window and input
     SetupWindow();
 
-    //
-    mShouldChangeScreen = false;
-
     // Initialize first screen
+    ScreenFactory screenFactory;
+    std::unique_ptr<Screen> ls = screenFactory.CreateScreen(ScreenFactory::ScreenName::LoadingScreen);
+    ls->SetFinishCb(
+        [&screenFactory, this]()
+        {
+            std::unique_ptr<Screen> mainScr = screenFactory.CreateScreen(ScreenFactory::ScreenName::MainScreen);
+            ScreenContext sc(&mEngine, &mFileDataCache);
+            mScreenManager.AddScreen(std::move(mainScr), sc);
+        }
+    );
+
+    // Push it to the engine manager
     ScreenContext sc(&mEngine, &mFileDataCache);
-    std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
-    ls->SetFinishCb([this]() { mShouldChangeScreen = true; });
     mScreenManager.AddScreen(std::move(ls), sc);
 }
 
@@ -63,14 +69,6 @@ void Game::Update(float dt)
 {
     // Perform deferred screen state actions
     mScreenManager.PerfomQueuedActions();
-
-    // Load main screen
-    if (mShouldChangeScreen)
-    {
-        ScreenContext sc(&mEngine, &mFileDataCache);
-        mScreenManager.AddScreen(std::make_unique<MainScreen>(), sc);
-        mShouldChangeScreen = false;
-    }
 
     // Check if last screen was poped out
     if (mScreenManager.GetActiveScreen() == nullptr)

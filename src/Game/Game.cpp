@@ -61,6 +61,9 @@ void Game::SetupWindow()
 
 void Game::Update(float dt)
 {
+    // Perform deferred screen state actions
+    mScreenManager.PerfomQueuedActions();
+
     // Load main screen
     if (mShouldChangeScreen)
     {

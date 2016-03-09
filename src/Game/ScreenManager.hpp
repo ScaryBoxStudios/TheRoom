@@ -33,22 +33,49 @@
 
 #include <vector>
 #include <memory>
+#include <queue>
 #include "Screen.hpp"
 
 class ScreenManager
 {
     public:
+        using ScreenPtr = std::unique_ptr<Screen>;
+
         // Appends a screen the the screen stack
-        void AddScreen(std::unique_ptr<Screen> screen, ScreenContext& sc);
+        void AddScreen(ScreenPtr screen, ScreenContext& sc);
 
         // Replaces current active screen with the given one
-        void ReplaceScreen(std::unique_ptr<Screen> screen, ScreenContext& sc);
+        void ReplaceScreen(ScreenPtr screen, ScreenContext& sc);
 
         // Retrieves the currently active screen
         Screen* GetActiveScreen();
 
+        // Performs all currently queued up actions
+        void PerfomQueuedActions();
+
     private:
-        using ScreenPtr = std::unique_ptr<Screen>;
+        // Deferred action type
+        enum class Action
+        {
+            Add = 0,
+            Replace,
+        };
+
+        // Action data
+        struct ActionData
+        {
+            std::unique_ptr<Screen> screen;
+            ScreenContext sc;
+        };
+
+        // Actual implementations of the actions
+        void AddScreenImpl(ScreenPtr screen, ScreenContext& sc);
+        void ReplaceScreenImpl(ScreenPtr screen, ScreenContext& sc);
+
+        // Deferred action queue
+        std::queue<std::pair<Action, ActionData>> mDeferredActions;
+
+        // Screen stack
         std::vector<ScreenPtr> mScreens;
 };
 

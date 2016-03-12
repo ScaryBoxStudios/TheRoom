@@ -45,7 +45,7 @@ ModelData GenUVSphere(float radius, std::uint32_t rings = 32, std::uint32_t sect
             *n++ = (glm::vec3(x, y, z));
 
             // Push back texture coordinates
-            *t++ = (glm::vec2(s*S, r*R));
+            *t++ = (glm::vec2(s * S, (rings - 1 - r) * R));
         }
     }
 

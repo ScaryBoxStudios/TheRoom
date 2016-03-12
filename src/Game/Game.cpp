@@ -1,6 +1,6 @@
 #include "Game.hpp"
 #include <algorithm>
-#include "ScreenFactory.hpp"
+#include "ScreenRouting.hpp"
 
 ///==============================================================
 ///= Game
@@ -17,21 +17,9 @@ void Game::Init()
     // Setup window and input
     SetupWindow();
 
-    // Initialize first screen
-    ScreenFactory screenFactory;
-    std::unique_ptr<Screen> ls = screenFactory.CreateScreen(ScreenFactory::ScreenName::LoadingScreen);
-    ls->SetFinishCb(
-        [&screenFactory, this]()
-        {
-            std::unique_ptr<Screen> mainScr = screenFactory.CreateScreen(ScreenFactory::ScreenName::MainScreen);
-            ScreenContext sc(&mEngine, &mFileDataCache);
-            mScreenManager.AddScreen(std::move(mainScr), sc);
-        }
-    );
-
-    // Push it to the engine manager
+    // Setup screen transition table
     ScreenContext sc(&mEngine, &mFileDataCache);
-    mScreenManager.AddScreen(std::move(ls), sc);
+    SetupScreenRouting(&mScreenManager, sc);
 }
 
 void Game::SetupWindow()

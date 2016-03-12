@@ -27,13 +27,3 @@ void Screen::onMouse(MouseButton mb, ButtonAction ba)
     (void) mb;
     (void) ba;
 }
-
-void Screen::Finish()
-{
-    mFinishCb();
-}
-
-void Screen::SetFinishCb(FinishCb cb)
-{
-    mFinishCb = cb;
-}

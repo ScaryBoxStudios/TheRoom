@@ -68,14 +68,6 @@ class Screen
         virtual void onRender(float interpoation) = 0;
         // When deinitializing the current screen
         virtual void onShutdown() = 0;
-        // To be called when the current screen is exiting
-        void Finish();
-        // Finish observer interface
-        using FinishCb = std::function<void()>;
-        void SetFinishCb(FinishCb cb);
-    private:
-        // The finish callback
-        FinishCb mFinishCb;
 };
 
 #endif // ! _SCREEN_HPP_

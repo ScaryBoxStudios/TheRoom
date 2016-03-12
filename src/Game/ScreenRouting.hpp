@@ -28,27 +28,11 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SCREEN_FACTORY_HPP_
-#define _SCREEN_FACTORY_HPP_
+#ifndef _SCREEN_ROUTING_HPP_
+#define _SCREEN_ROUTING_HPP_
 
-#include <memory>
-#include "Screen.hpp"
+#include "ScreenManager.hpp"
 
-class ScreenFactory
-{
-    public:
-        // Alias for shorter definitions
-        using ScreenPtr = std::unique_ptr<Screen>;
+void SetupScreenRouting(ScreenManager* screenMgr, ScreenContext& sc);
 
-        // Enum containing all the available game states
-        enum class ScreenName
-        {
-            LoadingScreen = 0,
-            MainScreen
-        };
-
-        // Factory function
-        ScreenPtr CreateScreen(ScreenName name);
-};
-
-#endif // ! _SCREEN_FACTORY_HPP_
+#endif // ! _SCREEN_ROUTING_HPP_

@@ -43,6 +43,9 @@ class LoadingScreen : public Screen
         void onUpdate(float dt);
         void onRender(float interpolation);
         void onShutdown();
+        // Transition interface
+        using OnLoadedCb = std::function<void()>;
+        void SetOnLoadedCb(OnLoadedCb cb);
     private:
         // Loads file data into memory cache
         void LoadFileData();
@@ -63,6 +66,8 @@ class LoadingScreen : public Screen
         bool mFileCacheIsReady;
         // Holds the currently loading file
         std::string mCurrentlyLoading;
+        // Observer cb for finish event
+        OnLoadedCb mOnLoadedCb;
 };
 
 #endif // ! _LOADING_SCREEN_HPP_

@@ -56,7 +56,7 @@ void LoadingScreen::LoadFromMem()
     mEngine->SetSkybox(std::move(skybox));
 
     // Call finish
-    Finish();
+    mOnLoadedCb();
 }
 
 void LoadingScreen::LoadFileData()
@@ -154,4 +154,9 @@ void LoadingScreen::onRender(float interpolation)
 
 void LoadingScreen::onShutdown()
 {
+}
+
+void LoadingScreen::SetOnLoadedCb(OnLoadedCb cb)
+{
+    mOnLoadedCb = cb;
 }

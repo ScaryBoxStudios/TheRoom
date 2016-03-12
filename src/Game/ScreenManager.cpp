@@ -65,7 +65,8 @@ void ScreenManager::AddScreenImpl(std::unique_ptr<Screen> screen, ScreenContext&
 
 void ScreenManager::ReplaceScreenImpl(std::unique_ptr<Screen> screen, ScreenContext& sc)
 {
-    //mScreens.back()->onPause(sc);
+    mScreens.back()->onShutdown();
+    mScreens.pop_back();
     mScreens.push_back(std::move(screen));
     mScreens.back()->onInit(sc);
 }

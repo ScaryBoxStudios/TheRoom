@@ -41,7 +41,7 @@ Skysphere::Skysphere()
     mProgram = std::make_unique<ShaderProgram>(vert.Id(), frag.Id());
 
     // Sphere geometry
-    ModelData sphere = GenUVSphere(1.0f, 16, 16);
+    ModelData sphere = GenUVSphere(1.0f, 32, 32);
     const auto& sphereData = sphere.meshes.front().data;
     const auto& sphereIndices = sphere.meshes.front().indices;
     mSphereNumIndices = static_cast<GLsizei>(sphereIndices.size());

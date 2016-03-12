@@ -195,6 +195,8 @@ void MainScreen::onKey(Key k, KeyAction ka)
         else if (mMovingLightIndex == 1)
             mMovingLightIndex = 0;
     }
+    if(k == Key::F2)
+        mOnNextScreenCb();
 }
 
 void MainScreen::onUpdate(float dt)
@@ -319,4 +321,9 @@ void MainScreen::onRender(float interpolation)
 
 void MainScreen::onShutdown()
 {
+}
+
+void MainScreen::SetOnNextScreenCb(OnNextScreenCb cb)
+{
+    mOnNextScreenCb = cb;
 }

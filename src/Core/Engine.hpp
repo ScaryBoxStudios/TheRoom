@@ -35,7 +35,6 @@
 #include "../Graphics/Texture/TextureStore.hpp"
 #include "../Graphics/Renderer/Renderer.hpp"
 #include "../Graphics/Renderer/AABBRenderer.hpp"
-#include "../Graphics/Renderer/Skybox.hpp"
 #include "../Graphics/Shader/Shader.hpp"
 #include "../Graphics/Material/MaterialStore.hpp"
 
@@ -78,9 +77,6 @@ class Engine
         // Sets adds a ShaderProgram to the program list
         void AddShaderProgram(const std::string& name, ShaderProgram sp);
 
-        // Sets the skybox that is used by the renderer
-        void SetSkybox(std::unique_ptr<Skybox> skybox);
-
     private:
         // Loads the default shaders used
         void LoadShaders();
@@ -104,9 +100,6 @@ class Engine
 
         // The loaded ShaderProgram(s)
         std::unordered_map<std::string, ShaderProgram> mShaderPrograms;
-
-        // The skybox used
-        std::unique_ptr<Skybox> mSkybox;
 };
 
 #endif // ! _ENGINE_HPP_

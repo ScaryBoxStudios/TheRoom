@@ -30,9 +30,6 @@ void main()
 
 void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId)
 {
-    // Skybox is initially unset
-    mSkybox = nullptr;
-
     // Scene is initially unset
     mScene = nullptr;
 
@@ -141,9 +138,6 @@ void Renderer::Render(float interpolation)
     glEnable(GL_DEPTH_TEST);
     // Forward rendering block
     {
-        // Render the skybox
-        if (mSkybox)
-            mSkybox->Render(mProjection, mView);
     }
 }
 
@@ -418,11 +412,6 @@ void Renderer::StencilPass(const PointLight& pLight)
     glDisable(GL_DEPTH_TEST);
 }
 
-void Renderer::SetSkybox(const Skybox* skybox)
-{
-    mSkybox = skybox;
-}
-
 void Renderer::SetScene(const Scene* scene)
 {
     mScene = scene;
@@ -443,4 +432,9 @@ void Renderer::SetDataStores(ModelStore* mdlStore, MaterialStore* matStore)
 Lights& Renderer::GetLights()
 {
     return mLights;
+}
+
+const glm::mat4 Renderer::GetProjection() const
+{
+    return mProjection;
 }

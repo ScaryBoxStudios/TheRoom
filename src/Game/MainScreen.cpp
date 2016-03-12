@@ -6,6 +6,7 @@ WARN_GUARD_ON
 #include "../Graphics/Scene/SceneLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
+#include "../Graphics/Image/ImageLoader.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
 
 // BufferType for the files loaded
@@ -43,6 +44,20 @@ void MainScreen::onInit(ScreenContext& sc)
 
     // Pass the current scene to renderer
     mEngine->GetRenderer().SetScene(mScene.get());
+
+    // Load the skybox
+    mSkybox = std::make_unique<Skybox>();
+    ImageLoader imLoader;
+    mSkybox->Load(
+        {
+            { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/right.jpg"], "jpg") },
+            { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/left.jpg"],  "jpg") },
+            { Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/top.jpg"],   "jpg") },
+            { Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/bottom.jpg"],"jpg") },
+            { Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/back.jpg"],  "jpg") },
+            { Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/front.jpg"], "jpg") }
+        }
+    );
 
     // Do not show AABBs by default
     mShowAABBs = false;
@@ -293,6 +308,10 @@ void MainScreen::onRender(float interpolation)
         aabbRenderer.SetScene(mScene.get());
         aabbRenderer.Render(interpolation);
     }
+
+    // Render the skybox
+    if (mSkybox)
+        mSkybox->Render(mEngine->GetRenderer().GetProjection(), view);
 
     // Render sample text
     mEngine->GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");

@@ -75,9 +75,6 @@ void Engine::Render(float interpolation)
 
 void Engine::Shutdown()
 {
-    // Destroy Skybox
-    mSkybox.reset();
-
     // Remove cached shader programs
     mShaderPrograms.clear();
 
@@ -138,12 +135,6 @@ TextRenderer& Engine::GetTextRenderer()
 void Engine::AddShaderProgram(const std::string& name, ShaderProgram sp)
 {
     mShaderPrograms.emplace(name, std::move(sp));
-}
-
-void Engine::SetSkybox(std::unique_ptr<Skybox> skybox)
-{
-    mSkybox = std::move(skybox);
-    mRenderer.SetSkybox(mSkybox.get());
 }
 
 void Engine::LoadShaders()

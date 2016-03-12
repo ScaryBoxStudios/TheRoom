@@ -35,6 +35,7 @@
 #include "Character.hpp"
 #include "../Graphics/Util/Camera.hpp"
 #include "../Graphics/Scene/Scene.hpp"
+#include "../Graphics/Renderer/Skybox.hpp"
 
 class MainScreen : public Screen
 {
@@ -66,6 +67,9 @@ class MainScreen : public Screen
         bool mFollowingCharacter;
         int mMovingLightIndex;
         Character mCharacter;
+
+        // The skybox used
+        std::unique_ptr<Skybox> mSkybox;
 
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();

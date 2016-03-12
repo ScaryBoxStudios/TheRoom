@@ -34,7 +34,6 @@
 #include <memory>
 #include "GBuffer.hpp"
 #include "Light.hpp"
-#include "Skybox.hpp"
 #include "TextRenderer.hpp"
 #include "ShadowRenderer.hpp"
 #include "../Geometry/ModelStore.hpp"
@@ -71,14 +70,14 @@ class Renderer
         /*! Sets the view matrix */
         void SetView(const glm::mat4& view);
 
-        /*! Sets the skybox */
-        void SetSkybox(const Skybox* s);
-
         /*! Sets the current rendering scene */
         void SetScene(const Scene* scene);
 
         /*! Retrieves the renderer's Lights */
         Lights& GetLights();
+
+        /*! Retrieves the renderer's cached projection matrix */
+        const glm::mat4 GetProjection() const;
 
     private:
         // Performs the geometry pass rendering step
@@ -117,9 +116,6 @@ class Renderer
 
         // The null program used by the stencil passes
         std::unique_ptr<ShaderProgram> mNullProgram;
-
-        // The root Skybox used
-        const Skybox* mSkybox;
 
         // The shadow map rendering utility
         ShadowRenderer mShadowRenderer;

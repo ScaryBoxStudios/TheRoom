@@ -1,8 +1,10 @@
 #include "OggFile.hpp"
-#include <vorbis/vorbisfile.h>
-#include <vorbis/codec.h>
 #include <ogg/os_types.h>
 #include <ogg/ogg.h>
+
+#define OV_EXCLUDE_STATIC_CALLBACKS
+#include <vorbis/codec.h>
+#include <vorbis/vorbisfile.h>
 
 void OggFile::Load(std::vector<std::uint8_t> f)
 {

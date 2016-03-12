@@ -12,8 +12,10 @@ MaterialStore::~MaterialStore()
 
 void MaterialStore::Clear()
 {
-    if (mUBO != 0)
+    if (mUBO != 0) {
         glDeleteBuffers(1, &mUBO);
+        mUBO = 0;
+    }
     mMaterials.clear();
     mMaterialDescs.clear();
 }

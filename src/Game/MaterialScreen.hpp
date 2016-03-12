@@ -34,6 +34,7 @@
 #include "Screen.hpp"
 #include "../Graphics/Util/Camera.hpp"
 #include "../Graphics/Scene/Scene.hpp"
+#include "../Graphics/Renderer/Skysphere.hpp"
 
 class MaterialScreen : public Screen
 {
@@ -54,6 +55,9 @@ class MaterialScreen : public Screen
         std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();
         Camera mCamera;
+
+        // The skysphere
+        std::unique_ptr<Skysphere> mSkysphere;
 };
 
 #endif // ! _MATERIAL_SCREEN_HPP_

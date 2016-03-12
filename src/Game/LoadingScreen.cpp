@@ -55,6 +55,8 @@ void LoadingScreen::LoadFileData()
     , "ext/Assets/Textures/Skybox/Bluesky/bottom.jpg"
     , "ext/Assets/Textures/Skybox/Bluesky/back.jpg"
     , "ext/Assets/Textures/Skybox/Bluesky/front.jpg"
+      // Skysphere
+    , "ext/Assets/Textures/Skysphere/Day Sun Peak Summersky.png"
       // Textures
     , "ext/Assets/Textures/Materials/Mahogany/mahogany_wood.jpg"
     , "ext/Assets/Textures/Materials/Mahogany/mahogany_wood_spec.jpg"

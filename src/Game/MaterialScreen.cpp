@@ -44,6 +44,12 @@ void MaterialScreen::onInit(ScreenContext& sc)
 
     // Pass the current scene to renderer
     mEngine->GetRenderer().SetScene(mScene.get());
+
+    // Initialize skysphere
+    ImageLoader imLoader;
+    mSkysphere = std::make_unique<Skysphere>();
+    mSkysphere->Load(
+        imLoader.Load(*(*fileDataCache)["ext/Assets/Textures/Skysphere/Day Sun Peak Summersky.png"], "png"));
 }
 
 std::vector<Camera::MoveDirection> MaterialScreen::CameraMoveDirections()
@@ -115,6 +121,9 @@ void MaterialScreen::onRender(float interpolation)
     // Render
     mEngine->GetRenderer().SetView(view);
     mEngine->GetRenderer().Render(interpolation);
+
+    // Render skysphere
+    mSkysphere->Render(mEngine->GetRenderer().GetProjection(), view);
 
     // Render sample text
     mEngine->GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");

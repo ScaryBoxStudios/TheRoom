@@ -2,6 +2,7 @@
 #include "../Window/GlfwError.hpp"
 #include "../Util/FileLoad.hpp"
 #include "../Graphics/Shader/ShaderPreprocessor.hpp"
+#include "../Util/Hash.hpp"
 
 WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>

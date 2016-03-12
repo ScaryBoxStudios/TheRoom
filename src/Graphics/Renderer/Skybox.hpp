@@ -39,7 +39,6 @@
 #include "../Image/RawImage.hpp"
 #include "../Shader/Shader.hpp"
 #include "../../Util/WarnGuard.hpp"
-#include "../../Util/Hash.hpp"
 
 WARN_GUARD_ON
 #include <glm/glm.hpp>

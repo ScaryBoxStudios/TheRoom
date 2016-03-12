@@ -18,10 +18,10 @@ void SetupScreenRouting(ScreenManager* screenMgr, ScreenContext& sc)
                 [screenMgr, &scrCtx]()
                 {
                     std::unique_ptr<MaterialScreen> matScr = std::make_unique<MaterialScreen>();
-                    screenMgr->AddScreen(std::move(matScr), scrCtx);
+                    screenMgr->ReplaceScreen(std::move(matScr), scrCtx);
                 }
             );
-            screenMgr->AddScreen(std::move(mainScr), scrCtx);
+            screenMgr->ReplaceScreen(std::move(mainScr), scrCtx);
         }
     );
 

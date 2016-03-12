@@ -50,7 +50,7 @@ void ScreenManager::PerfomQueuedActions()
             }
             case Action::Replace:
             {
-                ReplaceScreen(std::move(screen), sc);
+                ReplaceScreenImpl(std::move(screen), sc);
                 break;
             }
         }

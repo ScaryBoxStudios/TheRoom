@@ -35,6 +35,7 @@
 #include <vector>
 #include "../Core/Engine.hpp"
 #include "ScreenManager.hpp"
+#include "ScreenRouting.hpp"
 
 class Game
 {
@@ -73,6 +74,9 @@ class Game
 
         // The screen manager instance
         ScreenManager mScreenManager;
+
+        // The screen router instance
+        std::unique_ptr<ScreenRouter> mScreenRouter;
 
         // Master switch, called when game is exiting
         std::function<void()> mExitHandler;

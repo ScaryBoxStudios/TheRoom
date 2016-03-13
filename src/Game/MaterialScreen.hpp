@@ -44,6 +44,9 @@ class MaterialScreen : public Screen
         void onKey(Key k, KeyAction ka);
         void onRender(float interpolation);
         void onShutdown();
+        // Transition interface
+        using OnNextScreenCb = std::function<void()>;
+        void SetOnNextScreenCb(OnNextScreenCb cb);
     private:
         // Engine ref
         Engine* mEngine;
@@ -58,6 +61,9 @@ class MaterialScreen : public Screen
 
         // The skysphere
         std::unique_ptr<Skysphere> mSkysphere;
+
+        // Callback called when transition event to next screen occurs
+        OnNextScreenCb mOnNextScreenCb;
 };
 
 #endif // ! _MATERIAL_SCREEN_HPP_

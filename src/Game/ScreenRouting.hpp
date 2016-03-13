@@ -33,6 +33,21 @@
 
 #include "ScreenManager.hpp"
 
-void SetupScreenRouting(ScreenManager* screenMgr, ScreenContext& sc);
+class ScreenRouter
+{
+    public:
+        // Constructor
+        ScreenRouter(ScreenContext screenContext);
+
+        // Main routing setup function
+        void SetupScreenRouting(ScreenManager* screenMgr);
+
+    private:
+        // The context passed to the screen instantiation actions
+        ScreenContext mScrContext;
+        // Various transition callbacks
+        std::function<void()> mOnMainScrNext;
+        std::function<void()> mOnMatScrNext;
+};
 
 #endif // ! _SCREEN_ROUTING_HPP_

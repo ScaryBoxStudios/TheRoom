@@ -85,8 +85,8 @@ std::tuple<float, float> MaterialScreen::CameraLookOffset()
 
 void MaterialScreen::onKey(Key k, KeyAction ka)
 {
-    (void)k;
-    (void)ka;
+    if(k == Key::F1 && ka == KeyAction::Release)
+        mOnNextScreenCb();
 }
 
 void MaterialScreen::onUpdate(float dt)
@@ -140,4 +140,9 @@ void MaterialScreen::onShutdown()
     mEngine->GetModelStore().Clear();
     mEngine->GetMaterialStore().Clear();
     mEngine->GetTextureStore().Clear();
+}
+
+void MaterialScreen::SetOnNextScreenCb(OnNextScreenCb cb)
+{
+    mOnNextScreenCb = cb;
 }

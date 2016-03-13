@@ -19,7 +19,8 @@ void Game::Init()
 
     // Setup screen transition table
     ScreenContext sc(&mEngine, &mFileDataCache);
-    SetupScreenRouting(&mScreenManager, sc);
+    mScreenRouter = std::make_unique<ScreenRouter>(sc);
+    mScreenRouter->SetupScreenRouting(&mScreenManager);
 }
 
 void Game::SetupWindow()

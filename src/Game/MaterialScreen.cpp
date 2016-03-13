@@ -17,11 +17,6 @@ void MaterialScreen::onInit(ScreenContext& sc)
     // Camera initial position
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
-    // Clear previous stores
-    mEngine->GetModelStore().Clear();
-    mEngine->GetMaterialStore().Clear();
-    mEngine->GetTextureStore().Clear();
-
     // Load sample scene file
     std::string sceneFile= "ext/Scenes/scene2.json";
     auto sceneFileData = FileLoad<BufferType>(sceneFile);
@@ -44,6 +39,17 @@ void MaterialScreen::onInit(ScreenContext& sc)
 
     // Pass the current scene to renderer
     mEngine->GetRenderer().SetScene(mScene.get());
+
+    // Setup scene lights
+    Lights& lights = mEngine->GetRenderer().GetLights();
+
+    // Add directional light
+    DirLight dirLight;
+    dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
+    dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
+    dirLight.properties.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
+    dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    lights.dirLights.push_back(dirLight);
 
     // Initialize skysphere
     ImageLoader imLoader;
@@ -131,4 +137,7 @@ void MaterialScreen::onRender(float interpolation)
 
 void MaterialScreen::onShutdown()
 {
+    mEngine->GetModelStore().Clear();
+    mEngine->GetMaterialStore().Clear();
+    mEngine->GetTextureStore().Clear();
 }

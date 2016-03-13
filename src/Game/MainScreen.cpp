@@ -325,6 +325,14 @@ void MainScreen::onRender(float interpolation)
 
 void MainScreen::onShutdown()
 {
+    // Remove lights
+    mEngine->GetRenderer().GetLights().pointLights.clear();
+    mEngine->GetRenderer().GetLights().dirLights.clear();
+
+    // Clear previous stores
+    mEngine->GetModelStore().Clear();
+    mEngine->GetMaterialStore().Clear();
+    mEngine->GetTextureStore().Clear();
 }
 
 void MainScreen::SetOnNextScreenCb(OnNextScreenCb cb)

@@ -34,6 +34,9 @@ SceneNode* Scene::CreateNode(
     if(category == Category::Light)
         mLights.push_back(rVal);
 
+    // Add it to updates
+    mUpdates.newNodes.push_back(rVal);
+
     return rVal;
 }
 
@@ -69,8 +72,9 @@ void Scene::DeleteNode(SceneNode* const node, bool deleteChildren /* = false */)
             DeleteNode(child, deleteChildren);
 
 
-    // Erase node
+    // Erase node and add it to updates
     auto nodeIt = mNodes.find(node->GetUUID());
+    mUpdates.deletedNodes.push_back(std::move(nodeIt->second));
     mNodes.erase(nodeIt);
 }
 
@@ -96,6 +100,24 @@ void Scene::DetachFromParent(const std::string& childUuid, const std::string& pa
 
     // Remove child from parent
     parent->RemoveChild(childUuid);
+}
+
+Scene::Updates Scene::PullUpdates()
+{
+    // Create an update bundle to return
+    Updates rVal;
+
+    // Copy new nodes
+    rVal.newNodes = mUpdates.newNodes;
+
+    // Move deleted nodes unique pointers
+    for (auto& uptr : mUpdates.deletedNodes)
+        rVal.deletedNodes.push_back(std::move(uptr));
+
+    // Clear old update state
+    ClearUpdates();
+
+    return rVal;
 }
 
 void Scene::Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren /* = false */)
@@ -151,4 +173,13 @@ SceneNode* Scene::FindNodeByUuid(const std::string& uuid)
 {
     auto it = mNodes.find(uuid);
     return (it == std::end(mNodes)) ? nullptr : it->second.get();
+}
+
+//==================================================
+// Private functions
+//==================================================
+void Scene::ClearUpdates()
+{
+    mUpdates.newNodes.clear();
+    mUpdates.deletedNodes.clear();
 }

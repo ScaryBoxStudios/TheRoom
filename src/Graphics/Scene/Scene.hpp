@@ -43,6 +43,12 @@ class Scene
     using PointLights = std::vector<SceneNode*>;
 
     public:
+        struct Updates
+        {
+            std::vector<SceneNode*> newNodes;
+            std::vector<std::unique_ptr<SceneNode>> deletedNodes;
+        };
+
         /// Constructor
         Scene();
 
@@ -64,6 +70,9 @@ class Scene
 
         /// Detach child from parent
         void DetachFromParent(const std::string& childUuid, const std::string& parentUuid);
+
+        /// Retrieves the updates and clears the update vectors
+        Updates PullUpdates();
 
         /// Move the node and optionally its children too
         void Move(const std::string& uuid, const glm::vec3& pos, bool moveChildren = false);
@@ -90,6 +99,10 @@ class Scene
         SceneNode*  mRootNode; /// Scene's root node
         NodeBank    mNodes;    /// All nodes
         PointLights mLights;   /// Scene's point lights
+        Updates     mUpdates;  /// Scene's updates (basically a diff)
+
+        /// Clear updates
+        void ClearUpdates();
 
 }; // ! Scene
 

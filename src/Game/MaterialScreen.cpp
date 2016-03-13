@@ -15,7 +15,8 @@ void MaterialScreen::onInit(ScreenContext& sc)
     mEngine = sc.GetEngine();
 
     // Camera initial position
-    mCamera.SetPos(glm::vec3(0, 0, 8));
+    mCamera.SetPos(glm::vec3(-2, 2, 10));
+    mCamera.Look(std::make_tuple(10/0.05f, 10/0.05f));
 
     // Load sample scene file
     std::string sceneFile= "ext/Scenes/scene2.json";
@@ -47,7 +48,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
     DirLight dirLight;
     dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
     dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    dirLight.properties.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
+    dirLight.properties.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
     lights.dirLights.push_back(dirLight);
 

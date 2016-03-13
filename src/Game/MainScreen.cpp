@@ -27,6 +27,10 @@ void MainScreen::onInit(ScreenContext& sc)
     // Camera initial position
     mCamera.SetPos(glm::vec3(0, 0, 8));
 
+    // Add sample UV Sphere
+    ModelData sphereModel = GenUVSphere(1, 32, 32);
+    mEngine->GetModelStore().Load("4", std::move(sphereModel));
+
     // Create world objects
     SetupWorld();
 

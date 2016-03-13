@@ -29,21 +29,6 @@ void LoadingScreen::onInit(ScreenContext& sc)
     loaderThread.detach();
 }
 
-void LoadingScreen::LoadFromMem()
-{
-    // Load the textures
-    LoadTextures();
-
-    // Load the materials
-    LoadMaterials();
-
-    // Load the models
-    LoadModels();
-
-    // Call finish
-    mOnLoadedCb();
-}
-
 void LoadingScreen::LoadFileData()
 {
     std::vector<std::string> fileList =
@@ -96,31 +81,13 @@ void LoadingScreen::LoadFileData()
     }
 };
 
-void LoadingScreen::LoadTextures()
-{
-}
-
-void LoadingScreen::LoadMaterials()
-{
-}
-
-void LoadingScreen::LoadModels()
-{
-    // Retrieve the model and texture stores from the renderer
-    auto& modelStore = mEngine->GetModelStore();
-
-    // Add sample UV Sphere
-    ModelData sphereModel = GenUVSphere(1, 32, 32);
-    modelStore.Load("4", std::move(sphereModel));
-}
-
 void LoadingScreen::onUpdate(float dt)
 {
     mEngine->Update(dt);
 
     if (mFileCacheIsReady)
     {
-        LoadFromMem();
+        mOnLoadedCb();
         mFileCacheIsReady = false;
     }
 }

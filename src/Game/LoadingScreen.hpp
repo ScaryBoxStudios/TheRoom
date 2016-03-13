@@ -49,14 +49,6 @@ class LoadingScreen : public Screen
     private:
         // Loads file data into memory cache
         void LoadFileData();
-        // Master load function called when file data have been loaded in cache
-        void LoadFromMem();
-            // Called during initialization to load textures
-            void LoadTextures();
-            // Called during initialization to load materials
-            void LoadMaterials();
-            // Called during initialization to load models
-            void LoadModels();
 
         // Engine ref
         Engine* mEngine;

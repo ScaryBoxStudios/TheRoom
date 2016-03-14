@@ -83,7 +83,8 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
         // Add color
         newMat.SetDiffuseColor(glm::vec3(material.color.r, material.color.g, material.color.b));
         newMat.SetSpecularColor(glm::vec3(material.specular.r, material.specular.g, material.specular.b));
-        newMat.SetShininess(material.shininess);
+        newMat.SetRoughness(material.roughness);
+        newMat.SetFresnel(material.fresnel);
 
         mMaterialStore->Load(std::to_string(material.id), newMat);
     }

@@ -21,7 +21,8 @@ uniform int lMode;
 
 struct MaterialProperties
 {
-    float shininess;
+    float roughness;
+    float fresnel;
     vec3 diffCol;
     vec3 specCol;
 };
@@ -49,7 +50,8 @@ void main(void)
     Material material;
     material.diffuse = materialProps[MatIdx].diffCol + Diffuse;
     material.specular = materialProps[MatIdx].specCol + vec3(Specular);
-    material.shininess = materialProps[MatIdx].shininess;
+    material.roughness = materialProps[MatIdx].roughness;
+    material.fresnel = materialProps[MatIdx].fresnel;
 
     // Properties
     vec3 norm = normalize(Normal);

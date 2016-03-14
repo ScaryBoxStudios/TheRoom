@@ -32,10 +32,13 @@ void MaterialStore::Load(const std::string& name, const Material& material)
     // The actual PACKED datatype that is uploaded to the UBO
     struct MatData
     {
-        float shininess;
-        float padding[3];
+        float roughness;
+        float fresnel;
+        float padding[2];
+
         float diffCol[3];
         float padding2;
+
         float specCol[3];
         float padding3;
     };
@@ -45,7 +48,8 @@ void MaterialStore::Load(const std::string& name, const Material& material)
     for (const auto& matDesc : mMaterialDescs)
     {
         MatData md = {};
-        md.shininess = matDesc.material.GetShininess();
+        md.roughness = matDesc.material.GetRoughness();
+        md.fresnel = matDesc.material.GetFresnel();
         md.diffCol[0] = matDesc.material.GetDiffuseColor().r / 255.0f;
         md.diffCol[1] = matDesc.material.GetDiffuseColor().g / 255.0f;
         md.diffCol[2] = matDesc.material.GetDiffuseColor().b / 255.0f;

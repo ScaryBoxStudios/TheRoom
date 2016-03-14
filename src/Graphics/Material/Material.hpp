@@ -62,8 +62,12 @@ class Material
         bool UsesSpecularTexture() const;
 
         // Shininesss
-        float GetShininess() const;
-        void SetShininess(float s);
+        float GetRoughness() const;
+        void SetRoughness(float s);
+
+        // Fresnel
+        float GetFresnel() const;
+        void SetFresnel(float f);
 
         // Normal Map texture
         GLuint GetNormalMapTexture() const;
@@ -79,8 +83,11 @@ class Material
         glm::vec3 mSpecColor;
         GLuint mSpecTexture;
 
-        // Shininess
-        float mShininess;
+        // Roughness
+        float mRoughness;
+
+        // Fresnel
+        float mFresnel;
 
         // Normal mapping properties
         GLuint mNMapTexture;

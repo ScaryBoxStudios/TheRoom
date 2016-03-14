@@ -193,8 +193,10 @@ SceneFile SceneLoader::Load(const Buffer& data)
                 mt.emissive = parseColor(m["emissive"].GetUint());
             if (m.HasMember("specular"))
                 mt.specular = parseColor(m["specular"].GetUint());
-            if (m.HasMember("shininess"))
-                mt.shininess = static_cast<float>(m["shininess"].GetDouble());
+            if (m.HasMember("roughness"))
+                mt.roughness = static_cast<float>(m["roughness"].GetDouble());
+            if (m.HasMember("fresnel"))
+                mt.fresnel = static_cast<float>(m["fresnel"].GetDouble());
 
             // Opacity
             if (m.HasMember("opacity"))

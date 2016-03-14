@@ -5,7 +5,8 @@ Material::Material()
   , mDiffTexture(0)
   , mSpecColor(glm::vec3(0.0f))
   , mSpecTexture(0)
-  , mShininess(0)
+  , mRoughness(0)
+  , mFresnel(0)
   , mNMapTexture(0)
 {
 }
@@ -66,14 +67,24 @@ bool Material::UsesSpecularTexture() const
     return mSpecTexture != 0;
 }
 
-float Material::GetShininess() const
+float Material::GetRoughness() const
 {
-    return mShininess;
+    return mRoughness;
 }
 
-void Material::SetShininess(float s)
+void Material::SetRoughness(float s)
 {
-    mShininess = s;
+    mRoughness = s;
+}
+
+float Material::GetFresnel() const
+{
+    return mFresnel;
+}
+
+void Material::SetFresnel(float s)
+{
+    mFresnel = s;
 }
 
 //

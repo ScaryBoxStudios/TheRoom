@@ -42,11 +42,12 @@ class RenderformCreator
     public:
         struct Mesh
         {
+            SceneNode*  node;
             std::string modelName;
-            Transform transformation;
+            Transform* transformation;
             GLuint    vaoId,
-                      eboId,
-                      numIndices;
+                      eboId;
+            GLsizei   numIndices;
         };
 
         struct Material

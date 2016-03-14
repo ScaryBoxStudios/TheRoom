@@ -11,6 +11,13 @@ void RenderformCreator::Update(const Scene::Updates& sceneUpdates)
 {
     ParseAddNodeUpdates(sceneUpdates.newNodes);
     ParseDeleteNodeUpdates(sceneUpdates.deletedNodes);
+
+    // Update model transformations
+    //for (const auto& p : mRenderform)
+    //{
+    //    for (auto& mesh : p.second.meshes)
+    //        mesh.transformation = mesh.node->GetTransformation();
+    //}
 }
 
 const RenderformCreator::Renderform& RenderformCreator::GetRenderform() const
@@ -26,7 +33,7 @@ void RenderformCreator::ParseAddNodeUpdates(const std::vector<SceneNode*>& added
     for (SceneNode* node : added)
     {
         // Get the transformation
-        const Transform& transformation = node->GetTransformation(); 
+        Transform& transformation = node->GetTransformation();
 
         // Get the model
         const std::string& modelName = node->GetModel();
@@ -63,16 +70,15 @@ void RenderformCreator::ParseAddNodeUpdates(const std::vector<SceneNode*>& added
                 material.nmapTexId = material.useNormalMap ? matDesc->material.GetNormalMapTexture() : 0;
             }
 
-            // Create new renderform mesh
-            Mesh renderformMesh;
-            renderformMesh.transformation = transformation;
-            renderformMesh.vaoId          = mesh.vaoId;
-            renderformMesh.eboId          = mesh.eboId;
-            renderformMesh.numIndices     = mesh.numIndices;
-            renderformMesh.modelName      = modelName;
-
-            // Append it to material
-            mRenderform[matName].meshes.push_back(renderformMesh);
+            // Create new renderform mesh and append it to material
+            mRenderform[matName].meshes.push_back(
+            { node
+            , modelName
+            , &transformation
+            , mesh.vaoId
+            , mesh.eboId
+            , mesh.numIndices
+            });
         }
     }
 }

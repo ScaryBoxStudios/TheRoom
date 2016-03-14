@@ -161,7 +161,7 @@ void MaterialScreen::onRender(float interpolation)
             for (const auto& rformMesh : rformMeshes)
             {
                 Renderer::IntMesh newMesh;
-                newMesh.transformation = rformMesh.transformation;
+                newMesh.transformation = *rformMesh.transformation;
                 newMesh.vaoId      = rformMesh.vaoId;
                 newMesh.eboId      = rformMesh.eboId;
                 newMesh.numIndices = rformMesh.numIndices;

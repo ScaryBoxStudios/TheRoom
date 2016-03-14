@@ -131,9 +131,12 @@ void MaterialScreen::onRender(float interpolation)
     // Update render form
     mRenderformCreator->Update(mScene->PullUpdates());
 
+    // Convert render form to int form
+    auto intForm = bakeIntForm(*mRenderformCreator);
+
     // Render
     mEngine->GetRenderer().SetView(view);
-    mEngine->GetRenderer().Render(interpolation, bakeIntForm(*mRenderformCreator));
+    mEngine->GetRenderer().Render(interpolation, intForm);
 
     // Render skysphere
     mSkysphere->Render(mEngine->GetRenderer().GetProjection(), view);

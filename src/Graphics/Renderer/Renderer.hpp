@@ -73,6 +73,7 @@ class Renderer
         struct IntForm
         {
             std::vector<MaterialVecEntry> materials;
+            GLuint                        skyboxId = 0;
         };
 
         /*! Initializes the renderer */

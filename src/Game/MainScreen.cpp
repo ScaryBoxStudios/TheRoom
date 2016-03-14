@@ -308,9 +308,15 @@ void MainScreen::onRender(float interpolation)
     // Update render form
     mRenderformCreator->Update(mScene->PullUpdates());
 
+    // Convert render form to int form
+    auto intForm = bakeIntForm(*mRenderformCreator);
+
+    // Add skybox id to intform
+    intForm.skyboxId = mSkybox->GetCubemap()->Id();
+
     // Render
     mEngine->GetRenderer().SetView(view);
-    mEngine->GetRenderer().Render(interpolation, bakeIntForm(*mRenderformCreator));
+    mEngine->GetRenderer().Render(interpolation, intForm);
 
     // Render the AABBs if enabled
     if (mShowAABBs)

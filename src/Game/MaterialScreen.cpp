@@ -47,9 +47,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
     // Add directional light
     DirLight dirLight;
     dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
-    dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    dirLight.properties.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
-    dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    dirLight.color = glm::vec3(0.8f, 0.8f, 0.8f);
     lights.dirLights.push_back(dirLight);
 
     // Initialize skysphere

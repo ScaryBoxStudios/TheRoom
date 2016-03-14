@@ -38,14 +38,6 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-// Generic light properties
-struct LightProps
-{
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-};
-
 // Attenuation properties
 struct AttenuationProps
 {
@@ -57,14 +49,14 @@ struct AttenuationProps
 // Directional light properties
 struct DirLight
 {
-    LightProps properties;
+    glm::vec3 color;
     glm::vec3 direction;
 };
 
 // Point light properties
 struct PointLight
 {
-    LightProps properties;
+    glm::vec3 color;
     AttenuationProps attProps;
     glm::vec3 position;
 };
@@ -72,7 +64,7 @@ struct PointLight
 // Spot light properties
 struct SpotLight
 {
-    LightProps properties;
+    glm::vec3 color;
     AttenuationProps attProps;
     glm::vec3 position;
     glm::vec3 direction;

@@ -139,18 +139,14 @@ void MainScreen::SetupLights()
     // Add directional light
     DirLight dirLight;
     dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
-    dirLight.properties.ambient = glm::vec3(0.05f, 0.05f, 0.05f);
-    dirLight.properties.diffuse = glm::vec3(0.4f, 0.4f, 0.4f);
-    dirLight.properties.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    dirLight.color = glm::vec3(0.5f, 0.5f, 0.5f);
     lights.dirLights.push_back(dirLight);
 
     // Add point lights
     for (int i = 0; i < 2; ++i)
     {
         PointLight pointLight;
-        pointLight.properties.ambient  = glm::vec3(0.2f, 0.2f, 0.2f);
-        pointLight.properties.diffuse  = glm::vec3(0.5f, 0.5f, 0.5f);
-        pointLight.properties.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+        pointLight.color = glm::vec3(0.8f, 0.8f, 0.8f);
         pointLight.attProps.constant   = 1.0f;
         pointLight.attProps.linear     = 0.09f;
         pointLight.attProps.quadratic  = 0.032f;

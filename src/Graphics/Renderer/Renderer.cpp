@@ -234,7 +234,7 @@ void Renderer::GeometryPass(float interpolation, const IntForm& intForm)
 
 float CalcPointLightBSphere(const PointLight& light)
 {
-    float MaxChannel = fmax(fmax(light.properties.diffuse.r, light.properties.diffuse.g), light.properties.diffuse.b);
+    float MaxChannel = fmax(fmax(light.color.r, light.color.g), light.color.b);
     float ret =
         (-light.attProps.linear
          +sqrtf(light.attProps.linear * light.attProps.linear - 4 * light.attProps.quadratic
@@ -304,10 +304,8 @@ void Renderer::LightPass(float interpolation)
 
     // Set directional light properties
     const DirLight& dirLight = mLights.dirLights.front();
-    glUniform3fv(glGetUniformLocation(progId, "dirLight.direction"),           1, glm::value_ptr(dirLight.direction));
-    glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.ambient"),  1, glm::value_ptr(dirLight.properties.ambient));
-    glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.diffuse"),  1, glm::value_ptr(dirLight.properties.diffuse));
-    glUniform3fv(glGetUniformLocation(progId, "dirLight.properties.specular"), 1, glm::value_ptr(dirLight.properties.specular));
+    glUniform3fv(glGetUniformLocation(progId, "dirLight.direction"), 1, glm::value_ptr(dirLight.direction));
+    glUniform3fv(glGetUniformLocation(progId, "dirLight.color"), 1, glm::value_ptr(dirLight.color));
 
     // Render
     glm::mat4 mvp = glm::mat4();
@@ -334,10 +332,8 @@ void Renderer::LightPass(float interpolation)
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
-        glUniform3fv(glGetUniformLocation(progId, "pLight.position"),            1, glm::value_ptr(pLight.position));
-        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.ambient"),  1, glm::value_ptr(pLight.properties.ambient));
-        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.diffuse"),  1, glm::value_ptr(pLight.properties.diffuse));
-        glUniform3fv(glGetUniformLocation(progId, "pLight.properties.specular"), 1, glm::value_ptr(pLight.properties.specular));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.position"), 1, glm::value_ptr(pLight.position));
+        glUniform3fv(glGetUniformLocation(progId, "pLight.color"), 1, glm::value_ptr(pLight.color));
         glUniform1f(glGetUniformLocation( progId, "pLight.attProps.constant"),   pLight.attProps.constant);
         glUniform1f(glGetUniformLocation( progId, "pLight.attProps.linear"),     pLight.attProps.linear);
         glUniform1f(glGetUniformLocation( progId, "pLight.attProps.quadratic"),  pLight.attProps.quadratic);

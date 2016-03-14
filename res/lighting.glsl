@@ -7,14 +7,6 @@ struct Material
     float shininess;
 };
 
-// General light properties
-struct LightProps
-{
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
-
 // Attenuation light properties
 struct AttenuationProps
 {
@@ -26,14 +18,14 @@ struct AttenuationProps
 // Directional light
 struct DirLight
 {
-    LightProps properties;
+    vec3 color;
     vec3 direction;
 };
 
 // Point light
 struct PointLight
 {
-    LightProps properties;
+    vec3 color;
     AttenuationProps attProps;
     vec3 position;
 };
@@ -41,7 +33,7 @@ struct PointLight
 // Spot light
 struct SpotLight
 {
-    LightProps properties;
+    vec3 color;
     AttenuationProps attProps;
     vec3 position;
     vec3 direction;
@@ -76,17 +68,17 @@ float CalcBlinnPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shinine
 }
 
 // Internal func used by other Calc Light functions
-vec3 CalcLight(LightProps lightProps, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
+vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
 {
     // Diffuse shading (Lambertian reflectance)
     float diff = max(dot(normal, lightDir), 0.0);
     // Specular shading (Phong model)
     float spec = CalcBlinnPhongSpec(normal, lightDir, viewDir, material.shininess);
     // Combine results
-    vec3 ambient  = lightProps.ambient  * material.diffuse;
-    vec3 diffuse  = lightProps.diffuse  * diff * material.diffuse * (1.0 - shadowFactor);
-    vec3 specular = lightProps.specular * spec * material.specular;
-    return (ambient + diffuse + specular);
+    vec3 ambient  = vec3(0.05);
+    vec3 diffuse  = diff * material.diffuse * (1.0 - shadowFactor);
+    vec3 specular = spec * material.specular;
+    return lightColor * (ambient + diffuse + specular);
 }
 
 // Calculates the color of directional light
@@ -94,7 +86,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, 
 {
     vec3 lightDir = normalize(-light.direction);
     // Color
-    vec3 color = CalcLight(light.properties, normal, lightDir, viewDir, material, shadow);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow);
     return color;
 }
 
@@ -103,7 +95,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, M
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // Color
-    vec3 color = CalcLight(light.properties, normal, lightDir, viewDir, material, 0.0);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0);
     // Attenuation
     float attenuation = CalcAttenuationValue(light.attProps, light.position, fragPos);
     return color * attenuation;
@@ -114,7 +106,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Mat
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // Color
-    vec3 color = CalcLight(light.properties, normal, lightDir, viewDir, material, 0.0);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0);
     // Attenuation
     float attenuation = CalcAttenuationValue(light.attProps, light.position, fragPos);
     // Spotlight intensity

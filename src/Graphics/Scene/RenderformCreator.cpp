@@ -11,13 +11,6 @@ void RenderformCreator::Update(const Scene::Updates& sceneUpdates)
 {
     ParseAddNodeUpdates(sceneUpdates.newNodes);
     ParseDeleteNodeUpdates(sceneUpdates.deletedNodes);
-
-    // Update model transformations
-    //for (const auto& p : mRenderform)
-    //{
-    //    for (auto& mesh : p.second.meshes)
-    //        mesh.transformation = mesh.node->GetTransformation();
-    //}
 }
 
 const RenderformCreator::Renderform& RenderformCreator::GetRenderform() const

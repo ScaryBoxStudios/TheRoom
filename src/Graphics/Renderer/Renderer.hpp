@@ -85,7 +85,7 @@ class Renderer
         void Update(float dt);
 
         /*! Called when rendering the current frame */
-        void Render(float interpolation, IntForm intForm);
+        void Render(float interpolation, const IntForm& intForm);
 
         /*! Deinitializes the renderer */
         void Shutdown();

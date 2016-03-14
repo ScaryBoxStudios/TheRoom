@@ -80,7 +80,7 @@ void Renderer::Update(float dt)
     (void) dt;
 }
 
-void Renderer::Render(float interpolation, IntForm intForm)
+void Renderer::Render(float interpolation, const IntForm& intForm)
 {
     // Setup clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

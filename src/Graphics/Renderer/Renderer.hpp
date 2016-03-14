@@ -32,12 +32,15 @@
 #define _RENDERER_HPP_
 
 #include <memory>
+#include <unordered_map>
+#include <vector>
 #include "GBuffer.hpp"
 #include "Light.hpp"
 #include "TextRenderer.hpp"
 #include "ShadowRenderer.hpp"
 #include "../Geometry/ModelStore.hpp"
 #include "../Scene/Scene.hpp"
+#include "../Scene/RenderformCreator.hpp"
 #include "../Scene/Transform.hpp"
 #include "../Material/MaterialStore.hpp"
 
@@ -49,6 +52,26 @@ WARN_GUARD_OFF
 class Renderer
 {
     public:
+        struct IntMesh
+        {
+            Transform transformation;
+            GLuint    vaoId,
+                      eboId,
+                      numIndices;
+        };
+
+        struct IntMaterial
+        {
+            GLuint diffTexId,
+                   specTexId,
+                   nmapTexId,
+                   matIndex;
+            bool   useNormalMap;
+        };
+
+        using IntFormEntry = std::pair<IntMaterial, std::vector<IntMesh>>;
+        using IntForm = std::vector<IntFormEntry>;
+
         /*! Initializes the renderer */
         void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
 
@@ -59,7 +82,7 @@ class Renderer
         void Update(float dt);
 
         /*! Called when rendering the current frame */
-        void Render(float interpolation);
+        void Render(float interpolation, IntForm intForm);
 
         /*! Deinitializes the renderer */
         void Shutdown();
@@ -81,7 +104,7 @@ class Renderer
 
     private:
         // Performs the geometry pass rendering step
-        void GeometryPass(float interpolation);
+        void GeometryPass(float interpolation, const IntForm& intForm);
 
         // Performs the light pass rendering step
         void LightPass(float interpolation);

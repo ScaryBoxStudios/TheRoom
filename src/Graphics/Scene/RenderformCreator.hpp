@@ -28,44 +28,58 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MATERIAL_SCREEN_HPP_
-#define _MATERIAL_SCREEN_HPP_
+#ifndef _RENDERFORM_CREATOR_HPP_
+#define _RENDERFORM_CREATOR_HPP_
 
-#include "Screen.hpp"
-#include "../Graphics/Util/Camera.hpp"
-#include "../Graphics/Scene/Scene.hpp"
-#include "../Graphics/Scene/RenderformCreator.hpp"
-#include "../Graphics/Renderer/Skysphere.hpp"
+#include <memory>
+#include <unordered_map>
+#include "Scene.hpp"
+#include "../Geometry/ModelStore.hpp"
+#include "../Material/MaterialStore.hpp"
 
-class MaterialScreen : public Screen
+class RenderformCreator
 {
     public:
-        void onInit(ScreenContext& sc);
-        void onUpdate(float dt);
-        void onKey(Key k, KeyAction ka);
-        void onRender(float interpolation);
-        void onShutdown();
-        // Transition interface
-        using OnNextScreenCb = std::function<void()>;
-        void SetOnNextScreenCb(OnNextScreenCb cb);
+        struct Mesh
+        {
+            std::string modelName;
+            Transform transformation;
+            GLuint    vaoId,
+                      eboId,
+                      numIndices;
+        };
+
+        struct Material
+        {
+            GLuint diffTexId,
+                   specTexId,
+                   nmapTexId,
+                   matIndex;
+            bool   useNormalMap;
+            std::vector<Mesh> meshes;
+        };
+
+        using Renderform = std::unordered_map<std::string, Material>;
+
+        // Constructor
+        RenderformCreator(ModelStore* modelStore, MaterialStore* matStore);
+
+        // Update the render form using scene's updates
+        void Update(const Scene::Updates& sceneUpdates);
+
+        // Retrieve the renderform
+        const Renderform& GetRenderform() const;
+
     private:
-        // Engine ref
-        Engine* mEngine;
+        Renderform     mRenderform;    // The scene's element sorted to a render friendly way
+        MaterialStore* mMaterialStore; // Material Store
+        ModelStore*    mModelStore;    // Model Store
 
-        // The scene
-        std::unique_ptr<Scene> mScene;
-        std::unique_ptr<RenderformCreator> mRenderformCreator;
+        // Parse added-node updates
+        void ParseAddNodeUpdates(const std::vector<SceneNode*>& added);
 
-        // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
-        std::tuple<float, float> CameraLookOffset();
-        Camera mCamera;
-
-        // The skysphere
-        std::unique_ptr<Skysphere> mSkysphere;
-
-        // Callback called when transition event to next screen occurs
-        OnNextScreenCb mOnNextScreenCb;
+        // Parse deleted-node updates
+        void ParseDeleteNodeUpdates(const std::vector<std::unique_ptr<SceneNode>>& deleted);
 };
 
-#endif // ! _MATERIAL_SCREEN_HPP_
+#endif // ! _RENDERFORM_CREATOR_HPP_

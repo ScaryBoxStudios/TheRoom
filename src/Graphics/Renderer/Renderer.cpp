@@ -80,7 +80,7 @@ void Renderer::Update(float dt)
     (void) dt;
 }
 
-void Renderer::Render(float interpolation)
+void Renderer::Render(float interpolation, IntForm intForm)
 {
     // Setup clear color
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -106,7 +106,7 @@ void Renderer::Render(float interpolation)
     //
     // Make the GeometryPass
     //
-    GeometryPass(interpolation);
+    GeometryPass(interpolation, intForm);
 
     //
     // Make the LightPass
@@ -150,7 +150,7 @@ void Renderer::Shutdown()
     mGBuffer.reset();
 }
 
-void Renderer::GeometryPass(float interpolation)
+void Renderer::GeometryPass(float interpolation, const IntForm& intForm)
 {
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -173,55 +173,46 @@ void Renderer::GeometryPass(float interpolation)
     glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
     glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
 
-    for(auto& p : mScene->GetNodes())
+    for (auto& p : intForm)
     {
-        SceneNode* node = p.second.get();
+        auto& intMat    = p.first;
+        auto& intMeshes = p.second;
 
-        // Calculate the model matrix
-        glm::mat4 model = node->GetTransformation().GetInterpolated(interpolation);
+        // Upload material's properties to GPU
+        // Pass the material index in the material buffer object
+        glUniform1ui(glGetUniformLocation(progId, "matIdx"), intMat.matIndex);
 
-        // Upload it
-        auto modelId = glGetUniformLocation(progId, "model");
-        glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(model));
+        //
+        // Upload material parameters
+        //
+        // Diffuse
+        GLuint diffTexId = intMat.diffTexId;
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffTexId);
 
-        // Get the model
-        ModelDescription* mdl = (*mModelStore)[node->GetModel()];
+        // Specular
+        GLuint specTexId = intMat.specTexId;
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specTexId);
 
-        // Get the material names per mesh
-        const auto mats = node->GetMaterials();
-
-        // Draw all its meshes
-        for(const auto& mesh : mdl->meshes)
+        // Normal map
+        if(intMat.useNormalMap)
         {
-            // Get the material description
-            MaterialDescription* matDesc = (*mMaterialStore)[mats[mesh.meshIndex]];
+            glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, intMat.nmapTexId);
+        }
+        else
+            glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
 
-            // Pass the material index in the material buffer object
-            glUniform1ui(glGetUniformLocation(progId, "matIdx"), matDesc->matIndex);
+        // Draw every mesh of this material
+        for (const IntMesh& mesh : intMeshes)
+        {
+            // Upload model matrix
+            auto modelId = glGetUniformLocation(progId, "model");
+            glUniformMatrix4fv(modelId, 1, GL_FALSE, glm::value_ptr(mesh.transformation.GetInterpolated(interpolation)));
 
-            //
-            // Upload material parameters
-            //
-            // Diffuse
-            GLuint diffTexId = matDesc->material.UsesDiffuseTexture() ? matDesc->material.GetDiffuseTexture() : 0;
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, diffTexId);
-
-            // Specular
-            GLuint specTexId = matDesc->material.UsesSpecularTexture() ? matDesc->material.GetSpecularTexture() : 0;
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, specTexId);
-
-            // Normal map
-            if(matDesc->material.UsesNormalMapTexture())
-            {
-                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_TRUE);
-                glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, matDesc->material.GetNormalMapTexture());
-            }
-            else
-                glUniform1i(glGetUniformLocation(progId, "useNormalMaps"), GL_FALSE);
-
+            // Draw mesh
             glBindVertexArray(mesh.vaoId);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
             glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);

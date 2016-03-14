@@ -31,11 +31,19 @@
 #ifndef _RENDERFORM_CREATOR_HPP_
 #define _RENDERFORM_CREATOR_HPP_
 
+#include <functional>
 #include <memory>
 #include <unordered_map>
 #include "Scene.hpp"
 #include "../Geometry/ModelStore.hpp"
 #include "../Material/MaterialStore.hpp"
+#include "../Renderer/Renderer.hpp"
+
+// Forward declaration of RenderformCreator
+class RenderformCreator;
+
+// Converts a RenderformCreator::Renderform to a Renderer::IntForm
+Renderer::IntForm bakeIntForm(const RenderformCreator& creator);
 
 class RenderformCreator
 {

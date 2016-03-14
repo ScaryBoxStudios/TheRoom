@@ -1,6 +1,47 @@
 #include "RenderformCreator.hpp"
 #include <algorithm>
 
+Renderer::IntForm bakeIntForm(const RenderformCreator& creator)
+{
+    Renderer::IntForm rVal;
+    RenderformCreator::Renderform form = creator.GetRenderform();
+
+    for (const auto& p : form)
+    {
+        // Create new element
+        Renderer::IntMaterial im;
+        std::vector<Renderer::IntMesh> vec;
+        rVal.push_back({ im, vec });
+
+        // Retrieve newly added element
+        auto& newEntry = rVal[rVal.size() - 1];
+
+        const auto& rformMat    = p.second;
+        const auto& rformMeshes = p.second.meshes;
+        std::vector<Renderer::IntMesh>& meshes = newEntry.second;
+
+        newEntry.first =
+        { rformMat.diffTexId
+        , rformMat.specTexId
+        , rformMat.nmapTexId
+        , rformMat.matIndex
+        , rformMat.useNormalMap
+        };
+
+        for (const auto& rformMesh : rformMeshes)
+        {
+            Renderer::IntMesh newMesh;
+            newMesh.transformation = *rformMesh.transformation;
+            newMesh.vaoId          = rformMesh.vaoId;
+            newMesh.eboId          = rformMesh.eboId;
+            newMesh.numIndices     = rformMesh.numIndices;
+            meshes.push_back(newMesh);
+        }
+    }
+
+    return rVal;
+}
+
 RenderformCreator::RenderformCreator(ModelStore* modelStore, MaterialStore* matStore)
     : mMaterialStore(matStore)
     , mModelStore(modelStore)

@@ -93,6 +93,9 @@ void RenderformCreator::ParseAddNodeUpdates(const std::vector<SceneNode*>& added
                 // Create new material
                 auto& material = mRenderform[matName];
 
+                // Material idnex
+                material.matIndex = matDesc->matIndex;
+
                 // Diffuse
                 material.diffTexId = matDesc->material.UsesDiffuseTexture() ? matDesc->material.GetDiffuseTexture() : 0;
 

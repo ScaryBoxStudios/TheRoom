@@ -11,10 +11,10 @@ Renderer::IntForm bakeIntForm(const RenderformCreator& creator)
         // Create new element
         Renderer::IntMaterial im;
         std::vector<Renderer::IntMesh> vec;
-        rVal.push_back({ im, vec });
+        rVal.materials.push_back({ im, vec });
 
         // Retrieve newly added element
-        auto& newEntry = rVal[rVal.size() - 1];
+        auto& newEntry = rVal.materials[rVal.materials.size() - 1];
 
         const auto& rformMat    = p.second;
         const auto& rformMeshes = p.second.meshes;

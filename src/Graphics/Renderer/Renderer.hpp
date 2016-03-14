@@ -68,8 +68,12 @@ class Renderer
             bool   useNormalMap;
         };
 
-        using IntFormEntry = std::pair<IntMaterial, std::vector<IntMesh>>;
-        using IntForm = std::vector<IntFormEntry>;
+        using MaterialVecEntry = std::pair<IntMaterial, std::vector<IntMesh>>;
+
+        struct IntForm
+        {
+            std::vector<MaterialVecEntry> materials;
+        };
 
         /*! Initializes the renderer */
         void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);

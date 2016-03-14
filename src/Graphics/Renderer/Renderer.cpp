@@ -173,7 +173,7 @@ void Renderer::GeometryPass(float interpolation, const IntForm& intForm)
     glUniform1i(glGetUniformLocation(progId, "material.specularTexture"), 1);
     glUniform1i(glGetUniformLocation(progId, "normalMap"), 2);
 
-    for (auto& p : intForm)
+    for (auto& p : intForm.materials)
     {
         auto& intMat    = p.first;
         auto& intMeshes = p.second;

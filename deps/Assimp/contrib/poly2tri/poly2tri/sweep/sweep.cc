@@ -28,7 +28,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#define _USE_MATH_DEFINES
 #include <stdexcept>
 #include "sweep.h"
 #include "sweep_context.h"
@@ -114,8 +113,8 @@ void Sweep::EdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle* triangl
   Point* p1 = triangle->PointCCW(point);
   Orientation o1 = Orient2d(eq, *p1, ep);
   if (o1 == COLLINEAR) {
-    // ASSIMP_CHANGE (aramis_acg)
-    throw std::runtime_error("EdgeEvent - collinear points not supported");
+	  // ASSIMP_CHANGE (aramis_acg)
+	  throw std::runtime_error("EdgeEvent - collinear points not supported");
     if( triangle->Contains(&eq, p1)) {
       triangle->MarkConstrainedEdge(&eq, p1 );
       // We are modifying the constraint maybe it would be better to 
@@ -124,9 +123,8 @@ void Sweep::EdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle* triangl
       triangle = &triangle->NeighborAcross(point);
       EdgeEvent( tcx, ep, *p1, triangle, *p1 );
     } else {
-      // ASSIMP_CHANGE (aramis_acg)
+	  // ASSIMP_CHANGE (aramis_acg)
       std::runtime_error("EdgeEvent - collinear points not supported");
-      //assert(0);
     }
     return;
   }
@@ -134,8 +132,9 @@ void Sweep::EdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle* triangl
   Point* p2 = triangle->PointCW(point);
   Orientation o2 = Orient2d(eq, *p2, ep);
   if (o2 == COLLINEAR) {
-    // ASSIMP_CHANGE (aramis_acg)
-    throw std::runtime_error("EdgeEvent - collinear points not supported");
+	  // ASSIMP_CHANGE (aramis_acg)
+	  throw std::runtime_error("EdgeEvent - collinear points not supported");
+
     if( triangle->Contains(&eq, p2)) {
       triangle->MarkConstrainedEdge(&eq, p2 );
       // We are modifying the constraint maybe it would be better to 
@@ -144,8 +143,8 @@ void Sweep::EdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle* triangl
       triangle = &triangle->NeighborAcross(point);
       EdgeEvent( tcx, ep, *p2, triangle, *p2 );
     } else {
-       // ASSIMP_CHANGE (aramis_acg)
-       throw std::runtime_error("EdgeEvent - collinear points not supported");
+      // ASSIMP_CHANGE (aramis_acg)
+      throw std::runtime_error("EdgeEvent - collinear points not supported");
     }
     return;
   }
@@ -653,13 +652,6 @@ void Sweep::FlipEdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle* t, 
   Triangle& ot = t->NeighborAcross(p);
   Point& op = *ot.OppositePoint(*t, p);
 
-  if (&ot == NULL) {
-    // If we want to integrate the fillEdgeEvent do it here
-    // With current implementation we should never get here
-    //throw new RuntimeException( "[BUG:FIXME] FLIP failed due to missing triangle");
-    assert(0);
-  }
-
   if (InScanArea(p, *t->PointCCW(p), *t->PointCW(p), op)) {
     // Lets rotate shared edge one vertex CW
     RotateTrianglePair(*t, p, ot, op);
@@ -717,8 +709,9 @@ Point& Sweep::NextFlipPoint(Point& ep, Point& eq, Triangle& ot, Point& op)
     // Left
     return *ot.PointCW(op);
   } else{
-    // ASSIMP_CHANGE (aramis_acg)
-    throw std::runtime_error("[Unsupported] Opposing point on constrained edge");
+    //throw new RuntimeException("[Unsupported] Opposing point on constrained edge");
+	  // ASSIMP_CHANGE (aramis_acg)
+	  throw std::runtime_error("[Unsupported] Opposing point on constrained edge");
   }
 }
 
@@ -727,13 +720,6 @@ void Sweep::FlipScanEdgeEvent(SweepContext& tcx, Point& ep, Point& eq, Triangle&
 {
   Triangle& ot = t.NeighborAcross(p);
   Point& op = *ot.OppositePoint(t, p);
-
-  if (&t.NeighborAcross(p) == NULL) {
-    // If we want to integrate the fillEdgeEvent do it here
-    // With current implementation we should never get here
-    //throw new RuntimeException( "[BUG:FIXME] FLIP failed due to missing triangle");
-    assert(0);
-  }
 
   if (InScanArea(eq, *flip_triangle.PointCCW(eq), *flip_triangle.PointCW(eq), op)) {
     // flip with new edge op->eq

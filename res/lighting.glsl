@@ -71,6 +71,7 @@ float CalcBlinnPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shinine
 // Calculates specular intensity according to the Cook - Torrance model
 float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessVal, float F0)
 {
+    float pi    = 3.14159265;
     float NdotL = max(dot(normal, lightDir), 0.0);
 
     float specular = 0.0;
@@ -91,7 +92,7 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessV
         // Roughness (or: microfacet distribution function)
         // Beckmann Distribution Function
         float roughnessVal2 = roughnessVal * roughnessVal;
-        float r1 = 1.0 / (4.0 * roughnessVal2 * pow(NdotH, 4.0));
+        float r1 = 1.0 / (pi * roughnessVal2 * pow(NdotH, 4.0));
         float r2 = (NdotH * NdotH - 1.0) / (roughnessVal2 * NdotH * NdotH);
         float D = r1 * exp(r2);
 
@@ -100,7 +101,7 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessV
         F *= (1.0 - F0);
         F += F0;
 
-        specular = (D * F * G) / (NdotV * NdotL * 3.14159265);
+        specular = (D * F * G) / (NdotV * NdotL * pi);
     }
     return specular;
 }

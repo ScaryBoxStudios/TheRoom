@@ -70,6 +70,7 @@ void LoadingScreen::LoadFileData()
     , "ext/Assets/Models/Well.obj"
     , "ext/Assets/Models/Warrior.dae"
     , "ext/Assets/Models/Barrel2.fbx"
+    , "ext/Assets/Models/ShaderBall.fbx"
     };
 
     for (const auto& file : fileList)

@@ -131,6 +131,10 @@ void UpdateLight(Renderer& renderer, Scene* const scene, int index, const glm::v
     renderer.GetLights().pointLights[index].position = glm::vec3(trans[3].x, trans[3].y, trans[3].z);
 };
 
+void UpdateDirectionalLight(Renderer& renderer, const glm::vec3& move) {
+    renderer.GetLights().dirLights[0].direction += move;
+}
+
 void MainScreen::SetupLights()
 {
     // Setup scene lights
@@ -274,6 +278,27 @@ void MainScreen::onUpdate(float dt)
                 scene->Rotate(p.first, RotationAxis::Y, mRotationData.degreesInc);
         }
     }
+
+    // Update dir light
+    increase = 0.3f;
+    if (window.IsKeyPressed(Key::Right))
+    {
+        if (window.IsKeyPressed(Key::LeftShift))
+            UpdateDirectionalLight(renderer, glm::vec3(0.0f, 0.0f, increase));
+        else
+            UpdateDirectionalLight(renderer, glm::vec3(increase, 0.0f, 0.0f));
+    }
+    if (window.IsKeyPressed(Key::Left))
+    {
+        if (window.IsKeyPressed(Key::LeftShift))
+            UpdateDirectionalLight(renderer, glm::vec3(0.0f, 0.0f, -increase));
+        else
+            UpdateDirectionalLight(renderer, glm::vec3(-increase, 0.0f, 0.0f));
+    }
+    if (window.IsKeyPressed(Key::Up))
+        UpdateDirectionalLight(renderer, glm::vec3(0.0f, increase, 0.0f));
+    if (window.IsKeyPressed(Key::Down))
+        UpdateDirectionalLight(renderer, glm::vec3(0.0f, -increase, 0.0f));
 
     // Update physics
     UpdatePhysics(dt);

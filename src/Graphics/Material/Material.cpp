@@ -5,6 +5,7 @@ Material::Material()
   , mDiffTexture(0)
   , mSpecColor(glm::vec3(0.0f))
   , mSpecTexture(0)
+  , mEmissiveColor(glm::vec3(0.0f))
   , mRoughness(0)
   , mFresnel(0)
   , mNMapTexture(0)
@@ -85,6 +86,19 @@ float Material::GetFresnel() const
 void Material::SetFresnel(float s)
 {
     mFresnel = s;
+}
+
+//
+//=- Specular
+//
+const glm::vec3& Material::GetEmissiveColor() const
+{
+    return mEmissiveColor;
+}
+
+void Material::SetEmissiveColor(const glm::vec3& col)
+{
+    mEmissiveColor = col;
 }
 
 //

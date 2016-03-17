@@ -25,6 +25,7 @@ struct MaterialProperties
     float fresnel;
     vec3 diffCol;
     vec3 specCol;
+    vec3 emissiveCol;
 };
 
 // UBO holding the material data
@@ -50,6 +51,7 @@ void main(void)
     Material material;
     material.diffuse = materialProps[MatIdx].diffCol + Diffuse;
     material.specular = materialProps[MatIdx].specCol + vec3(Specular);
+    material.emissive = materialProps[MatIdx].emissiveCol;
     material.roughness = materialProps[MatIdx].roughness;
     material.fresnel = materialProps[MatIdx].fresnel;
 

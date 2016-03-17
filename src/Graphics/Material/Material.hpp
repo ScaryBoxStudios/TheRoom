@@ -61,6 +61,10 @@ class Material
         void SetSpecularTexture(GLuint id);
         bool UsesSpecularTexture() const;
 
+        // Emissive color
+        const glm::vec3& GetEmissiveColor() const;
+        void SetEmissiveColor(const glm::vec3& v);
+
         // Shininesss
         float GetRoughness() const;
         void SetRoughness(float s);
@@ -82,6 +86,9 @@ class Material
         // Specular properties
         glm::vec3 mSpecColor;
         GLuint mSpecTexture;
+
+        // Emissive properties
+        glm::vec3 mEmissiveColor;
 
         // Roughness
         float mRoughness;

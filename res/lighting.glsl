@@ -4,6 +4,7 @@ struct Material
 {
     vec3 diffuse;
     vec3 specular;
+    vec3 emissive;
     float roughness;
     float fresnel;
 };
@@ -117,7 +118,8 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
     vec3 ambient  = vec3(0.05);
     vec3 diffuse  = diff * material.diffuse * (1.0 - shadowFactor);
     vec3 specular = spec * material.specular;
-    return lightColor * (ambient + diffuse + specular);
+    vec3 emissive = material.emissive;
+    return lightColor * (emissive + ambient + diffuse + specular);
     // vec3 finalValue = lightColor * diff * k + specular * (1.0 - k);
 }
 

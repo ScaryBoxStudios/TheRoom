@@ -19,7 +19,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
     mCamera.Look(std::make_tuple(10/0.05f, 10/0.05f));
 
     // Load sample scene file
-    std::string sceneFile = "ext/Scenes/material_scene.json";
+    std::string sceneFile = "res/Scenes/material_scene.json";
     auto sceneFileData = FileLoad<BufferType>(sceneFile);
     if(!sceneFileData)
         throw std::runtime_error("Couldn't load file (" + sceneFile + ")");

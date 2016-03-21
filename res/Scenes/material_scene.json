@@ -1,0 +1,151 @@
+{
+    "metadata":
+    {
+        "version": 4.4,
+        "type": "Object",
+        "generator": "Object3D.toJSON"
+    },
+    "images":
+    [
+        {
+            "id": 0,
+            "url" : "ext/Assets/Textures/Materials/Mahogany/mahogany_wood.jpg"
+        },
+        {
+            "id": 1,
+            "url" : "ext/Assets/Textures/Materials/Mahogany/mahogany_wood_spec.jpg"
+        },
+        {
+            "id": 2,
+            "url" : "ext/Assets/Textures/Materials/Stone/brickwall.jpg"
+        },
+        {
+            "id": 3,
+            "url" : "ext/Assets/Textures/Materials/Stone/brickwall_NM.jpg"
+        }
+    ],
+    "textures":
+    [
+        {
+            "id" : 0,
+            "image": 0
+        },
+        {
+            "id" : 1,
+            "image": 1
+        },
+        {
+            "id" : 2,
+            "image": 2
+        },
+        {
+            "id" : 3,
+            "image": 3
+        }
+    ],
+    "geometries":
+    [
+        {
+            "id": 0,
+            "type": "cube",
+            "url" : "ext/Assets/Models/Cube.obj"
+        },
+        {
+            "id": 1,
+            "type": "teapot",
+            "url" : "ext/Assets/Models/Teapot.obj"
+        },
+        {
+            "id": 2,
+            "type": "sphere",
+            "url" : ""
+        },
+        {
+            "id": 3,
+            "type": "shaderball",
+            "url" : "ext/Assets/Models/ShaderBall.fbx"
+        }
+    ],
+    "materials":
+    [
+        {
+            "id": 0,
+            "type": "mahogany",
+            "map": 0,
+            "specMap": 1,
+            "roughness": 0.3,
+            "fresnel": 0.5,
+            "reflectivity": 0.2
+        },
+        {
+            "id": 1,
+            "type": "white",
+            "color": 16777215,
+            "emissive": 8025185,
+            "roughness": 0.3,
+            "fresnel": 0.5,
+            "reflectivity": 0
+        },
+        {
+            "id": 2,
+            "type": "stone",
+            "map": 2,
+            "nmap": 3,
+            "roughness": 0.3,
+            "fresnel": 0.5,
+            "reflectivity": 0
+        }
+    ],
+    "object":
+    {
+        "id": 0,
+        "type": "Scene",
+        "name": "Scene",
+        "transform": {},
+        "children":
+        [
+            {
+                "id": 0,
+                "type": "Mesh",
+                "name": "cube",
+                "transform": {
+                    "position": [0, 0, 0],
+                    "scale": [1.5, 1.5, 1.5]
+                },
+                "materials": [0],
+                "geometry": 0
+            },
+            {
+                "id": 1,
+                "type": "Mesh",
+                "name": "wall",
+                "transform": {
+                    "position": [4, 0, 0],
+                    "scale": [2, 2, 2]
+                },
+                "materials": [2],
+                "geometry": 0
+            },
+            {
+                "id": 2,
+                "type": "Mesh",
+                "name": "sphere",
+                "transform": {
+                    "position": [-4, 0, 0]
+                },
+                "materials": [0],
+                "geometry": 2
+            },
+            {
+                "id": 3,
+                "type": "Mesh",
+                "name": "shaderBall",
+                "transform": {
+                    "position": [-8, 0, 0]
+                },
+                "materials": [0, 2],
+                "geometry": 3
+            }
+        ]
+    }
+}

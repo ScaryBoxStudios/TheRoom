@@ -94,7 +94,17 @@
             "roughness": 0.3,
             "fresnel": 0.5,
             "reflectivity": 0
+        },
+        {
+            "id": 3,
+            "type": "mirror",
+            "color": 15921906,
+            "emissive": 0,
+            "roughness": 0.3,
+            "fresnel": 0.5,
+            "reflectivity": 1.0
         }
+
     ],
     "object":
     {
@@ -145,6 +155,27 @@
                 },
                 "materials": [0, 2],
                 "geometry": 3
+            },
+            {
+                "id": 4,
+                "type": "Mesh",
+                "name": "mirrorShaderBall",
+                "transform": {
+                    "position": [-12, 0, 0]
+                },
+                "materials": [3, 0],
+                "geometry": 3
+            },
+            {
+                "id": 5,
+                "type": "Mesh",
+                "name": "mirrorCube",
+                "transform": {
+                    "position": [-16, 0, 0],
+                    "scale": [1.5, 1.5, 1.5]
+                },
+                "materials": [3],
+                "geometry": 0
             }
         ]
     }

@@ -344,6 +344,15 @@
             "roughness": 0.3,
             "fresnel": 0.5,
             "reflectivity": 0
+        },
+        {
+            "id": 9,
+            "type": "mirror",
+            "color": 15921906,
+            "emissive": 0,
+            "roughness": 0.3,
+            "fresnel": 0.5,
+            "reflectivity": 1.0
         }
     ],
     "object":
@@ -371,7 +380,7 @@
                 "type": "Mesh",
                 "name": "cube0",
                 "transform": {},
-                "materials": [0],
+                "materials": [9],
                 "geometry": 0
             },
             {

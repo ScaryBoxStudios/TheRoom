@@ -73,6 +73,10 @@ class Material
         float GetFresnel() const;
         void SetFresnel(float f);
 
+        // Reflectivity
+        float GetReflectivity() const;
+        void SetReflectivity(float r);
+
         // Normal Map texture
         GLuint GetNormalMapTexture() const;
         void SetNormalMapTexture(GLuint id);
@@ -95,6 +99,9 @@ class Material
 
         // Fresnel
         float mFresnel;
+
+        // Environment mapping
+        float mReflectivity;
 
         // Normal mapping properties
         GLuint mNMapTexture;

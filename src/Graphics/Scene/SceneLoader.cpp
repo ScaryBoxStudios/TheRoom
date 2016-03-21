@@ -197,6 +197,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
                 mt.roughness = static_cast<float>(m["roughness"].GetDouble());
             if (m.HasMember("fresnel"))
                 mt.fresnel = static_cast<float>(m["fresnel"].GetDouble());
+            if (m.HasMember("reflectivity"))
+                mt.reflectivity = static_cast<float>(m["reflectivity"].GetDouble());
 
             // Opacity
             if (m.HasMember("opacity"))

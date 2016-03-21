@@ -86,6 +86,7 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
         newMat.SetEmissiveColor(glm::vec3(material.emissive.r, material.emissive.g, material.emissive.b));
         newMat.SetRoughness(material.roughness);
         newMat.SetFresnel(material.fresnel);
+        newMat.SetReflectivity(material.reflectivity);
 
         mMaterialStore->Load(std::to_string(material.id), newMat);
     }

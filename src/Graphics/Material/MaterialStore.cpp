@@ -43,7 +43,7 @@ void MaterialStore::Load(const std::string& name, const Material& material)
         float padding3;
 
         float emissiveCol[3];
-        float padding4;
+        float reflectivity;
     };
 
     // Construct the data to be uploaded
@@ -62,6 +62,7 @@ void MaterialStore::Load(const std::string& name, const Material& material)
         md.emissiveCol[0] = matDesc.material.GetEmissiveColor().r / 255.0f;
         md.emissiveCol[1] = matDesc.material.GetEmissiveColor().g / 255.0f;
         md.emissiveCol[2] = matDesc.material.GetEmissiveColor().b / 255.0f;
+        md.reflectivity   = matDesc.material.GetReflectivity();
         matData.push_back(md);
     }
 

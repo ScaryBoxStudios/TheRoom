@@ -116,21 +116,22 @@ struct SceneFile
 
     struct Material
     {
-        Id id;            // "id"
-        std::string name; // "name"
-        std::string type; // "type" - Can be MeshPhongMaterial | ???
-        Color color;      // "color"
-        Color ambient;    // "ambient"
-        Color emissive;   // "emissive"
-        Color specular;   // "specular"
-        float roughness;  // "roughness"
-        float fresnel;    // "fresnel"
-        float opacity;    // "opacity"
-        bool transparent; // "transparent"
-        bool wireframe;   // "wireframe"
-        Id map;           // "map" - Diffuse map
-        Id specMap;       // "specMap" - Specular map
-        Id nmap;          // "nmap" - Normal map
+        Id id;              // "id"
+        std::string name;   // "name"
+        std::string type;   // "type" - Can be MeshPhongMaterial | ???
+        Color color;        // "color"
+        Color ambient;      // "ambient"
+        Color emissive;     // "emissive"
+        Color specular;     // "specular"
+        float roughness;    // "roughness"
+        float fresnel;      // "fresnel"
+        float reflectivity; // "reflectivity"
+        float opacity;      // "opacity"
+        bool transparent;   // "transparent"
+        bool wireframe;     // "wireframe"
+        Id map;             // "map" - Diffuse map
+        Id specMap;         // "specMap" - Specular map
+        Id nmap;            // "nmap" - Normal map
     };
     std::vector<Material> materials; // "materials"
 

@@ -28,6 +28,7 @@ struct MaterialProperties
     vec3 diffCol;
     vec3 specCol;
     vec3 emissiveCol;
+    float reflectivity;
 };
 
 // UBO holding the material data
@@ -56,6 +57,7 @@ void main(void)
     material.emissive = materialProps[MatIdx].emissiveCol;
     material.roughness = materialProps[MatIdx].roughness;
     material.fresnel = materialProps[MatIdx].fresnel;
+    material.reflectivity = materialProps[MatIdx].reflectivity;
 
     // Properties
     vec3 norm = normalize(Normal);
@@ -64,7 +66,7 @@ void main(void)
     // Calculate reflection
     vec3 R = reflect(-viewDir, norm);
     vec4 reflectColor = texture(skybox, R) + texture(skysphere, vec2(R.x, R.y));
-    material.diffuse = mix(material.diffuse, vec3(reflectColor.r, reflectColor.g, reflectColor.b), 0.2);
+    material.diffuse = mix(material.diffuse, vec3(reflectColor.r, reflectColor.g, reflectColor.b), material.reflectivity);
 
     // Calculate fragment shadow
     float shadow = ShadowCalculation(FragPosLightSpace, norm, -dirLight.direction, FragPos, shadowMap);

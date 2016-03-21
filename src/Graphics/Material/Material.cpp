@@ -8,6 +8,7 @@ Material::Material()
   , mEmissiveColor(glm::vec3(0.0f))
   , mRoughness(0)
   , mFresnel(0)
+  , mReflectivity(0)
   , mNMapTexture(0)
 {
 }
@@ -86,6 +87,16 @@ float Material::GetFresnel() const
 void Material::SetFresnel(float s)
 {
     mFresnel = s;
+}
+
+float Material::GetReflectivity() const
+{
+    return mReflectivity;
+}
+
+void Material::SetReflectivity(float r)
+{
+    mReflectivity = r;
 }
 
 //

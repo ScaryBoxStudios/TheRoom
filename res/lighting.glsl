@@ -7,6 +7,7 @@ struct Material
     vec3 emissive;
     float roughness;
     float fresnel;
+    float reflectivity;
 };
 
 // Attenuation light properties

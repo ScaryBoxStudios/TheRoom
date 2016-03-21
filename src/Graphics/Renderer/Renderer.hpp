@@ -73,7 +73,8 @@ class Renderer
         struct IntForm
         {
             std::vector<MaterialVecEntry> materials;
-            GLuint                        skyboxId = 0;
+            GLuint                        skyboxId    = 0;
+            GLuint                        skysphereId = 0;
         };
 
         /*! Initializes the renderer */
@@ -111,7 +112,7 @@ class Renderer
         void GeometryPass(float interpolation, const IntForm& intForm);
 
         // Performs the light pass rendering step
-        void LightPass(float interpolation);
+        void LightPass(float interpolation, const IntForm& intForm);
 
         // Performs a stencil pass
         void StencilPass(const PointLight& pLight);

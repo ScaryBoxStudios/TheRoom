@@ -132,6 +132,9 @@ void MaterialScreen::onRender(float interpolation)
     // Convert render form to int form
     auto intForm = bakeIntForm(*mRenderformCreator);
 
+    // Add skybox id to intform
+    intForm.skysphereId = mSkysphere->GetTextureId();
+
     // Render
     mEngine->GetRenderer().SetView(view);
     mEngine->GetRenderer().Render(interpolation, intForm);

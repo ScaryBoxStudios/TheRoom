@@ -13,6 +13,8 @@ uniform vec3 viewPos;
 // Shadows
 uniform mat4 lightSpaceMatrix;
 uniform sampler2D shadowMap;
+uniform samplerCube skybox;
+uniform sampler2D   skysphere;
 
 // Lights
 uniform PointLight pLight;
@@ -58,6 +60,11 @@ void main(void)
     // Properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
+
+    // Calculate reflection
+    vec3 R = reflect(-viewDir, norm);
+    vec4 reflectColor = texture(skybox, R) + texture(skysphere, vec2(R.x, R.y));
+    material.diffuse = mix(material.diffuse, vec3(reflectColor.r, reflectColor.g, reflectColor.b), 0.2);
 
     // Calculate fragment shadow
     float shadow = ShadowCalculation(FragPosLightSpace, norm, -dirLight.direction, FragPos, shadowMap);

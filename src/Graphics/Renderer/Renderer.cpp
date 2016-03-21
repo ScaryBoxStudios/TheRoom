@@ -111,7 +111,7 @@ void Renderer::Render(float interpolation, const IntForm& intForm)
     //
     // Make the LightPass
     //
-    LightPass(interpolation);
+    LightPass(interpolation, intForm);
 
     //
     // Copy result to default fbo
@@ -242,7 +242,7 @@ float CalcPointLightBSphere(const PointLight& light)
     return ret;
 }
 
-void Renderer::LightPass(float interpolation)
+void Renderer::LightPass(float interpolation, const IntForm& intForm)
 {
     (void)interpolation;
 
@@ -282,6 +282,18 @@ void Renderer::LightPass(float interpolation)
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
     glUniform1i(glGetUniformLocation(progId, "shadowMap"), 4);
+
+    // Bind the skybox cube
+    GLuint envMapId = intForm.skyboxId;
+    glActiveTexture(GL_TEXTURE5);
+    glUniform1i(glGetUniformLocation(progId, "skybox"), 5);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envMapId);
+
+    // Bind the skysphere
+    GLuint skysphereId = intForm.skysphereId;
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, skysphereId);
+    glUniform1i(glGetUniformLocation(progId, "skysphere"), 6);
 
     // Pass the screen size
     glUniform2i(glGetUniformLocation(progId, "gScreenSize"), mScreenWidth, mScreenHeight);

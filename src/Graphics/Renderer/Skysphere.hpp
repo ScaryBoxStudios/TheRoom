@@ -56,6 +56,9 @@ class Skysphere
         // Renders the current Skysphere
         void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
+        // Get skysphere's texture id
+        GLuint GetTextureId() const;
+
     private:
         GLuint mVao, mVbo, mEbo;
         GLuint mTexture;

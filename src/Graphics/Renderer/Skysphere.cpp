@@ -134,3 +134,9 @@ void Skysphere::Render(const glm::mat4& projection, const glm::mat4& view) const
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
 }
+
+GLuint Skysphere::GetTextureId() const
+{
+    return mTexture;
+}
+

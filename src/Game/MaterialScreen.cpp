@@ -148,6 +148,11 @@ void MaterialScreen::onRender(float interpolation)
 
 void MaterialScreen::onShutdown()
 {
+    // Remove lights
+    mEngine->GetRenderer().GetLights().pointLights.clear();
+    mEngine->GetRenderer().GetLights().dirLights.clear();
+
+    // Clear previous stores
     mEngine->GetModelStore().Clear();
     mEngine->GetMaterialStore().Clear();
     mEngine->GetTextureStore().Clear();

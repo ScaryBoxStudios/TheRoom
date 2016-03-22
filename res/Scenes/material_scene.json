@@ -103,6 +103,15 @@
             "roughness": 0.3,
             "fresnel": 0.5,
             "reflectivity": 1.0
+        },
+        {
+            "id": 4,
+            "type": "gold",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.3,
+            "fresnel": 0.5,
+            "reflectivity": 0.2
         }
 
     ],
@@ -122,7 +131,7 @@
                     "position": [0, 0, 0],
                     "scale": [1.5, 1.5, 1.5]
                 },
-                "materials": [0],
+                "materials": [4],
                 "geometry": 0
             },
             {

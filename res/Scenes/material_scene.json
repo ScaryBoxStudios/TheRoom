@@ -109,9 +109,9 @@
             "type": "gold",
             "color":  4278245375,
             "emissive": 0,
-            "roughness": 0.3,
-            "fresnel": 0.5,
-            "reflectivity": 0.2
+            "roughness": 0.001,
+            "fresnel": 0.9,
+            "reflectivity": 0.3
         }
 
     ],
@@ -126,13 +126,12 @@
             {
                 "id": 0,
                 "type": "Mesh",
-                "name": "cube",
+                "name": "goldShaderBall",
                 "transform": {
-                    "position": [0, 0, 0],
-                    "scale": [1.5, 1.5, 1.5]
+                    "position": [0, 0, 0]
                 },
-                "materials": [4],
-                "geometry": 0
+                "materials": [4, 0],
+                "geometry": 3
             },
             {
                 "id": 1,

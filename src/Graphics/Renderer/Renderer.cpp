@@ -418,9 +418,8 @@ void Renderer::SetView(const glm::mat4& view)
     mView = view;
 }
 
-void Renderer::SetDataStores(ModelStore* mdlStore, MaterialStore* matStore)
+void Renderer::SetDataStores(MaterialStore* matStore)
 {
-    mModelStore = mdlStore;
     mMaterialStore = matStore;
 }
 

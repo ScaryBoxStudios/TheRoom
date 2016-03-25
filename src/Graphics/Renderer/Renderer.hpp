@@ -38,7 +38,6 @@
 #include "Light.hpp"
 #include "TextRenderer.hpp"
 #include "ShadowRenderer.hpp"
-#include "../Geometry/ModelStore.hpp"
 #include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
 #include "../Material/MaterialStore.hpp"
@@ -93,7 +92,7 @@ class Renderer
         void Shutdown();
 
         /*! Sets the various data stores that hold the GPU handles to data */
-        void SetDataStores(ModelStore* mdlStore, MaterialStore* matStore);
+        void SetDataStores(MaterialStore* matStore);
 
         /*! Sets the view matrix */
         void SetView(const glm::mat4& view);
@@ -127,7 +126,6 @@ class Renderer
         Lights mLights;
 
         // References to various data stores
-        ModelStore* mModelStore;
         MaterialStore* mMaterialStore;
 
         // Shader programIds of the geometry pass and the lighting pass

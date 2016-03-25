@@ -39,7 +39,7 @@ void Engine::Init()
     );
 
     // Pass the data store instances to renderer
-    mRenderer.SetDataStores(&mModelStore, &mMaterialStore);
+    mRenderer.SetDataStores(&mMaterialStore);
 
     // Initialize the AABBRenderer
     mAABBRenderer.Init();

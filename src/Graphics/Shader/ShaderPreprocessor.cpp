@@ -1,4 +1,5 @@
 #include "ShaderPreprocessor.hpp"
+#include <cstdint>
 #include <algorithm>
 #include <sstream>
 #include <unordered_map>

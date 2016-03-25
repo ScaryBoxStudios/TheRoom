@@ -33,8 +33,6 @@
 
 #include <string>
 #include <glad/glad.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 // Throws std::runtime_error with the last OpenGL error that occurred
 void CheckGLError();

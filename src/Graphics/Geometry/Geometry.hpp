@@ -31,12 +31,10 @@
 #ifndef _GEOMETRY_HPP_
 #define _GEOMETRY_HPP_
 
-#include <string>
 #include <vector>
-#include <array>
 #include <cstdint>
-#include "../Scene/AABB.hpp"
 #include <glad/glad.h>
+#include "../Scene/AABB.hpp"
 
 struct VertexData
 {

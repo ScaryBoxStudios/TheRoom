@@ -34,7 +34,6 @@
 #include <string>
 #include <memory>
 #include <glad/glad.h>
-#include <GL/gl.h>
 #include "../Text/FontStore.hpp"
 #include "../Shader/Shader.hpp"
 

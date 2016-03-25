@@ -32,13 +32,10 @@
 #define _RENDERER_HPP_
 
 #include <memory>
-#include <unordered_map>
 #include <vector>
 #include "GBuffer.hpp"
 #include "Light.hpp"
-#include "TextRenderer.hpp"
 #include "ShadowRenderer.hpp"
-#include "../Scene/Scene.hpp"
 #include "../Scene/Transform.hpp"
 #include "../Material/MaterialStore.hpp"
 

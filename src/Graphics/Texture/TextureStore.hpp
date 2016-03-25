@@ -34,7 +34,6 @@
 #include <unordered_map>
 #include <string>
 #include <glad/glad.h>
-#include <GL/gl.h>
 #include "../Image/PixelBufferTraits.hpp"
 #include "../Image/RawImageTraits.hpp"
 

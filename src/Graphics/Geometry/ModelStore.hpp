@@ -35,11 +35,7 @@
 #include <vector>
 #include <unordered_map>
 #include <glad/glad.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include "Geometry.hpp"
-#include "../Material/Material.hpp"
-#include "../Texture/TextureStore.hpp"
 
 // MeshDescription
 struct MeshDescription

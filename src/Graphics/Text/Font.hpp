@@ -33,9 +33,7 @@
 
 #include <map>
 #include <vector>
-#include <cstdint>
 #include <glad/glad.h>
-#include <GL/gl.h>
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON

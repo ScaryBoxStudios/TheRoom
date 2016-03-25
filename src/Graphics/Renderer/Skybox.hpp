@@ -34,12 +34,11 @@
 #include <unordered_map>
 #include <memory>
 #include <glad/glad.h>
-#include <GL/gl.h>
 #include "Cubemap.hpp"
 #include "../Image/RawImage.hpp"
 #include "../Shader/Shader.hpp"
-#include "../../Util/WarnGuard.hpp"
 
+#include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF

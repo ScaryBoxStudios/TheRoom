@@ -32,7 +32,6 @@
 #define _G_BUFFER_HPP_
 
 #include <glad/glad.h>
-#include <GL/gl.h>
 
 class GBuffer
 {

@@ -32,9 +32,7 @@
 #define _SHADER_HPP_
 
 #include <string>
-#include <stdexcept>
 #include <glad/glad.h>
-#include <GL/gl.h>
 
 class Shader
 {

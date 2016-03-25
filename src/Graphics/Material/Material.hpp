@@ -32,7 +32,6 @@
 #define _MATERIAL_HPP_
 
 #include <glad/glad.h>
-#include <GL/gl.h>
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON

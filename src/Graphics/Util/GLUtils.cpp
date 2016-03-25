@@ -1,6 +1,7 @@
 #include "GLUtils.hpp"
 #include <vector>
 #include <sstream>
+#include <GL/glu.h>
 
 void CheckGLError()
 {

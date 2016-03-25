@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include <stdexcept>
 #include "../Util/GLUtils.hpp"
 
 Shader::Shader(const std::string& source, Type type)

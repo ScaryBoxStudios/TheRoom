@@ -34,7 +34,6 @@
 #include <vector>
 #include <memory>
 #include <glad/glad.h>
-#include <GL/gl.h>
 #include "../Scene/Transform.hpp"
 #include "../Shader/Shader.hpp"
 

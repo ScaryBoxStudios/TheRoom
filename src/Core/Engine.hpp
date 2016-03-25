@@ -33,10 +33,12 @@
 
 #include "../Window/Window.hpp"
 #include "../Graphics/Texture/TextureStore.hpp"
+#include "../Graphics/Geometry/ModelStore.hpp"
+#include "../Graphics/Material/MaterialStore.hpp"
 #include "../Graphics/Renderer/Renderer.hpp"
 #include "../Graphics/Renderer/AABBRenderer.hpp"
+#include "../Graphics/Renderer/TextRenderer.hpp"
 #include "../Graphics/Shader/Shader.hpp"
-#include "../Graphics/Material/MaterialStore.hpp"
 
 class Engine
 {

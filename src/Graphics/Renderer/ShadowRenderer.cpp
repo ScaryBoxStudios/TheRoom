@@ -68,7 +68,7 @@ void ShadowRenderer::Shutdown()
     glDeleteFramebuffers(1, &mDepthMapFboId);
 }
 
-void ShadowRenderer::Render(float interpolation)
+void ShadowRenderer::Render(float interpolation, std::vector<IntMesh> scene)
 {
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_FRONT);
@@ -88,26 +88,17 @@ void ShadowRenderer::Render(float interpolation)
             glm::value_ptr(mLightViewMatrix)
         );
 
-        for (const auto& gObj : mScene->GetNodes())
+        for (const auto& gObj : scene)
         {
             // Upload needed uniforms
-            glm::mat4 model = gObj.second->GetTransformation().GetInterpolated(interpolation);
+            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
             glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "model"), 1, GL_FALSE, glm::value_ptr(model));
 
-            // Get the model
-            ModelDescription* mdl = (*mModelStore)[gObj.second->GetModel()];
-            if (mdl)
-            {
-                // Draw the model
-                for (const auto& mesh : mdl->meshes)
-                {
-                    glBindVertexArray(mesh.vaoId);
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.eboId);
-                    glDrawElements(GL_TRIANGLES, mesh.numIndices, GL_UNSIGNED_INT, 0);
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                    glBindVertexArray(0);
-                }
-            }
+            glBindVertexArray(gObj.vaoId);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gObj.eboId);
+            glDrawElements(GL_TRIANGLES, gObj.numIndices, GL_UNSIGNED_INT, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindVertexArray(0);
         }
 
         glUseProgram(0);
@@ -118,16 +109,6 @@ void ShadowRenderer::Render(float interpolation)
 
     glCullFace(GL_BACK);
     glDisable(GL_DEPTH_TEST);
-}
-
-void ShadowRenderer::SetScene(const Scene* scene)
-{
-    mScene = scene;
-}
-
-void ShadowRenderer::SetModelStore(ModelStore* modelStore)
-{
-    mModelStore = modelStore;
 }
 
 void ShadowRenderer::SetLightPos(const glm::vec3& lightPos)

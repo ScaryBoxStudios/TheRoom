@@ -30,9 +30,6 @@ void main()
 
 void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId)
 {
-    // Scene is initially unset
-    mScene = nullptr;
-
     // Store the needed program id's
     mGeometryPassProgId = gPassProgId;
     mLightingPassProgId = lPassProgId;
@@ -97,11 +94,16 @@ void Renderer::Render(float interpolation, const IntForm& intForm)
     // Render the shadow map
     //
     // Set the rendering scene
-    mShadowRenderer.SetScene(mScene);
+    std::vector<ShadowRenderer::IntMesh> shadowRendererIntForm;
+    for (const auto& matEntry : intForm.materials)
+        for (const auto& mesh : matEntry.second)
+            shadowRendererIntForm.emplace_back(
+                ShadowRenderer::IntMesh{mesh.transformation, mesh.vaoId, mesh.eboId, mesh.numIndices}
+            );
     // Set light's properties
     mShadowRenderer.SetLightPos(-(mLights.dirLights.front().direction));
     // Render depth map
-    mShadowRenderer.Render(interpolation);
+    mShadowRenderer.Render(interpolation, shadowRendererIntForm);
 
     //
     // Make the GeometryPass
@@ -411,11 +413,6 @@ void Renderer::StencilPass(const PointLight& pLight)
     glDisable(GL_DEPTH_TEST);
 }
 
-void Renderer::SetScene(const Scene* scene)
-{
-    mScene = scene;
-}
-
 void Renderer::SetView(const glm::mat4& view)
 {
     mView = view;
@@ -425,7 +422,6 @@ void Renderer::SetDataStores(ModelStore* mdlStore, MaterialStore* matStore)
 {
     mModelStore = mdlStore;
     mMaterialStore = matStore;
-    mShadowRenderer.SetModelStore(mModelStore);
 }
 
 Lights& Renderer::GetLights()

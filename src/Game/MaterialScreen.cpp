@@ -38,9 +38,6 @@ void MaterialScreen::onInit(ScreenContext& sc)
         fileDataCache);
     mScene = factory.CreateFromSceneFile(sf);
 
-    // Pass the current scene to renderer
-    mEngine->GetRenderer().SetScene(mScene.get());
-
     // Setup scene lights
     Lights& lights = mEngine->GetRenderer().GetLights();
 

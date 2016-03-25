@@ -46,9 +46,6 @@ void MainScreen::onInit(ScreenContext& sc)
     // Init character
     mCharacter.Init(&mEngine->GetWindow(), mScene.get());
 
-    // Pass the current scene to renderer
-    mEngine->GetRenderer().SetScene(mScene.get());
-
     // Load the skybox
     mSkybox = std::make_unique<Skybox>();
     ImageLoader imLoader;

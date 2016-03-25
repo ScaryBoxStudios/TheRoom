@@ -98,9 +98,6 @@ class Renderer
         /*! Sets the view matrix */
         void SetView(const glm::mat4& view);
 
-        /*! Sets the current rendering scene */
-        void SetScene(const Scene* scene);
-
         /*! Retrieves the renderer's Lights */
         Lights& GetLights();
 
@@ -125,9 +122,6 @@ class Renderer
 
         // The screen size
         int mScreenWidth, mScreenHeight;
-
-        // Currently rendering scene
-        const Scene* mScene;
 
         // The lights that are rendered
         Lights mLights;

@@ -31,12 +31,12 @@
 #ifndef _SHADOW_RENDERER_HPP_
 #define _SHADOW_RENDERER_HPP_
 
+#include <vector>
 #include <memory>
 #include <glad/glad.h>
 #include <GL/gl.h>
+#include "../Scene/Transform.hpp"
 #include "../Shader/Shader.hpp"
-#include "../Scene/Scene.hpp"
-#include "../Geometry/ModelStore.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -46,6 +46,14 @@ WARN_GUARD_OFF
 class ShadowRenderer
 {
     public:
+        struct IntMesh
+        {
+            Transform transform;
+            GLuint    vaoId,
+                      eboId,
+                      numIndices;
+        };
+
         // Initializes the renderer state
         void Init(unsigned int width, unsigned int height);
 
@@ -53,13 +61,7 @@ class ShadowRenderer
         void Shutdown();
 
         // Renders the scene from the light's view in the depth buffer
-        void Render(float interpolation);
-
-        // Sets the scene to process
-        void SetScene(const Scene* scene);
-
-        // Sets the model store to retrieve the Model data for the scene
-        void SetModelStore(ModelStore* modelStore);
+        void Render(float interpolation, std::vector<IntMesh> scene);
 
         // Sets the light properties
         void SetLightPos(const glm::vec3& lightPos);
@@ -78,8 +80,6 @@ class ShadowRenderer
         std::unique_ptr<ShaderProgram> mProgram;
 
         glm::mat4 mLightViewMatrix;
-        const Scene* mScene;
-        ModelStore* mModelStore;
 };
 
 #endif // ! _SHADOW_RENDERER_HPP_

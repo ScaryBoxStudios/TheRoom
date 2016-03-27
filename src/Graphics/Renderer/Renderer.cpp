@@ -440,7 +440,6 @@ const std::vector<GLuint> Renderer::GetTextureTargets() const
         mGBuffer->NormalId(),
         mGBuffer->AlbedoSpecId(),
         mGBuffer->FinalId(),
-        mGBuffer->DepthStencilId(),
         mShadowRenderer.DepthMapId()
     };
 }

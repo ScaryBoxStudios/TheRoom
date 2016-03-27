@@ -63,6 +63,9 @@ void MainScreen::onInit(ScreenContext& sc)
     // Do not show AABBs by default
     mShowAABBs = false;
 
+    // Do not show Debug info by default
+    mShowDbgInfo = false;
+
     // Init renderform creator
     mRenderformCreator = std::make_unique<RenderformCreator>(&(mEngine->GetModelStore()), &(mEngine->GetMaterialStore()));
 }
@@ -188,6 +191,8 @@ void MainScreen::onKey(Key k, KeyAction ka)
 {
     if(k == Key::B && ka == KeyAction::Release)
         mShowAABBs = !mShowAABBs;
+    if(k == Key::F12 && ka == KeyAction::Release)
+        mShowDbgInfo = !mShowDbgInfo;
     if(k == Key::R && ka == KeyAction::Release)
         mRotationData.rotating = !mRotationData.rotating;
     if(k == Key::F && ka == KeyAction::Release)
@@ -343,6 +348,13 @@ void MainScreen::onRender(float interpolation)
         aabbRenderer.SetView(view);
         aabbRenderer.SetScene(mScene.get());
         aabbRenderer.Render(interpolation);
+    }
+
+    // Render teh debug info if enabled
+    if (mShowDbgInfo)
+    {
+        DebugRenderer& dbgRenderer = mEngine->GetDebugRenderer();
+        dbgRenderer.Render(interpolation);
     }
 
     // Render the skybox

@@ -69,6 +69,12 @@ class GBuffer
         // Retrieves the material index buffer id
         GLuint MatIndexId() const;
 
+        // Retrieves the depth-stencil buffer id
+        GLuint DepthStencilId() const;
+
+        // Retrieves the final buffer id
+        GLuint FinalId() const;
+
     private:
         // The GBuffer's framebuffer id
         GLuint mGBufferId;

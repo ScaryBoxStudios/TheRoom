@@ -100,6 +100,9 @@ class Renderer
         /*! Retrieves the renderer's cached projection matrix */
         const glm::mat4 GetProjection() const;
 
+        /*! Retrieves various internal texture handles */
+        const std::vector<GLuint> GetTextureTargets() const;
+
     private:
         // Performs the geometry pass rendering step
         void GeometryPass(float interpolation, const IntForm& intForm);

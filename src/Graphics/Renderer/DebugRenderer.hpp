@@ -28,75 +28,41 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _MAIN_SCREEN_HPP_
-#define _MAIN_SCREEN_HPP_
+#ifndef _DEBUG_RENDERER_HPP_
+#define _DEBUG_RENDERER_HPP_
 
-#include "Screen.hpp"
-#include "Character.hpp"
-#include "../Graphics/Util/Camera.hpp"
-#include "../Graphics/Scene/Scene.hpp"
-#include "../Graphics/Scene/RenderformCreator.hpp"
-#include "../Graphics/Renderer/Skybox.hpp"
+#include <vector>
+#include <memory>
+#include <glad/glad.h>
+#include "../Shader/Shader.hpp"
 
-class MainScreen : public Screen
+#include "../../Util/WarnGuard.hpp"
+WARN_GUARD_ON
+#include <glm/glm.hpp>
+WARN_GUARD_OFF
+
+class DebugRenderer
 {
     public:
-        void onInit(ScreenContext& sc);
-        void onUpdate(float dt);
-        void onKey(Key k, KeyAction ka);
-        void onRender(float interpolation);
-        void onShutdown();
-        // Transition interface
-        using OnNextScreenCb = std::function<void()>;
-        void SetOnNextScreenCb(OnNextScreenCb cb);
+        // Initializes the renderer state
+        void Init(int scrWidth, int scrHeight);
+
+        // Renders AABBs in the given scene
+        void Render(float interpolation);
+
+        // Deinitializes the renderer state
+        void Shutdown();
+
+        // Sets the debug texture targets to show
+        void SetDebugTextures(const std::vector<GLuint>& dbgTex);
+
+        // Sets the window dimensions for placing the viewports
+        void SetWindowDimensions(int width, int height);
+
     private:
-        // Called during initialization to setup the world
-        void SetupWorld();
-
-        // Called during initialization to setup the lights
-        void SetupLights();
-
-        //
-        void UpdatePhysics(float dt);
-
-        // Engine ref
-        Engine* mEngine;
-
-        // File Data Cache ref
-        ScreenContext::FileDataCache* mFileDataCache;
-
-        // The Scene
-        void MoveCharacter() const;
-        std::unique_ptr<Scene> mScene;
-        bool mFollowingCharacter;
-        int mMovingLightIndex;
-        Character mCharacter;
-        std::unique_ptr<RenderformCreator> mRenderformCreator;
-
-        // The skybox used
-        std::unique_ptr<Skybox> mSkybox;
-
-        // The camera view
-        std::vector<Camera::MoveDirection> CameraMoveDirections();
-        std::tuple<float, float> CameraLookOffset();
-        Camera mCamera;
-
-        // The data needed for rotating the cubes
-        struct RotationData
-        {
-            float degreesInc;
-            bool rotating;
-        };
-        RotationData mRotationData;
-
-        // When flag on AABBs are shown
-        bool mShowAABBs;
-
-        // When flag on Debug info is shown
-        bool mShowDbgInfo;
-
-        // Callback called when transition event to next screen occurs
-        OnNextScreenCb mOnNextScreenCb;
+        int mWndWidth, mWndHeight;
+        std::unique_ptr<ShaderProgram> mProgram;
+        std::vector<GLuint> mDbgTextures;
 };
 
-#endif // ! _MAIN_SCREEN_HPP_
+#endif // ! _DEBUG_RENDERER_HPP_

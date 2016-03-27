@@ -432,3 +432,15 @@ const glm::mat4 Renderer::GetProjection() const
 {
     return mProjection;
 }
+
+const std::vector<GLuint> Renderer::GetTextureTargets() const
+{
+    return {
+        mGBuffer->PosId(),
+        mGBuffer->NormalId(),
+        mGBuffer->AlbedoSpecId(),
+        mGBuffer->FinalId(),
+        mGBuffer->DepthStencilId(),
+        mShadowRenderer.DepthMapId()
+    };
+}

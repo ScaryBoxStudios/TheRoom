@@ -159,3 +159,13 @@ GLuint GBuffer::MatIndexId() const
 {
     return mMatIndexBufId;
 }
+
+GLuint GBuffer::DepthStencilId() const
+{
+    return mDepthStencilBufId;
+}
+
+GLuint GBuffer::FinalId() const
+{
+    return mFinalBufId;
+}

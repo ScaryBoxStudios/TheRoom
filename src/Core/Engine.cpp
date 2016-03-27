@@ -24,6 +24,8 @@ void Engine::Init()
         {
             glViewport(0, 0, w, h);
             mRenderer.Resize(w, h);
+            mDbgRenderer.SetWindowDimensions(w, h);
+            mDbgRenderer.SetDebugTextures(mRenderer.GetTextureTargets());
         }
     );
 
@@ -56,6 +58,13 @@ void Engine::Init()
         mWindow.GetWidth(),
         mWindow.GetHeight()
     );
+
+    // Initialize the DebugRenderer
+    mDbgRenderer.Init(
+        mWindow.GetWidth(),
+        mWindow.GetHeight()
+    );
+    mDbgRenderer.SetDebugTextures(mRenderer.GetTextureTargets());
 }
 
 void Engine::Update(float dt)
@@ -78,6 +87,9 @@ void Engine::Shutdown()
 {
     // Remove cached shader programs
     mShaderPrograms.clear();
+
+    // DebugRenderer
+    mDbgRenderer.Shutdown();
 
     // TextRenderer
     mTextRenderer.Shutdown();
@@ -131,6 +143,11 @@ AABBRenderer& Engine::GetAABBRenderer()
 TextRenderer& Engine::GetTextRenderer()
 {
     return mTextRenderer;
+}
+
+DebugRenderer& Engine::GetDebugRenderer()
+{
+    return mDbgRenderer;
 }
 
 void Engine::AddShaderProgram(const std::string& name, ShaderProgram sp)

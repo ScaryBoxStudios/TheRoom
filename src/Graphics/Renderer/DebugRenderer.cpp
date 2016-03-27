@@ -62,7 +62,8 @@ void DebugRenderer::Render(float interpolation)
     float padding = 10;
     float totalPadding = (mDbgTextures.size() + 1) * padding;
     float scaleFactor = ((mWndWidth - totalPadding) / mDbgTextures.size()) / mWndWidth;
-    int curWidth = mWndWidth * scaleFactor, curHeight = mWndHeight * scaleFactor;
+    int curWidth = static_cast<int>(mWndWidth * scaleFactor);
+    int curHeight = static_cast<int>(mWndHeight * scaleFactor);
     glUniform2i(glGetUniformLocation(mProgram->Id(), "gScreenSize"), curWidth, curHeight);
 
     for (std::size_t i = 0; i < mDbgTextures.size(); ++i)
@@ -71,7 +72,8 @@ void DebugRenderer::Render(float interpolation)
         GLuint tex = mDbgTextures[i];
 
         // Set the viewport
-        int xOffset = padding + (curWidth + padding) * i, yOffset = padding;
+        int xOffset = static_cast<int>(padding + (curWidth + padding) * i);
+        int yOffset = static_cast<int>(padding);
         glViewport(xOffset, yOffset, curWidth, curHeight);
         glUniform2i(glGetUniformLocation(mProgram->Id(), "offset"), xOffset, yOffset);
 

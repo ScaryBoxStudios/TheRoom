@@ -350,16 +350,16 @@ void MainScreen::onRender(float interpolation)
         aabbRenderer.Render(interpolation);
     }
 
-    // Render teh debug info if enabled
+    // Render the skybox
+    if (mSkybox)
+        mSkybox->Render(mEngine->GetRenderer().GetProjection(), view);
+
+    // Render the debug info if enabled
     if (mShowDbgInfo)
     {
         DebugRenderer& dbgRenderer = mEngine->GetDebugRenderer();
         dbgRenderer.Render(interpolation);
     }
-
-    // Render the skybox
-    if (mSkybox)
-        mSkybox->Render(mEngine->GetRenderer().GetProjection(), view);
 
     // Render sample text
     mEngine->GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");

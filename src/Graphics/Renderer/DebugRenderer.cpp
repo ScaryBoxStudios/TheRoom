@@ -1,5 +1,6 @@
 #include "DebugRenderer.hpp"
 #include <vector>
+#include <tuple>
 #include "RenderUtils.hpp"
 
 WARN_GUARD_ON
@@ -25,10 +26,15 @@ uniform ivec2 gScreenSize;
 uniform ivec2 offset;
 uniform sampler2D sampler;
 
+uniform int mode;
+
 void main(void)
 {
     vec2 UVCoords = (gl_FragCoord.xy - offset) / gScreenSize;
-    color = texture(sampler, UVCoords);
+    if (mode == 0)
+        color = texture(sampler, UVCoords);
+    else
+        color = vec4(vec3((texture(sampler, UVCoords)).r), 1.0);
 }
 )foo";
 
@@ -68,8 +74,14 @@ void DebugRenderer::Render(float interpolation)
 
     for (std::size_t i = 0; i < mDbgTextures.size(); ++i)
     {
+        // Get texture channel number
+        std::uint8_t channels = std::get<1>(mDbgTextures[i]);
+
+        // Set the shader mode
+        glUniform1i(glGetUniformLocation(mProgram->Id(), "mode"), channels == 3 ? 0 : 1);
+
         // Current rendering texture
-        GLuint tex = mDbgTextures[i];
+        GLuint tex = std::get<2>(mDbgTextures[i]);
 
         // Set the viewport
         int xOffset = static_cast<int>(padding + (curWidth + padding) * i);
@@ -105,7 +117,7 @@ void DebugRenderer::SetWindowDimensions(int width, int height)
     mWndHeight = height;
 }
 
-void DebugRenderer::SetDebugTextures(const std::vector<GLuint>& dbgTex)
+void DebugRenderer::SetDebugTextures(const std::vector<TextureTarget>& dbgTex)
 {
     mDbgTextures = dbgTex;
 }

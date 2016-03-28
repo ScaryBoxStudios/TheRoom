@@ -433,13 +433,13 @@ const glm::mat4 Renderer::GetProjection() const
     return mProjection;
 }
 
-const std::vector<GLuint> Renderer::GetTextureTargets() const
+const std::vector<Renderer::TextureTarget> Renderer::GetTextureTargets() const
 {
     return {
-        mGBuffer->PosId(),
-        mGBuffer->NormalId(),
-        mGBuffer->AlbedoSpecId(),
-        mGBuffer->FinalId(),
-        mShadowRenderer.DepthMapId()
+        TextureTarget{0, 3, mGBuffer->PosId()},
+        TextureTarget{0, 3, mGBuffer->NormalId()},
+        TextureTarget{0, 3, mGBuffer->AlbedoSpecId()},
+        TextureTarget{0, 3, mGBuffer->FinalId()},
+        TextureTarget{0, 2, mShadowRenderer.DepthMapId()}
     };
 }

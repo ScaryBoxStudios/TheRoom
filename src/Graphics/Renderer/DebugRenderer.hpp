@@ -53,8 +53,10 @@ class DebugRenderer
         // Deinitializes the renderer state
         void Shutdown();
 
+        // Channel offset - channel number - texture
+        using TextureTarget = std::tuple<std::uint8_t, std::uint8_t, GLuint>;
         // Sets the debug texture targets to show
-        void SetDebugTextures(const std::vector<GLuint>& dbgTex);
+        void SetDebugTextures(const std::vector<TextureTarget>& dbgTex);
 
         // Sets the window dimensions for placing the viewports
         void SetWindowDimensions(int width, int height);
@@ -62,7 +64,7 @@ class DebugRenderer
     private:
         int mWndWidth, mWndHeight;
         std::unique_ptr<ShaderProgram> mProgram;
-        std::vector<GLuint> mDbgTextures;
+        std::vector<TextureTarget> mDbgTextures;
 };
 
 #endif // ! _DEBUG_RENDERER_HPP_

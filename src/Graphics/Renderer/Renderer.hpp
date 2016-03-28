@@ -101,7 +101,9 @@ class Renderer
         const glm::mat4 GetProjection() const;
 
         /*! Retrieves various internal texture handles */
-        const std::vector<GLuint> GetTextureTargets() const;
+        // Channel offset - channel number - texture
+        using TextureTarget = std::tuple<std::uint8_t, std::uint8_t, GLuint>;
+        const std::vector<TextureTarget> GetTextureTargets() const;
 
     private:
         // Performs the geometry pass rendering step

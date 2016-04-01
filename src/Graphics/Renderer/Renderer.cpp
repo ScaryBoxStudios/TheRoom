@@ -101,7 +101,7 @@ void Renderer::Render(float interpolation, const IntForm& intForm)
                 ShadowRenderer::IntMesh{mesh.transformation, mesh.vaoId, mesh.eboId, mesh.numIndices}
             );
     // Set light's properties
-    mShadowRenderer.SetLightPos(-(mLights.dirLights.front().direction));
+    mShadowRenderer.SetLightViewParams(mProjection, mView, -(mLights.dirLights.front().direction));
     // Render depth map
     mShadowRenderer.Render(interpolation, shadowRendererIntForm);
 

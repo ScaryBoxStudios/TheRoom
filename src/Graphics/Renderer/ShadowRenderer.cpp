@@ -2,6 +2,7 @@
 #include <stdexcept>
 
 WARN_GUARD_ON
+#include <glm/common.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
@@ -111,15 +112,147 @@ void ShadowRenderer::Render(float interpolation, std::vector<IntMesh> scene)
     glDisable(GL_DEPTH_TEST);
 }
 
-void ShadowRenderer::SetLightPos(const glm::vec3& lightPos)
+static float ExtractFovFromProjection(const glm::mat4& projection)
 {
-    // Calculate light space matrix
-    float orthoSz = 100.0f;
-    float nearPlane = 1.0f;
-    float farPlane = 75.0f;
-    glm::mat4 lightProjection = glm::ortho(-orthoSz, orthoSz, -orthoSz, orthoSz, nearPlane, farPlane);
-    glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(1.0f));
-    mLightViewMatrix = lightProjection * lightView;
+    // From the source code it is:
+    // T const tanHalfFovy = tan(fovy / static_cast<T>(2));
+    // Result[1][1] = static_cast<T>(1) / (tanHalfFovy);
+    float t = projection[1][1];
+    float fov = glm::atan((1.0f / t)) * 2.0f;
+    return fov;
+}
+
+static float ExtractAspectFromProjection(const glm::mat4& projection)
+{
+    // From the source code it is:
+    // Result[0][0] = static_cast<T>(1) / (aspect * tanHalfFovy);
+    // Result[1][1] = static_cast<T>(1) / (tanHalfFovy);
+    float tanHalfFovy = 1.0f / projection[1][1];
+    float t = projection[0][0];
+    float aspect = 1.0f / (t * tanHalfFovy);
+    return aspect;
+}
+
+void ShadowRenderer::SetLightViewParams(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& lightPos)
+{
+    // Get projection properties
+    const float cameraFov = ExtractFovFromProjection(projection);
+    const float cameraAspect = ExtractAspectFromProjection(projection);
+    const float cameraNear = 0.01f;
+    const float cameraFar = 300.0f;
+
+    // Get view properties
+    //const glm::mat4 inverseView = glm::inverse(view);
+    //const glm::vec3 viewPos = glm::vec3(inverseView[3].x, inverseView[3].y, inverseView[3].z);
+    //const glm::vec3 viewDir = glm::vec3(view * glm::vec4(0, 0, -1, 0));
+
+    struct SplitData
+    {
+        glm::mat4 projectionMat;
+        glm::mat4 viewMat;
+        glm::mat4 shadowMat;
+        glm::vec2 planes;
+        float nearPlane, farPlane;
+    };
+    std::vector<SplitData> splitData;
+
+    /*
+    const float splitLambda = 0.5f;
+    const unsigned int splitNum = 4;
+    for(unsigned int i = 0; i < splitNum; ++i)
+    {
+        // Find the split planes using GPU Gem 3. Chap 10 "Practical Split Scheme".
+        float splitNear = i > 0
+            ? glm::mix(
+                cameraNear + (static_cast<float>(i) / splitNum) * (cameraFar - cameraNear),
+                cameraNear * powf(cameraFar / cameraNear, static_cast<float>(i) / splitNum),
+                splitLambda)
+            : cameraNear;
+        float splitFar = i < splitNum - 1
+            ? glm::mix(
+                cameraNear + (static_cast<float>(i + 1) / splitNum) * (cameraFar - cameraNear),
+                cameraNear * powf(cameraFar / cameraNear, static_cast<float>(i + 1) / splitNum),
+                splitLambda)
+            : cameraFar;
+
+        // Create the projection for this split
+    */
+        float splitNear = cameraNear;
+        float splitFar = cameraFar;
+
+        glm::mat4 splitProj = glm::perspective(cameraFov, cameraAspect, splitNear, splitFar);
+        glm::mat4 inverseProjView = glm::inverse(splitProj * view);
+
+        // Extract the frustum points
+        glm::vec4 splitVertices[8] = {
+            // Near plane
+            {-1.f, -1.f, -1.f, 1.f},
+            {-1.f,  1.f, -1.f, 1.f},
+            { 1.f,  1.f, -1.f, 1.f},
+            { 1.f, -1.f, -1.f, 1.f},
+            // Far plane
+            {-1.f, -1.f,  1.f, 1.f},
+            {-1.f,  1.f,  1.f, 1.f},
+            { 1.f,  1.f,  1.f, 1.f},
+            { 1.f, -1.f,  1.f, 1.f}
+        };
+        for(unsigned int j = 0; j < 8; ++j)
+        {
+            splitVertices[j] = inverseProjView * splitVertices[j];
+            splitVertices[j] /= splitVertices[j].w;
+        }
+
+        // Find the centroid in oder to construct a view matrix
+        glm::vec4 splitCentroid(0.0f);
+        for(unsigned int j = 0; j < 8; ++j)
+            splitCentroid += splitVertices[j];
+        splitCentroid /= 8.0f;
+
+        // Construct the view matrix
+        float dist = glm::max(splitFar - splitNear, glm::distance(splitVertices[5], splitVertices[6]));
+        glm::mat4 viewMat = glm::lookAt(
+            glm::vec3(splitCentroid) + lightPos * dist,
+            glm::vec3(splitCentroid),
+            glm::vec3(0.0f, 1.0f, 0.0f)
+        );
+
+        // Transform split vertices to the light view space
+        glm::vec4 splitVerticesLS[8];
+        for(unsigned int j = 0; j < 8; ++j)
+            splitVerticesLS[j] += viewMat * splitVertices[j];
+
+        // Find the frustum bounding box in view space
+        glm::vec4 min = splitVerticesLS[0];
+        glm::vec4 max = splitVerticesLS[0];
+        for(unsigned int j = 0; j < 8; ++j)
+        {
+            min = glm::min(min, splitVerticesLS[j]);
+            max = glm::max(max, splitVerticesLS[j]);
+        }
+
+        // Create an orthogonal projection matrix with the corners
+        float nearOffset = 10.0f;
+        float farOffset = 20.0f;
+        glm::mat4 projMat = glm::ortho(min.x, max.x, min.y, max.y, -max.z - nearOffset, -min.z + farOffset);
+
+        // Save matrices and planes
+        splitData.emplace_back(
+            SplitData
+            {
+                projMat,
+                viewMat,
+                projMat * viewMat,
+                glm::vec2(splitNear, splitFar),
+                -max.z - nearOffset,
+                -min.z + farOffset
+            }
+        );
+    /*
+    }
+    */
+
+    // Store the combination
+    mLightViewMatrix = splitData[0].projectionMat * splitData[0].viewMat;
 }
 
 GLuint ShadowRenderer::DepthMapId() const

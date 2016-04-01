@@ -63,7 +63,7 @@ class ShadowRenderer
         void Render(float interpolation, std::vector<IntMesh> scene);
 
         // Sets the light properties
-        void SetLightPos(const glm::vec3& lightPos);
+        void SetLightViewParams(const glm::mat4& projection, const glm::mat4& view, const glm::vec3& lightPos);
 
         // Retrieves the depth map Id
         GLuint DepthMapId() const;

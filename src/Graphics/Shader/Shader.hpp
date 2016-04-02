@@ -41,6 +41,7 @@ class Shader
         enum class Type
         {
             Vertex = GL_VERTEX_SHADER,
+            Geometry = GL_GEOMETRY_SHADER,
             Fragment = GL_FRAGMENT_SHADER
         };
 
@@ -70,6 +71,7 @@ class ShaderProgram
     public:
         // Constructor, throws std::runtime_error if program fails to link
         ShaderProgram(GLuint vertShId, GLuint fragShId);
+        ShaderProgram(GLuint vertShId, GLuint geomShId, GLuint fragShId);
 
         // Destructor
         ~ShaderProgram();

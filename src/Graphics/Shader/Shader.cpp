@@ -62,6 +62,24 @@ ShaderProgram::ShaderProgram(GLuint vertShId, GLuint fragShId)
     }
 }
 
+ShaderProgram::ShaderProgram(GLuint vertShId, GLuint geomShId, GLuint fragShId)
+{
+    // Create program, attach shaders and link
+    mId = glCreateProgram();
+    glAttachShader(mId, vertShId);
+    glAttachShader(mId, geomShId);
+    glAttachShader(mId, fragShId);
+    glLinkProgram(mId);
+
+    // Check link result
+    std::string err = GetLastLinkError(mId);
+    if (err != "")
+    {
+        glDeleteProgram(mId);
+        throw std::runtime_error(err);
+    }
+}
+
 ShaderProgram::ShaderProgram(ShaderProgram&& other)
 {
     this->mId = other.mId;

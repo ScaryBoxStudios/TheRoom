@@ -11,7 +11,10 @@ void CheckGLError()
         std::stringstream ss;
         ss << "OpenGL Error! Code: " << errVal;
         const char* desc = reinterpret_cast<const char*>(gluErrorString(errVal));
-        throw std::runtime_error(std::string("OpenGL error: \n") + desc);
+        throw std::runtime_error(
+            std::string("OpenGL error : ") + std::to_string(errVal) + "\n" +
+            (desc != nullptr ? desc : "")
+        );
     }
 }
 

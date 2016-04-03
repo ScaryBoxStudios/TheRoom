@@ -165,6 +165,7 @@ void Engine::LoadShaders()
       , "res/light_pass_vert.glsl"
       , "res/light_pass_frag.glsl"
       , "res/lighting.glsl"
+      , "res/shadowing.glsl"
     };
 
     std::unordered_map<std::string, std::string> loadedShaders;

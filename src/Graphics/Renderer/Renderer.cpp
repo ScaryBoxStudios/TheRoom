@@ -463,6 +463,5 @@ const std::vector<Renderer::TextureTarget> Renderer::GetTextureTargets() const
         TextureTarget{0, 3, mGBuffer->NormalId()},
         TextureTarget{0, 3, mGBuffer->AlbedoSpecId()},
         TextureTarget{0, 3, mGBuffer->FinalId()},
-        TextureTarget{0, 2, mShadowRenderer.DepthMapId()}
     };
 }

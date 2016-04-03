@@ -43,7 +43,7 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
     mNullProgram = std::make_unique<ShaderProgram>(vert.Id(), frag.Id());
 
     // Initialize the ShadowRenderer
-    mShadowRenderer.Init(8096, 8096);
+    mShadowRenderer.Init(1024, 1024);
 
     // Get ubo index
     GLuint geometryPassUboIndex = glGetUniformBlockIndex(mGeometryPassProgId, "Matrices");
@@ -282,8 +282,8 @@ void Renderer::LightPass(float interpolation, const IntForm& intForm)
 
     // Bind the shadow map
     glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, mShadowRenderer.DepthMapId());
-    glUniform1i(glGetUniformLocation(progId, "shadowMap"), 4);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, mShadowRenderer.DepthMapId());
+    glUniform1i(glGetUniformLocation(progId, "uShadowMap"), 4);
 
     // Bind the skybox cube
     GLuint envMapId = intForm.skyboxId;
@@ -300,12 +300,35 @@ void Renderer::LightPass(float interpolation, const IntForm& intForm)
     // Pass the screen size
     glUniform2i(glGetUniformLocation(progId, "gScreenSize"), mScreenWidth, mScreenHeight);
 
-    // Pass the light space matrix
-    glUniformMatrix4fv(
-        glGetUniformLocation(progId, "lightSpaceMatrix"),
-        1, GL_FALSE,
-        glm::value_ptr(mShadowRenderer.GetLightViewMatrix())
+    //
+    // Pass the shadow uniforms
+    //
+    // Near values
+    glUniform1fv(
+        glGetUniformLocation(progId, "uCascadesNear"),
+        static_cast<GLsizei>(mShadowRenderer.GetSplitNearPlanes().size()),
+        mShadowRenderer.GetSplitNearPlanes().data()
     );
+    // Far values
+    glUniform1fv(
+        glGetUniformLocation(progId, "uCascadesFar"),
+        static_cast<GLsizei>(mShadowRenderer.GetSplitFarPlanes().size()),
+        mShadowRenderer.GetSplitFarPlanes().data()
+    );
+    // Plane values
+    glUniform2fv(
+        glGetUniformLocation(progId, "uCascadesPlanes"),
+        static_cast<GLsizei>(mShadowRenderer.GetSplitPlanes().size()),
+        glm::value_ptr(*mShadowRenderer.GetSplitPlanes().data())
+    );
+    // Matrices values
+    glUniformMatrix4fv(
+        glGetUniformLocation(progId, "uCascadesMatrices"),
+        static_cast<GLsizei>(mShadowRenderer.GetSplitShadowMats().size()), GL_FALSE,
+        glm::value_ptr(*mShadowRenderer.GetSplitShadowMats().data())
+    );
+    // View matrix
+    glUniformMatrix4fv(glGetUniformLocation(progId, "viewMat"), 1, GL_FALSE, glm::value_ptr(mView));
 
     //
     // Directional light passes

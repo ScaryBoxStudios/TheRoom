@@ -45,6 +45,7 @@ WARN_GUARD_OFF
 class ShadowRenderer
 {
     public:
+        // Input scene data
         struct IntMesh
         {
             Transform transform;
@@ -68,17 +69,31 @@ class ShadowRenderer
         // Retrieves the depth map Id
         GLuint DepthMapId() const;
 
-        // Retrieves the currently used light space matrix
-        const glm::mat4& GetLightViewMatrix() const;
+        // Retrieves various shadow frustum properties
+        unsigned int GetSplitNum() const;
+        const std::vector<glm::mat4> GetSplitProjMats() const;
+        const std::vector<glm::mat4> GetSplitViewMats() const;
+        const std::vector<glm::mat4> GetSplitShadowMats() const;
+        const std::vector<glm::vec2> GetSplitPlanes() const;
+        const std::vector<float> GetSplitNearPlanes() const;
+        const std::vector<float> GetSplitFarPlanes() const;
 
     private:
+        // Dimensions of each shadow map
         int mWidth, mHeight;
 
+        // GL handles
         GLuint mDepthMapId;
         GLuint mDepthMapFboId;
         std::unique_ptr<ShaderProgram> mProgram;
 
-        glm::mat4 mLightViewMatrix;
+        // Split data
+        unsigned int mSplitNum;
+        std::vector<glm::mat4> mProjectionMats;
+        std::vector<glm::mat4> mViewMats;
+        std::vector<glm::mat4> mShadowMats;
+        std::vector<glm::vec2> mPlanes;
+        std::vector<float> mNearPlanes, mFarPlanes;
 };
 
 #endif // ! _SHADOW_RENDERER_HPP_

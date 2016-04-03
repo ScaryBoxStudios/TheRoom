@@ -1,5 +1,5 @@
 #include "ShadowRenderer.hpp"
-#include <stdexcept>
+#include <assert.h>
 
 WARN_GUARD_ON
 #include <glm/common.hpp>
@@ -11,21 +11,56 @@ static const char* vShader = R"foo(
 #version 330 core
 layout (location = 0) in vec3 position;
 
-uniform mat4 lightSpaceMatrix;
 uniform mat4 model;
 
 void main()
 {
-    gl_Position = lightSpaceMatrix * model * vec4(position, 1.0f);
+    gl_Position = model * vec4(position, 1.0f);
+}
+)foo";
+
+static const char* gShader = R"foo(
+#version 330 core
+#extension GL_ARB_gpu_shader5 : enable
+
+layout(triangles, invocations = 4) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+uniform mat4 uCascadesViewMatrices[4];
+uniform mat4 uCascadesProjMatrices[4];
+
+out float gLayer;
+out vec3  vsPosition;
+
+void main()
+{
+    for(int i = 0; i < gl_in.length(); ++i)
+    {
+        vec4 pos    = (uCascadesViewMatrices[gl_InvocationID] * gl_in[i].gl_Position);
+        gl_Position = uCascadesProjMatrices[gl_InvocationID] * pos;
+        vsPosition  = pos.xyz;
+        gl_Layer    = gl_InvocationID;
+        gLayer      = float(gl_InvocationID);
+        EmitVertex();
+    }
+    EndPrimitive();
 }
 )foo";
 
 static const char* fShader = R"foo(
 #version 330 core
 
+uniform float uCascadesNear[4];
+uniform float uCascadesFar[4];
+
+in float gLayer;
+in vec3 vsPosition;
+
 void main()
 {
-    // gl_FragDepth = gl_FragCoord.z;
+    int layer = int(gLayer);
+    float linearDepth = (-vsPosition.z - uCascadesNear[layer]) / (uCascadesFar[layer] - uCascadesNear[layer]);
+    gl_FragDepth = linearDepth;
 }
 )foo";
 
@@ -33,34 +68,39 @@ void ShadowRenderer::Init(unsigned int width, unsigned int height)
 {
     mWidth = width;
     mHeight = height;
+    mSplitNum = 4;
 
     Shader vert(vShader, Shader::Type::Vertex);
+    Shader geom(gShader, Shader::Type::Geometry);
     Shader frag(fShader, Shader::Type::Fragment);
-    mProgram = std::make_unique<ShaderProgram>(vert.Id(), frag.Id());
+    mProgram = std::make_unique<ShaderProgram>(vert.Id(), geom.Id(), frag.Id());
 
+    // Create textures that will hold the shadow maps
     glGenTextures(1, &mDepthMapId);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, mDepthMapId);
 
-    glBindTexture(GL_TEXTURE_2D, mDepthMapId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, width, height, mSplitNum, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+    // Prepare framebuffer
     glGenFramebuffers(1, &mDepthMapFboId);
-
     glBindFramebuffer(GL_FRAMEBUFFER, mDepthMapFboId);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDepthMapId, 0);
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDepthMapId, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mDepthMapId, 0);
+
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Check if framebuffer is complete
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        throw std::runtime_error("OpenGL: Framebuffer incomplete!");
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
 void ShadowRenderer::Shutdown()
@@ -81,28 +121,48 @@ void ShadowRenderer::Render(float interpolation, std::vector<IntMesh> scene)
 
     // Bind shadow map fbo
     glBindFramebuffer(GL_FRAMEBUFFER, mDepthMapFboId);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glUseProgram(mProgram->Id());
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glUseProgram(mProgram->Id());
 
+        // Projection matrices
         glUniformMatrix4fv(
-            glGetUniformLocation(mProgram->Id(), "lightSpaceMatrix"), 1, GL_FALSE,
-            glm::value_ptr(mLightViewMatrix)
+            glGetUniformLocation(mProgram->Id(), "uCascadesProjMatrices"),
+            static_cast<GLsizei>(mProjectionMats.size()), GL_FALSE,
+            glm::value_ptr(mProjectionMats[0])
+        );
+        // View matrices
+        glUniformMatrix4fv(
+            glGetUniformLocation(mProgram->Id(), "uCascadesViewMatrices"),
+            static_cast<GLsizei>(mViewMats.size()), GL_FALSE,
+            glm::value_ptr(mViewMats[0])
+        );
+        // Near values
+        glUniform1fv(
+            glGetUniformLocation(mProgram->Id(), "uCascadesNear"),
+            static_cast<GLsizei>(mNearPlanes.size()),
+            mNearPlanes.data()
+        );
+        // Far values
+        glUniform1fv(
+            glGetUniformLocation(mProgram->Id(), "uCascadesFar"),
+            static_cast<GLsizei>(mFarPlanes.size()),
+            mFarPlanes.data()
         );
 
-        for (const auto& gObj : scene)
-        {
-            // Upload needed uniforms
-            glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
-            glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "model"), 1, GL_FALSE, glm::value_ptr(model));
+    for (const auto& gObj : scene)
+    {
+        // Upload needed uniforms
+        glm::mat4 model = gObj.transform.GetInterpolated(interpolation);
+        glUniformMatrix4fv(glGetUniformLocation(mProgram->Id(), "model"), 1, GL_FALSE, glm::value_ptr(model));
 
-            glBindVertexArray(gObj.vaoId);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gObj.eboId);
-            glDrawElements(GL_TRIANGLES, gObj.numIndices, GL_UNSIGNED_INT, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
-        }
+        glBindVertexArray(gObj.vaoId);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gObj.eboId);
+        glDrawElements(GL_TRIANGLES, gObj.numIndices, GL_UNSIGNED_INT, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
 
-        glUseProgram(0);
+    glUseProgram(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Restore viewport
@@ -146,19 +206,16 @@ void ShadowRenderer::SetLightViewParams(const glm::mat4& projection, const glm::
     //const glm::vec3 viewPos = glm::vec3(inverseView[3].x, inverseView[3].y, inverseView[3].z);
     //const glm::vec3 viewDir = glm::vec3(view * glm::vec4(0, 0, -1, 0));
 
-    struct SplitData
-    {
-        glm::mat4 projectionMat;
-        glm::mat4 viewMat;
-        glm::mat4 shadowMat;
-        glm::vec2 planes;
-        float nearPlane, farPlane;
-    };
-    std::vector<SplitData> splitData;
+    //
+    mProjectionMats.clear();
+    mViewMats.clear();
+    mShadowMats.clear();
+    mPlanes.clear();
+    mNearPlanes.clear();
+    mFarPlanes.clear();
 
-    /*
     const float splitLambda = 0.5f;
-    const unsigned int splitNum = 4;
+    const unsigned int splitNum = mSplitNum;
     for(unsigned int i = 0; i < splitNum; ++i)
     {
         // Find the split planes using GPU Gem 3. Chap 10 "Practical Split Scheme".
@@ -176,10 +233,6 @@ void ShadowRenderer::SetLightViewParams(const glm::mat4& projection, const glm::
             : cameraFar;
 
         // Create the projection for this split
-    */
-        float splitNear = cameraNear;
-        float splitFar = cameraFar;
-
         glm::mat4 splitProj = glm::perspective(cameraFov, cameraAspect, splitNear, splitFar);
         glm::mat4 inverseProjView = glm::inverse(splitProj * view);
 
@@ -236,23 +289,13 @@ void ShadowRenderer::SetLightViewParams(const glm::mat4& projection, const glm::
         glm::mat4 projMat = glm::ortho(min.x, max.x, min.y, max.y, -max.z - nearOffset, -min.z + farOffset);
 
         // Save matrices and planes
-        splitData.emplace_back(
-            SplitData
-            {
-                projMat,
-                viewMat,
-                projMat * viewMat,
-                glm::vec2(splitNear, splitFar),
-                -max.z - nearOffset,
-                -min.z + farOffset
-            }
-        );
-    /*
+        mProjectionMats.push_back(projMat);
+        mViewMats.push_back(viewMat);
+        mShadowMats.push_back(projMat * viewMat);
+        mPlanes.push_back(glm::vec2(splitNear, splitFar));
+        mNearPlanes.push_back(-max.z - nearOffset);
+        mFarPlanes.push_back(-min.z + farOffset);
     }
-    */
-
-    // Store the combination
-    mLightViewMatrix = splitData[0].projectionMat * splitData[0].viewMat;
 }
 
 GLuint ShadowRenderer::DepthMapId() const
@@ -260,7 +303,37 @@ GLuint ShadowRenderer::DepthMapId() const
     return mDepthMapId;
 }
 
-const glm::mat4& ShadowRenderer::GetLightViewMatrix() const
+unsigned int ShadowRenderer::GetSplitNum() const
 {
-    return mLightViewMatrix;
+    return mSplitNum;
+}
+
+const std::vector<glm::mat4> ShadowRenderer::GetSplitProjMats() const
+{
+    return mProjectionMats;
+}
+
+const std::vector<glm::mat4> ShadowRenderer::GetSplitViewMats() const
+{
+    return mViewMats;
+}
+
+const std::vector<glm::mat4> ShadowRenderer::GetSplitShadowMats() const
+{
+    return mShadowMats;
+}
+
+const std::vector<glm::vec2> ShadowRenderer::GetSplitPlanes() const
+{
+    return mPlanes;
+}
+
+const std::vector<float> ShadowRenderer::GetSplitNearPlanes() const
+{
+    return mNearPlanes;
+}
+
+const std::vector<float> ShadowRenderer::GetSplitFarPlanes() const
+{
+    return mFarPlanes;
 }

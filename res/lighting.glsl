@@ -70,38 +70,50 @@ float CalcBlinnPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shinine
     return spec;
 }
 
+float GeometricalAttenuation(float NdotH, float NdotV, float VdotH, float NdotL)
+{
+    float NH2 = 2.0 * NdotH;
+    float g1  = (NH2 * NdotV) / VdotH;
+    float g2  = (NH2 * NdotL) / VdotH;
+    return min(1.0, min(g1, g2));
+}
+
+float BeckmannDistribution(float roughness, float NdotH)
+{
+    float pi    = 3.14159265;
+
+    float roughness2 = roughness * roughness;
+    float NdotH2     = NdotH * NdotH;
+    float r1 = 1.0 / (pi * roughness2 * pow(NdotH, 4.0));
+    float r2 = (NdotH2 - 1.0) / (roughness2 * NdotH2);
+    return r1 * exp(r2);
+}
+
+float Fresnel(float F0, float VdotH)
+{
+    float F = pow(1.0 - VdotH, 5.0);
+    F *= (1.0 - F0);
+    F += F0;
+    return F;
+}
+
 // Calculates specular intensity according to the Cook - Torrance model
 float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessVal, float F0)
 {
-    float pi    = 3.14159265;
+    // Calculate intermediary values
+    vec3 halfVector = normalize(lightDir + viewDir);
     float NdotL = max(dot(normal, lightDir), 0.0);
+    float NdotH = max(dot(normal, halfVector), 0.0);
+    float NdotV = max(dot(normal, viewDir), 0.0); // Note: this could also be NdotL, which is the same value
+    float VdotH = max(dot(viewDir, halfVector), 0.0);
+    float pi    = 3.14159265;
 
     float specular = 0.0;
     if(NdotL > 0.0)
     {
-        // Calculate intermediary values
-        vec3 halfVector = normalize(lightDir + viewDir);
-        float NdotH = max(dot(normal, halfVector), 0.0);
-        float NdotV = max(dot(normal, viewDir), 0.0); // Note: this could also be NdotL, which is the same value
-        float VdotH = max(dot(viewDir, halfVector), 0.0);
-
-        // Geometric attenuation
-        float NH2 = 2.0 * NdotH;
-        float g1 = (NH2 * NdotV) / VdotH;
-        float g2 = (NH2 * NdotL) / VdotH;
-        float G = min(1.0, min(g1, g2));
-
-        // Roughness (or: microfacet distribution function)
-        // Beckmann Distribution Function
-        float roughnessVal2 = roughnessVal * roughnessVal;
-        float r1 = 1.0 / (pi * roughnessVal2 * pow(NdotH, 4.0));
-        float r2 = (NdotH * NdotH - 1.0) / (roughnessVal2 * NdotH * NdotH);
-        float D = r1 * exp(r2);
-
-        // Fresnel (Schlick approximation)
-        float F = pow(1.0 - VdotH, 5.0);
-        F *= (1.0 - F0);
-        F += F0;
+        float G = GeometricalAttenuation(NdotH, NdotV, VdotH, NdotL);
+        float D = BeckmannDistribution(roughnessVal, NdotH);
+        float F = Fresnel(F0, VdotH);
 
         specular = (D * F * G) / (NdotV * NdotL * pi);
     }

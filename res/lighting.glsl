@@ -123,17 +123,20 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessV
 // Internal func used by other Calc Light functions
 vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
 {
+    // Ambient
+    vec3 ambient = vec3(0.05);
+
     // Diffuse shading (Lambertian reflectance)
     float diff = max(dot(normal, lightDir), 0.0);
+
     // Specular shading (Phong model)
     float spec = CalcCookTorSpec(normal, lightDir, viewDir, material.roughness, material.fresnel);
+
     // Combine results
-    vec3 ambient  = vec3(0.05);
     vec3 diffuse  = diff * material.diffuse * (1.0 - shadowFactor);
     vec3 specular = spec * material.specular;
     vec3 emissive = material.emissive;
-    return lightColor * (emissive + ambient + diffuse + specular);
-    // vec3 finalValue = lightColor * diff * k + specular * (1.0 - k);
+    return ambient + lightColor * (emissive + diffuse + specular);
 }
 
 // Calculates the color of directional light

@@ -80,13 +80,16 @@ void main(void)
     // Calculate fragment shadow coefficient
     float shadow = CalcShadowCoef(uShadowMap, FragPos, vVsPos.xyz, uCascadesMatrices, uCascadesNear, uCascadesFar, uCascadesPlanes);
 
+    // Calculate environment contribution (ambient)
+    vec3 ambient = vec3(0.05);
+
     // Empty result
     vec3 result = vec3(0.0);
 
     if (lMode == 1)
-        result += CalcDirLight(dirLight, norm, viewDir, material, shadow);
+        result += CalcDirLight(dirLight, norm, viewDir, material, shadow, ambient);
     else if (lMode == 2)
-        result += CalcPointLight(pLight, norm, FragPos, viewDir, material);
+        result += CalcPointLight(pLight, norm, FragPos, viewDir, material, ambient);
 
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir, material);
 

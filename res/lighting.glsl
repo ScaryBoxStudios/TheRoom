@@ -121,11 +121,8 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessV
 }
 
 // Internal func used by other Calc Light functions
-vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
+vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor, vec3 ambient)
 {
-    // Ambient
-    vec3 ambient = vec3(0.05);
-
     // Diffuse shading (Lambertian reflectance)
     float diff = max(dot(normal, lightDir), 0.0);
 
@@ -140,31 +137,31 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
 }
 
 // Calculates the color of directional light
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow)
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow, vec3 ambient)
 {
     vec3 lightDir = normalize(-light.direction);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow, ambient);
     return color;
 }
 
 // Calculates the color when using a point light.
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material, vec3 ambient)
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0, ambient);
     // Attenuation
     float attenuation = CalcAttenuationValue(light.attProps, light.position, fragPos);
     return color * attenuation;
 }
 
 // Calculates the color when using a spot light.
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material, vec3 ambient)
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0, ambient);
     // Attenuation
     float attenuation = CalcAttenuationValue(light.attProps, light.position, fragPos);
     // Spotlight intensity

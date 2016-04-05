@@ -266,7 +266,7 @@
             "specMap": 7,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0.2
+            "metallic": 0.2
         },
         {
             "id": 1,
@@ -275,7 +275,7 @@
             "emissive": 8025185,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.2
         },
         {
             "id": 2,
@@ -285,7 +285,7 @@
             "nmap": 10,
             "roughness": 0.5,
             "fresnel": 0.3,
-            "reflectivity": 0
+            "metallic": 0.2
         },
         {
             "id": 3,
@@ -294,7 +294,7 @@
             "specMap": 14,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.2
         },
         {
             "id": 4,
@@ -304,7 +304,7 @@
             "nmap": 12,
             "roughness": 0.9,
             "fresnel": 0.1,
-            "reflectivity": 0
+            "metallic": 0.5
         },
         {
             "id": 5,
@@ -314,7 +314,7 @@
             "nmap": 16,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.7
         },
         {
             "id": 6,
@@ -324,7 +324,7 @@
             "nmap": 19,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.7
         },
         {
             "id": 7,
@@ -334,7 +334,7 @@
             "nmap": 22,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.7
         },
         {
             "id": 8,
@@ -343,7 +343,7 @@
             "nmap": 25,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.2
         },
         {
             "id": 9,
@@ -352,7 +352,7 @@
             "emissive": 0,
             "roughness": 0.0,
             "fresnel": 1.0,
-            "reflectivity": 1.0
+            "metallic": 1.0
         }
     ],
     "object":

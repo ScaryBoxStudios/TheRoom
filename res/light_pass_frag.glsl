@@ -31,10 +31,10 @@ struct MaterialProperties
 {
     float roughness;
     float fresnel;
-    vec3 diffCol;
-    vec3 specCol;
-    vec3 emissiveCol;
-    float reflectivity;
+    float metallic;
+    vec3  diffCol;
+    vec3  specCol;
+    vec3  emissiveCol;
 };
 
 // UBO holding the material data
@@ -58,12 +58,12 @@ void main(void)
 
     // Fill material struct
     Material material;
-    material.diffuse = materialProps[MatIdx].diffCol + Diffuse;
-    material.specular = materialProps[MatIdx].specCol + vec3(Specular);
-    material.emissive = materialProps[MatIdx].emissiveCol;
+    material.diffuse   = materialProps[MatIdx].diffCol + Diffuse;
+    material.specular  = materialProps[MatIdx].specCol + vec3(Specular);
+    material.emissive  = materialProps[MatIdx].emissiveCol;
     material.roughness = materialProps[MatIdx].roughness;
-    material.fresnel = materialProps[MatIdx].fresnel;
-    material.reflectivity = materialProps[MatIdx].reflectivity;
+    material.fresnel   = materialProps[MatIdx].fresnel;
+    material.metallic  = materialProps[MatIdx].metallic;
 
     // Properties
     vec3 norm = normalize(Normal);

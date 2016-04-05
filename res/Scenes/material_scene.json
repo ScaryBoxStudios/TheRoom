@@ -75,7 +75,7 @@
             "specMap": 1,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0.2
+            "metallic": 0.2
         },
         {
             "id": 1,
@@ -84,7 +84,7 @@
             "emissive": 8025185,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.2
         },
         {
             "id": 2,
@@ -93,7 +93,7 @@
             "nmap": 3,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 0
+            "metallic": 0.2
         },
         {
             "id": 3,
@@ -102,7 +102,7 @@
             "emissive": 0,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "reflectivity": 1.0
+            "metallic": 1.0
         },
         {
             "id": 4,
@@ -111,7 +111,7 @@
             "emissive": 0,
             "roughness": 0.5,
             "fresnel": 0.9,
-            "reflectivity": 0.3
+            "metallic": 0.9
         }
 
     ],

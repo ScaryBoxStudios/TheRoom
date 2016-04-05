@@ -7,7 +7,7 @@ struct Material
     vec3 emissive;
     float roughness;
     float fresnel;
-    float reflectivity;
+    float metallic;
 };
 
 // Attenuation light properties
@@ -136,7 +136,7 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
     vec3  emissive  = material.emissive;
     float roughness = material.roughness;
     float fresnel   = material.fresnel;
-    float metallic  = 0.9;
+    float metallic  = material.metallic;
     float pi        = 3.14159265;
 
     // Calculate contribution based on metallicity

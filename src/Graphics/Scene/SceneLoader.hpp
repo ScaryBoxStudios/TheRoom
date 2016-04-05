@@ -125,7 +125,7 @@ struct SceneFile
         Color specular;     // "specular"
         float roughness;    // "roughness"
         float fresnel;      // "fresnel"
-        float reflectivity; // "reflectivity"
+        float metallic;     // "metallic"
         float opacity;      // "opacity"
         bool transparent;   // "transparent"
         bool wireframe;     // "wireframe"

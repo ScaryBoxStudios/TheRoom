@@ -107,7 +107,6 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughness,
     float NdotH = max(dot(normal, halfVector), 0.0);
     float NdotV = max(dot(normal, viewDir), 0.0); // Note: this could also be NdotL, which is the same value
     float VdotH = max(dot(viewDir, halfVector), 0.0);
-    float pi    = 3.14159265;
     float smoothness = max(1.0 - roughness, 0.01);
 
     float specular = 0.0;
@@ -117,7 +116,7 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughness,
         float D = BeckmannDistribution(smoothness, NdotH);
         float F = Fresnel(F0, VdotH);
 
-        specular = (D * F * G) / (NdotV * NdotL * pi);
+        specular = (D * F * G) / (NdotV * NdotL * 4);
     }
     return specular;
 }

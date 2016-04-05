@@ -78,14 +78,14 @@ float GeometricalAttenuation(float NdotH, float NdotV, float VdotH, float NdotL)
     return min(1.0, min(g1, g2));
 }
 
-float BeckmannDistribution(float roughness, float NdotH)
+float BeckmannDistribution(float smoothness, float NdotH)
 {
     float pi    = 3.14159265;
 
-    float roughness2 = roughness * roughness;
+    float smoothness2 = smoothness * smoothness;
     float NdotH2     = NdotH * NdotH;
-    float r1 = 1.0 / (pi * roughness2 * pow(NdotH, 4.0));
-    float r2 = (NdotH2 - 1.0) / (roughness2 * NdotH2);
+    float r1 = 1.0 / (pi * smoothness2 * pow(NdotH, 4.0));
+    float r2 = (NdotH2 - 1.0) / (smoothness2 * NdotH2);
     return r1 * exp(r2);
 }
 
@@ -95,10 +95,11 @@ float Fresnel(float F0, float VdotH)
     F *= (1.0 - F0);
     F += F0;
     return F;
+    //return mix(F0, 1, pow(1.0 - VdotH, 5.0));
 }
 
 // Calculates specular intensity according to the Cook - Torrance model
-float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessVal, float F0)
+float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughness, float F0)
 {
     // Calculate intermediary values
     vec3 halfVector = normalize(lightDir + viewDir);
@@ -107,12 +108,13 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessV
     float NdotV = max(dot(normal, viewDir), 0.0); // Note: this could also be NdotL, which is the same value
     float VdotH = max(dot(viewDir, halfVector), 0.0);
     float pi    = 3.14159265;
+    float smoothness = max(1.0 - roughness, 0.01);
 
     float specular = 0.0;
     if(NdotL > 0.0)
     {
         float G = GeometricalAttenuation(NdotH, NdotV, VdotH, NdotL);
-        float D = BeckmannDistribution(roughnessVal, NdotH);
+        float D = BeckmannDistribution(smoothness, NdotH);
         float F = Fresnel(F0, VdotH);
 
         specular = (D * F * G) / (NdotV * NdotL * pi);
@@ -120,20 +122,39 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughnessV
     return specular;
 }
 
+float DiffuseLambert(vec3 normal, vec3 lightDir)
+{
+    return max(dot(normal, lightDir), 0.0);
+}
+
 // Internal func used by other Calc Light functions
 vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor, vec3 ambient)
 {
-    // Diffuse shading (Lambertian reflectance)
-    float diff = max(dot(normal, lightDir), 0.0);
+    // Helper variables
+    vec3  baseColor = material.diffuse;
+    vec3  specColor = material.specular;
+    vec3  emissive  = material.emissive;
+    float roughness = material.roughness;
+    float fresnel   = material.fresnel;
+    float metallic  = 0.9;
+    float pi        = 3.14159265;
 
-    // Specular shading (Phong model)
-    float spec = CalcCookTorSpec(normal, lightDir, viewDir, material.roughness, material.fresnel);
+    // Calculate contribution based on metallicity
+    vec3 diffuseColor  = baseColor - baseColor * metallic;
+    vec3 specularColor = mix(vec3(0.00), baseColor, metallic);
+
+    // Lambertian reflectance
+    float diff = DiffuseLambert(normal, lightDir);
+
+    // Specular shading (Cook-Torrance model)
+    float reflectance = CalcCookTorSpec(normal, lightDir, viewDir, roughness, fresnel);
 
     // Combine results
-    vec3 diffuse  = diff * material.diffuse * (1.0 - shadowFactor);
-    vec3 specular = spec * material.specular;
-    vec3 emissive = material.emissive;
-    return ambient + lightColor * (emissive + diffuse + specular);
+    vec3 diffuse  = diffuseColor * diff;
+    vec3 specular = reflectance * specularColor;
+    vec3 result   = emissive + diffuse + specular;
+    vec3 sum      = ambient * result + lightColor * result;
+    return pi * sum * (1.0 - shadowFactor) / 2;
 }
 
 // Calculates the color of directional light

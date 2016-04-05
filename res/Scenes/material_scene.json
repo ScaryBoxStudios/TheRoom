@@ -109,7 +109,7 @@
             "type": "gold",
             "color":  4278245375,
             "emissive": 0,
-            "roughness": 0.001,
+            "roughness": 0.5,
             "fresnel": 0.9,
             "reflectivity": 0.3
         }

@@ -69,11 +69,6 @@ void main(void)
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
 
-    // Calculate reflection
-    vec3 R = reflect(-viewDir, norm);
-    vec4 reflectColor = texture(skybox, R) + texture(skysphere, vec2(R.x, R.y));
-    material.diffuse = mix(material.diffuse, vec3(reflectColor.r, reflectColor.g, reflectColor.b), material.reflectivity);
-
     // Get the vertex view space position
     vec4 vVsPos = viewMat * vec4(FragPos, 1.0);
 
@@ -82,6 +77,12 @@ void main(void)
 
     // Calculate environment contribution (ambient)
     vec3 ambient = vec3(0.05);
+
+    // Calculate reflection
+    vec3 R = reflect(-viewDir, norm);
+    vec4 rc = texture(skybox, R) + texture(skysphere, vec2(R.x, R.y));
+
+    ambient += vec3(rc.r, rc.g, rc.b);
 
     // Empty result
     vec3 result = vec3(0.0);

@@ -284,7 +284,7 @@
             "specMap": 9,
             "nmap": 10,
             "roughness": 0.5,
-            "fresnel": 1.329,
+            "fresnel": 0.3,
             "reflectivity": 0
         },
         {
@@ -302,8 +302,8 @@
             "map": 11,
             "specMap": 14,
             "nmap": 12,
-            "roughness": 1.0,
-            "fresnel": 1.635,
+            "roughness": 0.9,
+            "fresnel": 0.1,
             "reflectivity": 0
         },
         {
@@ -350,8 +350,8 @@
             "type": "mirror",
             "color": 15921906,
             "emissive": 0,
-            "roughness": 0.3,
-            "fresnel": 0.5,
+            "roughness": 0.0,
+            "fresnel": 1.0,
             "reflectivity": 1.0
         }
     ],

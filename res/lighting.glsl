@@ -1,5 +1,8 @@
 #module lighting
 
+uniform samplerCube skybox;
+uniform sampler2D   skysphere;
+
 struct Material
 {
     vec3 diffuse;
@@ -127,7 +130,7 @@ float DiffuseLambert(vec3 normal, vec3 lightDir)
 }
 
 // Internal func used by other Calc Light functions
-vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor, vec3 ambient)
+vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
 {
     // Helper variables
     vec3  baseColor = material.diffuse;
@@ -136,52 +139,50 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
     float roughness = material.roughness;
     float fresnel   = material.fresnel;
     float metallic  = material.metallic;
-    float pi        = 3.14159265;
 
     // Calculate contribution based on metallicity
     vec3 diffuseColor  = baseColor - baseColor * metallic;
     vec3 specularColor = mix(vec3(0.00), baseColor, metallic);
 
     // Lambertian reflectance
-    float diff = DiffuseLambert(normal, lightDir);
+    float Kd = DiffuseLambert(normal, lightDir);
 
     // Specular shading (Cook-Torrance model)
-    float reflectance = CalcCookTorSpec(normal, lightDir, viewDir, roughness, fresnel);
+    float Ks = CalcCookTorSpec(normal, lightDir, viewDir, roughness, fresnel);
 
     // Combine results
-    vec3 diffuse  = diffuseColor * diff;
-    vec3 specular = reflectance * specularColor;
-    vec3 result   = emissive + diffuse + specular;
-    vec3 sum      = ambient * result + lightColor * result;
-    return pi * sum * (1.0 - shadowFactor) / 2;
+    vec3 diffuse  = diffuseColor * Kd;
+    vec3 specular = specularColor * Ks;
+    vec3 result   = lightColor * (emissive + diffuse + specular);
+    return result * (1.0 - shadowFactor);
 }
 
 // Calculates the color of directional light
-vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow, vec3 ambient)
+vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow)
 {
     vec3 lightDir = normalize(-light.direction);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow, ambient);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow);
     return color;
 }
 
 // Calculates the color when using a point light.
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material, vec3 ambient)
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0, ambient);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0);
     // Attenuation
     float attenuation = CalcAttenuationValue(light.attProps, light.position, fragPos);
     return color * attenuation;
 }
 
 // Calculates the color when using a spot light.
-vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material, vec3 ambient)
+vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 {
     vec3 lightDir = normalize(light.position - fragPos);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0, ambient);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, 0.0);
     // Attenuation
     float attenuation = CalcAttenuationValue(light.attProps, light.position, fragPos);
     // Spotlight intensity

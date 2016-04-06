@@ -19,9 +19,6 @@ uniform vec2 uCascadesPlanes[4];
 uniform mat4 uCascadesMatrices[4];
 uniform mat4 viewMat;
 
-uniform samplerCube skybox;
-uniform sampler2D   skysphere;
-
 // Lights
 uniform PointLight pLight;
 uniform DirLight dirLight;
@@ -75,23 +72,20 @@ void main(void)
     // Calculate fragment shadow coefficient
     float shadow = CalcShadowCoef(uShadowMap, FragPos, vVsPos.xyz, uCascadesMatrices, uCascadesNear, uCascadesFar, uCascadesPlanes);
 
-    // Calculate environment contribution (ambient)
-    vec3 ambient = vec3(0.05);
-
-    // Calculate reflection
-    vec3 R = reflect(-viewDir, norm);
-    vec4 rc = texture(skybox, R) + texture(skysphere, vec2(R.x, R.y));
-
-    ambient += vec3(rc.r, rc.g, rc.b);
-
     // Empty result
     vec3 result = vec3(0.0);
 
     if (lMode == 1)
-        result += CalcDirLight(dirLight, norm, viewDir, material, shadow, ambient);
+        result += CalcDirLight(dirLight, norm, viewDir, material, shadow);
     else if (lMode == 2)
-        result += CalcPointLight(pLight, norm, FragPos, viewDir, material, ambient);
+        result += CalcPointLight(pLight, norm, FragPos, viewDir, material);
 
+    // Calculate environment contribution
+    float pi = 3.14159265;
+    vec3 R = reflect(-viewDir, norm);
+    vec3 rc = (texture(skybox, R) + texture(skysphere, R.xy)).rgb;
+    //result += CalcLight(rc, norm, R, viewDir, material, 0);
+    //result *= pi / 2;
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir, material);
 
     color = vec4(result, 1.0);

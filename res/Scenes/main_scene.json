@@ -271,8 +271,8 @@
         {
             "id": 1,
             "type": "white",
-            "color": 16777215,
-            "emissive": 8025185,
+            "color": [255, 255, 255, 255],
+            "emissive": [255, 255, 255, 255],
             "roughness": 0.3,
             "fresnel": 0.5,
             "metallic": 0.1
@@ -348,8 +348,7 @@
         {
             "id": 9,
             "type": "mirror",
-            "color": 15921906,
-            "emissive": 0,
+            "color": [255, 255, 255, 255],
             "roughness": 0.0,
             "fresnel": 1.0,
             "metallic": 1.0

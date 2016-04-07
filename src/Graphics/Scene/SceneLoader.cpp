@@ -104,13 +104,14 @@ SceneFile SceneLoader::Load(const Buffer& data)
     }
 
     // Helper
-    auto parseColor = [](std::uint32_t v) -> SceneFile::Color
+    auto parseColor = [](const Value& pos) -> SceneFile::Color
     {
         SceneFile::Color col = {};
-        col.r = (v >> 0) & 0xFF;
-        col.g = (v >> 8) & 0xFF;
-        col.b = (v >> 16) & 0xFF;
-        col.a = (v >> 24) & 0xFF;
+        assert(pos.IsArray());
+        col.r = static_cast<std::uint8_t>(pos[0].GetInt());
+        col.g = static_cast<std::uint8_t>(pos[1].GetInt());
+        col.b = static_cast<std::uint8_t>(pos[2].GetInt());
+        col.a = static_cast<std::uint8_t>(pos[3].GetInt());
         return col;
     };
 
@@ -155,7 +156,7 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // BorderColor
             if(t.HasMember("borderColor"))
-                tex.borderColor = parseColor(t["borderColor"].GetUint());
+                tex.borderColor = parseColor(t["borderColor"]);
 
             // Add parsed texture to the list
             sc.textures.push_back(tex);
@@ -186,13 +187,13 @@ SceneFile SceneLoader::Load(const Buffer& data)
 
             // Colors
             if(m.HasMember("color"))
-                mt.color = parseColor(m["color"].GetUint());
+                mt.color = parseColor(m["color"]);
             if (m.HasMember("ambient"))
-                mt.ambient = parseColor(m["ambient"].GetUint());
+                mt.ambient = parseColor(m["ambient"]);
             if (m.HasMember("emissive"))
-                mt.emissive = parseColor(m["emissive"].GetUint());
+                mt.emissive = parseColor(m["emissive"]);
             if (m.HasMember("specular"))
-                mt.specular = parseColor(m["specular"].GetUint());
+                mt.specular = parseColor(m["specular"]);
             if (m.HasMember("roughness"))
                 mt.roughness = static_cast<float>(m["roughness"].GetDouble());
             if (m.HasMember("fresnel"))

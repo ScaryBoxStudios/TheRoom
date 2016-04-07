@@ -149,6 +149,9 @@ void Renderer::Render(float interpolation, const IntForm& intForm)
 
 void Renderer::Shutdown()
 {
+    // Delete matrices UBO
+    glDeleteBuffers(1, &mUboMatrices);
+
     // Shutdown the ShadowRenderer
     mShadowRenderer.Shutdown();
 

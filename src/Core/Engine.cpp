@@ -11,6 +11,89 @@ WARN_GUARD_OFF
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
 
+static std::unordered_map<std::string, ShaderProgram> LoadShaders()
+{
+    // Load the shader files
+    std::vector<std::string> shaderFiles =
+    {
+        "res/geometry_pass_vert.glsl"
+      , "res/geometry_pass_frag.glsl"
+      , "res/light_pass_vert.glsl"
+      , "res/light_pass_frag.glsl"
+      , "res/lighting.glsl"
+      , "res/shadowing.glsl"
+    };
+
+    std::unordered_map<std::string, std::string> loadedShaders;
+    for (const auto& filepath : shaderFiles)
+    {
+        // Load file
+        auto shaderFile = FileLoad<BufferType>(filepath);
+        if (!shaderFile)
+            throw std::runtime_error("Could not find shader file: \n" + filepath);
+
+        // Convert it to std::string containter
+        std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
+
+        // Store it to the loaded shader data vector
+        loadedShaders.insert({filepath, shaderSrc});
+    }
+
+    // Preprocess them
+    ShaderPreprocessor shaderPreprocessor;
+    std::vector<std::string> deps;
+    for (const auto& dep : loadedShaders)
+        deps.push_back(dep.second);
+    for (auto& shs : loadedShaders)
+        shs.second = shaderPreprocessor.Preprocess(shs.second, deps);
+
+    // The shader map
+    std::unordered_map<std::string, std::vector<std::pair<Shader::Type, std::string>>> shadersLoc =
+    {
+        {
+            "geometry_pass",
+            {
+                { Shader::Type::Vertex,   "res/geometry_pass_vert.glsl" },
+                { Shader::Type::Fragment, "res/geometry_pass_frag.glsl" },
+            }
+        },
+        {
+            "light_pass",
+            {
+                { Shader::Type::Vertex,   "res/light_pass_vert.glsl" },
+                { Shader::Type::Fragment, "res/light_pass_frag.glsl" },
+            }
+        }
+    };
+
+    // Load shaders
+    std::unordered_map<std::string, ShaderProgram> shaderPrograms;
+    for (const auto& p : shadersLoc)
+    {
+        // Will temporarily store the the compiled shaders
+        std::unordered_map<Shader::Type, Shader> shaders;
+        for (const auto& f : p.second)
+        {
+            // Get the source
+            std::string shaderSrc = loadedShaders[f.second];
+
+            // Create shader from source
+            Shader shader(shaderSrc, f.first);
+
+            // Insert loaded shader id to temp map
+            shaders.emplace(f.first, std::move(shader));
+        }
+
+        // Fetch vert and frag shader id's from temp map and link
+        ShaderProgram program(
+            shaders.at(Shader::Type::Vertex).Id(),
+            shaders.at(Shader::Type::Fragment).Id()
+        );
+        shaderPrograms.emplace(p.first, std::move(program));
+    }
+    return shaderPrograms;
+}
+
 void Engine::Init()
 {
     // Setup window
@@ -30,17 +113,19 @@ void Engine::Init()
     );
 
     // Load the needed shaders
-    LoadShaders();
+    std::unordered_map<std::string, ShaderProgram> shdrProgs = LoadShaders();
 
     // Initialize the renderer
     mRenderer.Init(
         mWindow.GetWidth(),
         mWindow.GetHeight(),
-        Renderer::ShaderPrograms
-        {
-            mShaderPrograms.at("geometry_pass").Id(),
-            mShaderPrograms.at("light_pass").Id()
-        }
+        std::make_unique<Renderer::ShaderPrograms>(
+            Renderer::ShaderPrograms
+            {
+                std::move(shdrProgs.at("geometry_pass")),
+                std::move(shdrProgs.at("light_pass"))
+            }
+        )
     );
 
     // Pass the data store instances to renderer
@@ -88,9 +173,6 @@ void Engine::Render(float interpolation)
 
 void Engine::Shutdown()
 {
-    // Remove cached shader programs
-    mShaderPrograms.clear();
-
     // DebugRenderer
     mDbgRenderer.Shutdown();
 
@@ -151,90 +233,4 @@ TextRenderer& Engine::GetTextRenderer()
 DebugRenderer& Engine::GetDebugRenderer()
 {
     return mDbgRenderer;
-}
-
-void Engine::AddShaderProgram(const std::string& name, ShaderProgram sp)
-{
-    mShaderPrograms.emplace(name, std::move(sp));
-}
-
-void Engine::LoadShaders()
-{
-    // Load the shader files
-    std::vector<std::string> shaderFiles =
-    {
-        "res/geometry_pass_vert.glsl"
-      , "res/geometry_pass_frag.glsl"
-      , "res/light_pass_vert.glsl"
-      , "res/light_pass_frag.glsl"
-      , "res/lighting.glsl"
-      , "res/shadowing.glsl"
-    };
-
-    std::unordered_map<std::string, std::string> loadedShaders;
-    for (const auto& filepath : shaderFiles)
-    {
-        // Load file
-        auto shaderFile = FileLoad<BufferType>(filepath);
-        if (!shaderFile)
-            throw std::runtime_error("Could not find shader file: \n" + filepath);
-
-        // Convert it to std::string containter
-        std::string shaderSrc((*shaderFile).begin(), (*shaderFile).end());
-
-        // Store it to the loaded shader data vector
-        loadedShaders.insert({filepath, shaderSrc});
-    }
-
-    // Preprocess them
-    ShaderPreprocessor shaderPreprocessor;
-    std::vector<std::string> deps;
-    for (const auto& dep : loadedShaders)
-        deps.push_back(dep.second);
-    for (auto& shs : loadedShaders)
-        shs.second = shaderPreprocessor.Preprocess(shs.second, deps);
-
-    // The shader map
-    std::unordered_map<std::string, std::vector<std::pair<Shader::Type, std::string>>> shadersLoc =
-    {
-        {
-            "geometry_pass",
-            {
-                { Shader::Type::Vertex,   "res/geometry_pass_vert.glsl" },
-                { Shader::Type::Fragment, "res/geometry_pass_frag.glsl" },
-            }
-        },
-        {
-            "light_pass",
-            {
-                { Shader::Type::Vertex,   "res/light_pass_vert.glsl" },
-                { Shader::Type::Fragment, "res/light_pass_frag.glsl" },
-            }
-        }
-    };
-
-    // Load shaders
-    for (const auto& p : shadersLoc)
-    {
-        // Will temporarily store the the compiled shaders
-        std::unordered_map<Shader::Type, Shader> shaders;
-        for (const auto& f : p.second)
-        {
-            // Get the source
-            std::string shaderSrc = loadedShaders[f.second];
-
-            // Create shader from source
-            Shader shader(shaderSrc, f.first);
-
-            // Insert loaded shader id to temp map
-            shaders.emplace(f.first, std::move(shader));
-        }
-
-        // Fetch vert and frag shader id's from temp map and link
-        ShaderProgram program(
-            shaders.at(Shader::Type::Vertex).Id(),
-            shaders.at(Shader::Type::Fragment).Id()
-        );
-        AddShaderProgram(p.first, std::move(program));
-    }
 }

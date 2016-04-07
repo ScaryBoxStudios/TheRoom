@@ -75,12 +75,12 @@ class Renderer
 
         struct ShaderPrograms
         {
-            GLuint geometryPassProgId;
-            GLuint lightPassProgId;
+            ShaderProgram geometryPassProg;
+            ShaderProgram lightPassProg;
         };
 
         /*! Initializes the renderer */
-        void Init(int width, int height, ShaderPrograms shdrProgs);
+        void Init(int width, int height, std::unique_ptr<ShaderPrograms> shdrProgs);
 
         /*! Called when window is resized */
         void Resize(int width, int height);
@@ -101,7 +101,7 @@ class Renderer
         void SetView(const glm::mat4& view);
 
         /*! Sets the used shader programs */
-        void SetShaderPrograms(const ShaderPrograms& shdrProgs);
+        void SetShaderPrograms(std::unique_ptr<ShaderPrograms> shdrProgs);
 
         /*! Retrieves the renderer's Lights */
         Lights& GetLights();
@@ -140,7 +140,7 @@ class Renderer
         MaterialStore* mMaterialStore;
 
         // Shader programIds of the geometry pass and the lighting pass
-        ShaderPrograms mShdrProgs;
+        std::unique_ptr<ShaderPrograms> mShdrProgs;
 
         // The GBuffer used by the deffered rendering steps
         std::unique_ptr<GBuffer> mGBuffer;

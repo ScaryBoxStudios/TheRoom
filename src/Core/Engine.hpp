@@ -80,13 +80,7 @@ class Engine
         // Retrieves the debug renderer instance
         DebugRenderer& GetDebugRenderer();
 
-        // Sets adds a ShaderProgram to the program list
-        void AddShaderProgram(const std::string& name, ShaderProgram sp);
-
     private:
-        // Loads the default shaders used
-        void LoadShaders();
-
         // The Game Window
         Window mWindow;
 
@@ -105,9 +99,6 @@ class Engine
         TextRenderer mTextRenderer;
         // The Debug Renderer
         DebugRenderer mDbgRenderer;
-
-        // The loaded ShaderProgram(s)
-        std::unordered_map<std::string, ShaderProgram> mShaderPrograms;
 };
 
 #endif // ! _ENGINE_HPP_

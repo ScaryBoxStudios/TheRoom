@@ -139,6 +139,42 @@
             "roughness": 0.9,
             "fresnel": 0.9,
             "metallic": 0.9
+        },
+        {
+            "id": 8,
+            "type": "yellowr3",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.3,
+            "fresnel": 0.9,
+            "metallic": 0.1
+        },
+        {
+            "id": 9,
+            "type": "yellowr5",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.5,
+            "fresnel": 0.9,
+            "metallic": 0.1
+        },
+        {
+            "id": 10,
+            "type": "yellowr7",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.7,
+            "fresnel": 0.9,
+            "metallic": 0.1
+        },
+        {
+            "id": 11,
+            "type": "yellowr9",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.9,
+            "fresnel": 0.9,
+            "metallic": 0.1
         }
     ],
     "object":
@@ -164,7 +200,7 @@
                 "type": "Mesh",
                 "name": "wall",
                 "transform": {
-                    "position": [4, 0, 0],
+                    "position": [8, 0, 0],
                     "scale": [2, 2, 2]
                 },
                 "materials": [2],
@@ -239,6 +275,46 @@
                     "position": [0, 0, -12]
                 },
                 "materials": [7, 0],
+                "geometry": 3
+            },
+            {
+                "id": 9,
+                "type": "Mesh",
+                "name": "yellowBall",
+                "transform": {
+                    "position": [4, 0, 0]
+                },
+                "materials": [8, 0],
+                "geometry": 3
+            },
+            {
+                "id": 10,
+                "type": "Mesh",
+                "name": "yellowBall2",
+                "transform": {
+                    "position": [4, 0, -4]
+                },
+                "materials": [9, 0],
+                "geometry": 3
+            },
+            {
+                "id": 11,
+                "type": "Mesh",
+                "name": "yellowBall3",
+                "transform": {
+                    "position": [4, 0, -8]
+                },
+                "materials": [10, 0],
+                "geometry": 3
+            },
+            {
+                "id": 12,
+                "type": "Mesh",
+                "name": "yellowBall4",
+                "transform": {
+                    "position": [4, 0, -12]
+                },
+                "materials": [11, 0],
                 "geometry": 3
             }
         ]

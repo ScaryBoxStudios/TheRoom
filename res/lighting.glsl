@@ -86,7 +86,7 @@ float BeckmannDistribution(float roughness, float NdotH)
     float pi = 3.14159265;
     float a  = roughness * roughness;
     float NdotH2 = NdotH * NdotH;
-    return 1.0 / (pi * a * pow(NdotH, 4.0)) * exp((NdotH2 - 1.0) / (a * NdotH2));
+    return exp((NdotH2 - 1.0) / (a * NdotH2)) / (pi * a * pow(NdotH, 4.0));
 }
 
 float Fresnel(float F0, float VdotH)

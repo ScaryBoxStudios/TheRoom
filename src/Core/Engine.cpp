@@ -36,8 +36,11 @@ void Engine::Init()
     mRenderer.Init(
         mWindow.GetWidth(),
         mWindow.GetHeight(),
-        mShaderPrograms.at("geometry_pass").Id(),
-        mShaderPrograms.at("light_pass").Id()
+        Renderer::ShaderPrograms
+        {
+            mShaderPrograms.at("geometry_pass").Id(),
+            mShaderPrograms.at("light_pass").Id()
+        }
     );
 
     // Pass the data store instances to renderer

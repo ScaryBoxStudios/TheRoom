@@ -28,11 +28,10 @@ void main()
 }
 )foo";
 
-void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId)
+void Renderer::Init(int width, int height, ShaderPrograms shdrProgs)
 {
     // Store the needed program id's
-    mGeometryPassProgId = gPassProgId;
-    mLightingPassProgId = lPassProgId;
+    SetShaderPrograms(shdrProgs);
 
     // Initialize screen size dependent values
     Resize(width, height);
@@ -44,11 +43,6 @@ void Renderer::Init(int width, int height, GLuint gPassProgId, GLuint lPassProgI
 
     // Initialize the ShadowRenderer
     mShadowRenderer.Init(1024, 1024);
-
-    // Get ubo index
-    GLuint geometryPassUboIndex = glGetUniformBlockIndex(mGeometryPassProgId, "Matrices");
-    // Link block to its binding point
-    glUniformBlockBinding(mGeometryPassProgId, geometryPassUboIndex, 0);
 
     // Create UBO buffer
     glGenBuffers(1, &mUboMatrices);
@@ -70,6 +64,16 @@ void Renderer::Resize(int width, int height)
         0.1f, 300.0f
     );
     mGBuffer = std::make_unique<GBuffer>(width, height);
+}
+
+void Renderer::SetShaderPrograms(const ShaderPrograms& shdrProgs)
+{
+    // Store shader program ids
+    mShdrProgs = shdrProgs;
+    // Get ubo index
+    GLuint geometryPassUboIndex = glGetUniformBlockIndex(mShdrProgs.geometryPassProgId, "Matrices");
+    // Link block to its binding point
+    glUniformBlockBinding(mShdrProgs.geometryPassProgId, geometryPassUboIndex, 0);
 }
 
 void Renderer::Update(float dt)
@@ -167,7 +171,7 @@ void Renderer::GeometryPass(float interpolation, const IntForm& intForm)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Use the geometry pass program
-    GLuint progId = mGeometryPassProgId;
+    GLuint progId = mShdrProgs.geometryPassProgId;
     glUseProgram(progId);
 
     // Set sampler locations
@@ -261,7 +265,7 @@ void Renderer::LightPass(float interpolation, const IntForm& intForm)
     glBlendFunc(GL_ONE, GL_ONE);
 
     // Use the light pass program
-    GLuint progId = mLightingPassProgId;
+    GLuint progId = mShdrProgs.lightPassProgId;
     glUseProgram(progId);
 
     // Setup material index buffer

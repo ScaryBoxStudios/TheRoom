@@ -73,8 +73,14 @@ class Renderer
             GLuint                        skysphereId = 0;
         };
 
+        struct ShaderPrograms
+        {
+            GLuint geometryPassProgId;
+            GLuint lightPassProgId;
+        };
+
         /*! Initializes the renderer */
-        void Init(int width, int height, GLuint gPassProgId, GLuint lPassProgId);
+        void Init(int width, int height, ShaderPrograms shdrProgs);
 
         /*! Called when window is resized */
         void Resize(int width, int height);
@@ -93,6 +99,9 @@ class Renderer
 
         /*! Sets the view matrix */
         void SetView(const glm::mat4& view);
+
+        /*! Sets the used shader programs */
+        void SetShaderPrograms(const ShaderPrograms& shdrProgs);
 
         /*! Retrieves the renderer's Lights */
         Lights& GetLights();
@@ -131,7 +140,7 @@ class Renderer
         MaterialStore* mMaterialStore;
 
         // Shader programIds of the geometry pass and the lighting pass
-        GLuint mGeometryPassProgId, mLightingPassProgId;
+        ShaderPrograms mShdrProgs;
 
         // The GBuffer used by the deffered rendering steps
         std::unique_ptr<GBuffer> mGBuffer;

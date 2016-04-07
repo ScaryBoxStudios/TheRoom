@@ -264,9 +264,9 @@
             "type": "mahogany",
             "map": 6,
             "specMap": 7,
-            "roughness": 0.3,
-            "fresnel": 0.5,
-            "metallic": 0.2
+            "roughness": 0.8,
+            "fresnel": 0.3,
+            "metallic": 0.1
         },
         {
             "id": 1,
@@ -275,7 +275,7 @@
             "emissive": 8025185,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 2,
@@ -283,18 +283,18 @@
             "map": 8,
             "specMap": 9,
             "nmap": 10,
-            "roughness": 0.5,
+            "roughness": 0.7,
             "fresnel": 0.3,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 3,
             "type": "well",
             "map": 13,
             "specMap": 14,
-            "roughness": 0.3,
+            "roughness": 0.4,
             "fresnel": 0.5,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 4,
@@ -302,9 +302,9 @@
             "map": 11,
             "specMap": 14,
             "nmap": 12,
-            "roughness": 0.9,
+            "roughness": 0.3,
             "fresnel": 0.1,
-            "metallic": 0.5
+            "metallic": 0.1
         },
         {
             "id": 5,
@@ -314,7 +314,7 @@
             "nmap": 16,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.7
+            "metallic": 0.1
         },
         {
             "id": 6,
@@ -324,7 +324,7 @@
             "nmap": 19,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.7
+            "metallic": 0.1
         },
         {
             "id": 7,
@@ -334,7 +334,7 @@
             "nmap": 22,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.7
+            "metallic": 0.1
         },
         {
             "id": 8,
@@ -343,7 +343,7 @@
             "nmap": 25,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 9,

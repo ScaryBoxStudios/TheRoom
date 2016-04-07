@@ -75,7 +75,7 @@
             "specMap": 1,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 1,
@@ -84,7 +84,7 @@
             "emissive": 8025185,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 2,
@@ -93,7 +93,7 @@
             "nmap": 3,
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.2
+            "metallic": 0.1
         },
         {
             "id": 3,
@@ -106,14 +106,40 @@
         },
         {
             "id": 4,
-            "type": "gold",
+            "type": "goldr3",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.3,
+            "fresnel": 0.9,
+            "metallic": 0.9
+        },
+        {
+            "id": 5,
+            "type": "goldr5",
             "color":  4278245375,
             "emissive": 0,
             "roughness": 0.5,
             "fresnel": 0.9,
             "metallic": 0.9
+        },
+        {
+            "id": 6,
+            "type": "goldr7",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.7,
+            "fresnel": 0.9,
+            "metallic": 0.9
+        },
+        {
+            "id": 7,
+            "type": "goldr9",
+            "color":  4278245375,
+            "emissive": 0,
+            "roughness": 0.9,
+            "fresnel": 0.9,
+            "metallic": 0.9
         }
-
     ],
     "object":
     {
@@ -184,6 +210,36 @@
                 },
                 "materials": [3],
                 "geometry": 0
+            },
+            {
+                "id": 6,
+                "type": "Mesh",
+                "name": "goldShaderBall2",
+                "transform": {
+                    "position": [0, 0, -4]
+                },
+                "materials": [5, 0],
+                "geometry": 3
+            },
+            {
+                "id": 7,
+                "type": "Mesh",
+                "name": "goldShaderBall3",
+                "transform": {
+                    "position": [0, 0, -8]
+                },
+                "materials": [6, 0],
+                "geometry": 3
+            },
+            {
+                "id": 8,
+                "type": "Mesh",
+                "name": "goldShaderBall4",
+                "transform": {
+                    "position": [0, 0, -12]
+                },
+                "materials": [7, 0],
+                "geometry": 3
             }
         ]
     }

@@ -81,15 +81,12 @@ float GeometricalAttenuation(float NdotH, float NdotV, float VdotH, float NdotL)
     return min(1.0, min(g1, g2));
 }
 
-float BeckmannDistribution(float smoothness, float NdotH)
+float BeckmannDistribution(float roughness, float NdotH)
 {
-    float pi    = 3.14159265;
-
-    float smoothness2 = smoothness * smoothness;
-    float NdotH2     = NdotH * NdotH;
-    float r1 = 1.0 / (pi * smoothness2 * pow(NdotH, 4.0));
-    float r2 = (NdotH2 - 1.0) / (smoothness2 * NdotH2);
-    return r1 * exp(r2);
+    float pi = 3.14159265;
+    float a  = roughness * roughness;
+    float NdotH2 = NdotH * NdotH;
+    return 1.0 / (pi * a * pow(NdotH, 4.0)) * exp((NdotH2 - 1.0) / (a * NdotH2));
 }
 
 float Fresnel(float F0, float VdotH)
@@ -110,13 +107,12 @@ float CalcCookTorSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float roughness,
     float NdotH = max(dot(normal, halfVector), 0.0);
     float NdotV = max(dot(normal, viewDir), 0.0); // Note: this could also be NdotL, which is the same value
     float VdotH = max(dot(viewDir, halfVector), 0.0);
-    float smoothness = max(1.0 - roughness, 0.01);
 
     float specular = 0.0;
     if(NdotL > 0.0)
     {
         float G = GeometricalAttenuation(NdotH, NdotV, VdotH, NdotL);
-        float D = BeckmannDistribution(smoothness, NdotH);
+        float D = BeckmannDistribution(roughness, NdotH);
         float F = Fresnel(F0, VdotH);
 
         specular = (D * F * G) / (NdotV * NdotL * 4);

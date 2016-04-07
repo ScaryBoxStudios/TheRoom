@@ -48,6 +48,9 @@ void Game::SetupWindow()
             // Ungrab mouse
             if(k == Key::RightControl && ka == KeyAction::Release)
                 window.SetMouseGrabEnabled(false);
+            // Reload shaders
+            if(k == Key::F5 && ka == KeyAction::Release)
+                mEngine.ReloadShaders();
             // Fw to Active screen onKey
             mScreenManager.GetActiveScreen()->onKey(k, ka);
         }

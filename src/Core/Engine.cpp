@@ -1,8 +1,10 @@
 #include "Engine.hpp"
 #include "../Window/GlfwError.hpp"
 #include "../Util/FileLoad.hpp"
+#include "../Graphics/Shader/Shader.hpp"
 #include "../Graphics/Shader/ShaderPreprocessor.hpp"
 #include "../Util/Hash.hpp"
+#include "../Util/MsgBox.hpp"
 
 WARN_GUARD_ON
 #include <glm/gtc/matrix_transform.hpp>
@@ -153,6 +155,27 @@ void Engine::Init()
         mWindow.GetHeight()
     );
     mDbgRenderer.SetDebugTextures(mRenderer.GetTextureTargets());
+}
+
+void Engine::ReloadShaders()
+{
+    try
+    {
+        std::unordered_map<std::string, ShaderProgram> shdrProgs = LoadShaders();
+        mRenderer.SetShaderPrograms(
+            std::make_unique<Renderer::ShaderPrograms>(
+                Renderer::ShaderPrograms
+                {
+                    std::move(shdrProgs.at("geometry_pass")),
+                    std::move(shdrProgs.at("light_pass"))
+                }
+            )
+        );
+    }
+    catch(const std::runtime_error& e)
+    {
+        MsgBox("Error", e.what()).Show();
+    }
 }
 
 void Engine::Update(float dt)

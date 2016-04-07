@@ -39,20 +39,16 @@
 #include "../Graphics/Renderer/AABBRenderer.hpp"
 #include "../Graphics/Renderer/TextRenderer.hpp"
 #include "../Graphics/Renderer/DebugRenderer.hpp"
-#include "../Graphics/Shader/Shader.hpp"
 
 class Engine
 {
     public:
         /*! Initializes all the low level modules of the game */
         void Init();
-
         /*! Called when updating the game state */
         void Update(float dt);
-
         /*! Called when rendering the current frame */
         void Render(float interpolation);
-
         /*! Deinitializes all the low level modules of the game */
         void Shutdown();
 
@@ -61,24 +57,22 @@ class Engine
 
         // Retrieves the ModelStore instance
         ModelStore& GetModelStore();
-
         // Retrieves the TextureStore instance
         TextureStore& GetTextureStore();
-
         // Retrieves the MaterialStore instance
         MaterialStore& GetMaterialStore();
 
         // Retrieves the renderer instance
         Renderer& GetRenderer();
-
         // Retrieves the AABB renderer instance
         AABBRenderer& GetAABBRenderer();
-
         // Retrieves the text renderer instance
         TextRenderer& GetTextRenderer();
-
         // Retrieves the debug renderer instance
         DebugRenderer& GetDebugRenderer();
+
+        // Tries to reload the Renderer's shaders from disk
+        void ReloadShaders();
 
     private:
         // The Game Window

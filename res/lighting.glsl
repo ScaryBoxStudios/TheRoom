@@ -138,7 +138,8 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
 
     // Calculate contribution based on metallicity
     vec3 diffuseColor  = baseColor - baseColor * metallic;
-    vec3 specularColor = mix(vec3(0.00), baseColor, metallic);
+    vec3 specularColor = mix(baseColor, vec3(0), roughness);
+    //vec3 specularColor = mix(vec3(0.00), baseColor, metallic);
 
     // Lambertian reflectance
     float Kd = DiffuseLambert(normal, lightDir);

@@ -75,7 +75,7 @@
             "specMap": 1,
             "roughness": 0.3,
             "fresnel": 0.1,
-            "metallic": 0.1
+            "metallic": 0
         },
         {
             "id": 1,
@@ -84,7 +84,7 @@
             "emissive": [255, 255, 255, 255],
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 0.1
+            "metallic": 0
         },
         {
             "id": 2,
@@ -93,7 +93,7 @@
             "nmap": 3,
             "roughness": 0.3,
             "fresnel": 0.1,
-            "metallic": 0.1
+            "metallic": 0
         },
         {
             "id": 3,
@@ -101,7 +101,7 @@
             "color": [255, 255, 255, 255],
             "roughness": 0.3,
             "fresnel": 0.5,
-            "metallic": 1.0
+            "metallic": 1
         },
         {
             "id": 4,
@@ -109,7 +109,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.3,
             "fresnel": 0.3,
-            "metallic": 0.9
+            "metallic": 1
         },
         {
             "id": 5,
@@ -117,7 +117,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.5,
             "fresnel": 0.3,
-            "metallic": 0.9
+            "metallic": 1
         },
         {
             "id": 6,
@@ -125,7 +125,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.7,
             "fresnel": 0.3,
-            "metallic": 0.9
+            "metallic": 1
         },
         {
             "id": 7,
@@ -133,7 +133,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.9,
             "fresnel": 0.3,
-            "metallic": 0.9
+            "metallic": 1
         },
         {
             "id": 8,
@@ -141,7 +141,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.3,
             "fresnel": 0.1,
-            "metallic": 0.1
+            "metallic": 0
         },
         {
             "id": 9,
@@ -149,7 +149,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.5,
             "fresnel": 0.1,
-            "metallic": 0.1
+            "metallic": 0
         },
         {
             "id": 10,
@@ -157,7 +157,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.7,
             "fresnel": 0.1,
-            "metallic": 0.1
+            "metallic": 0
         },
         {
             "id": 11,
@@ -165,7 +165,7 @@
             "color":  [255, 213, 98, 255],
             "roughness": 0.9,
             "fresnel": 0.1,
-            "metallic": 0.1
+            "metallic": 0
         }
     ],
     "object":

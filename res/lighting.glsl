@@ -1,4 +1,5 @@
 #module lighting
+#extension GL_ARB_texture_query_levels : enable
 
 uniform samplerCube skybox;
 uniform sampler2D   skysphere;
@@ -148,6 +149,36 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
 
     // Combine results
     return lightColor * NdotL * (brdfResult + emissive) * visibility;
+}
+
+// Calculates the enviroment light contribution
+vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
+{
+    // Calculate mipmap level based on roughness
+    float lodRegulator = 512.0;
+    float levels = float(textureQueryLevels(skybox)) - 1;
+    float mx = log2(material.roughness * lodRegulator + 1) / log2(lodRegulator);
+    float mipmapLevel = mx * levels;
+    if (mipmapLevel > 6)
+        mipmapLevel = 6;
+
+    // Calculate reflection dir
+    vec3 reflectDir = reflect(-viewDir, normal);
+    //vec3 mixed = mix(normal, reflectDir, material.roughness);
+    //vec3 mixed = mix(reflectDir, normal, material.roughness);
+    vec3 mixed = reflectDir;
+
+    // Get color from env map
+    vec4 color = textureLod(skybox, mixed, mipmapLevel) + textureLod(skysphere, mixed.xy, mipmapLevel);
+
+    // Set lightDir
+    vec3 lightDir = reflectDir;
+    //vec3 lightDir = normal;
+    float NdotL   = max(dot(normal, lightDir), 0.0);
+    color *= NdotL;
+
+    // Calculate final light color
+    return CalcLight(color.rgb, normal, lightDir, viewDir, material, 0.0);
 }
 
 // Calculates the color of directional light

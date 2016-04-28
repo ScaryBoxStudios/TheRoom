@@ -79,13 +79,9 @@ void main(void)
         result += CalcDirLight(dirLight, norm, viewDir, material, shadow);
     else if (lMode == 2)
         result += CalcPointLight(pLight, norm, FragPos, viewDir, material);
+    else if (lMode == 3)
+        result += CalcEnvLight(norm, FragPos, viewDir, material);
 
-    // Calculate environment contribution
-    float pi = 3.14159265;
-    vec3 R = reflect(-viewDir, norm);
-    vec3 rc = (texture(skybox, R) + texture(skysphere, R.xy)).rgb;
-    //result += CalcLight(rc, norm, R, viewDir, material, 0);
-    //result *= pi / 2;
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir, material);
 
     color = vec4(result, 1.0);

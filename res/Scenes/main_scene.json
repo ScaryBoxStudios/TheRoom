@@ -349,8 +349,8 @@
             "id": 9,
             "type": "mirror",
             "color": [255, 255, 255, 255],
-            "roughness": 0.0,
-            "fresnel": 1.0,
+            "roughness": 0.1,
+            "fresnel": 0.9,
             "metallic": 1
         }
     ],

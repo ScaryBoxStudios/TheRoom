@@ -361,6 +361,12 @@ void Renderer::LightPass(float interpolation, const IntForm& intForm)
     RenderQuad();
 
     //
+    // Ambient Light Pass
+    //
+    glUniform1i(glGetUniformLocation(progId, "lMode"), 3);
+    RenderQuad();
+
+    //
     // Point light passes
     //
     // Enable stencil test for bounding sphere optimization

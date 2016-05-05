@@ -143,7 +143,7 @@ void MainScreen::SetupLights()
     // Add directional light
     DirLight dirLight;
     dirLight.direction = glm::vec3(-0.3f, -0.5f, -0.5f);
-    dirLight.color = glm::vec3(1.8f, 1.8f, 1.8f);
+    dirLight.color = glm::vec3(0.9f);
     lights.dirLights.push_back(dirLight);
 
     // Add point lights

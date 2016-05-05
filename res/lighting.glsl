@@ -95,12 +95,8 @@ float BeckmannDistribution(float roughness, float NdotH)
 // Pass the reflected color at normal angle directly
 vec3 Fresnel(vec3 R0, float VdotH)
 {
-    float u  = 1.0 - VdotH;
-    float u5 = pow(u, 5);
-    return vec3(
-        min(1.0, R0.r + (1.0 - R0.r) * u5),
-        min(1.0, R0.g + (1.0 - R0.g) * u5),
-        min(1.0, R0.b + (1.0 - R0.b) * u5));
+    float u5 = pow(1.0 - VdotH, 5);
+    return R0.rgb + (vec3(1.0) - R0.rgb) * vec3(u5);
 }
 
 vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity)

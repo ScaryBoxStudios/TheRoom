@@ -265,7 +265,7 @@
             "map": 6,
             "specMap": 7,
             "roughness": 0.8,
-            "fresnel": 0.3,
+            "fresnel": 0.02,
             "metallic": 0
         },
         {
@@ -274,7 +274,7 @@
             "color": [255, 255, 255, 255],
             "emissive": [255, 255, 255, 255],
             "roughness": 0.3,
-            "fresnel": 0.5,
+            "fresnel": 0.8,
             "metallic": 0
         },
         {
@@ -284,7 +284,7 @@
             "specMap": 9,
             "nmap": 10,
             "roughness": 0.7,
-            "fresnel": 0.3,
+            "fresnel": 0.01,
             "metallic": 0
         },
         {
@@ -293,7 +293,7 @@
             "map": 13,
             "specMap": 14,
             "roughness": 0.4,
-            "fresnel": 0.5,
+            "fresnel": 0.02,
             "metallic": 0
         },
         {
@@ -303,8 +303,8 @@
             "specMap": 14,
             "nmap": 12,
             "roughness": 0.3,
-            "fresnel": 0.5,
-            "metallic": 1
+            "fresnel": 0.04,
+            "metallic": 0
         },
         {
             "id": 5,
@@ -313,8 +313,8 @@
             "specMap": 15,
             "nmap": 16,
             "roughness": 0.3,
-            "fresnel": 0.5,
-            "metallic": 1
+            "fresnel": 0.02,
+            "metallic": 0
         },
         {
             "id": 6,
@@ -323,7 +323,7 @@
             "specMap": 18,
             "nmap": 19,
             "roughness": 0.3,
-            "fresnel": 0.5,
+            "fresnel": 0.8,
             "metallic": 1
         },
         {
@@ -333,7 +333,7 @@
             "specMap": 21,
             "nmap": 22,
             "roughness": 0.3,
-            "fresnel": 0.5,
+            "fresnel": 0.9,
             "metallic": 1
         },
         {
@@ -342,14 +342,14 @@
             "map": 24,
             "nmap": 25,
             "roughness": 0.3,
-            "fresnel": 0.5,
+            "fresnel": 0.02,
             "metallic": 0
         },
         {
             "id": 9,
             "type": "mirror",
             "color": [255, 255, 255, 255],
-            "roughness": 0.1,
+            "roughness": 0.2,
             "fresnel": 0.9,
             "metallic": 1
         }

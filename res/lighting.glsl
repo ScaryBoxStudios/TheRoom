@@ -4,6 +4,9 @@
 uniform samplerCube skybox;
 uniform sampler2D   skysphere;
 
+float saturate(float v) { return clamp(v, 0.0, 1.0); }
+vec3 saturate(vec3 v) { return clamp(v, 0.0, 1.0); }
+
 struct Material
 {
     vec3 diffuse;
@@ -102,10 +105,10 @@ vec3 Fresnel(vec3 R0, float VdotH)
 vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity)
 {
     vec3  H     = normalize(L + V);
-    float NdotL = max(dot(N, L), 0.0);
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotV = max(dot(N, V), 0.0);
-    float VdotH = max(dot(V, H), 0.0);
+    float NdotL = saturate(dot(N, L));
+    float NdotH = max(1e-5, dot(N, H));
+    float NdotV = max(1e-5, dot(N, V));
+    float VdotH = clamp(dot(V, H), 1e-5, 1.0);
 
     // Specular vs Diffuse
     vec3 C0 = baseColor * metallic + vec3(1.0) * (1.0 - metallic);
@@ -135,7 +138,7 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
     float roughness    = material.roughness;
     float reflectivity = material.fresnel;
     float metallic     = material.metallic;
-    float NdotL        = max(dot(normal, lightDir), 0.0);
+    float NdotL = saturate(dot(normal, lightDir));
 
     // Calculate visibility
     float visibility = 1.0 - shadowFactor;

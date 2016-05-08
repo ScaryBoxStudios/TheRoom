@@ -88,6 +88,10 @@ void main(void)
 
     color = vec4(result, 1.0);
 
+    // Apply gamma correction
+    float gamma = 1.2;
+    color.rgb = pow(color.rgb, vec3(1.0 / gamma));
+
     // Debug shadow splits
     //if (lMode == 1)
     //{

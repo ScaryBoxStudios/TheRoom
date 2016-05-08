@@ -101,6 +101,7 @@ vec3 Fresnel(vec3 R0, float VdotH)
 {
     float u5 = pow(1.0 - VdotH, 5);
     return R0.rgb + (vec3(1.0) - R0.rgb) * vec3(u5);
+    //return mix(vec3(u5), vec3(1.0), R0.rgb));
 }
 
 vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity)
@@ -112,6 +113,7 @@ vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughnes
     float VdotH = clamp(dot(V, H), 1e-5, 1.0);
 
     // Specular vs Diffuse
+    //vec3 C0 = mix(vec3(1.0), baseColor, metallic)
     vec3 C0 = baseColor * metallic + vec3(1.0) * (1.0 - metallic);
 
     // Calculate fresnel

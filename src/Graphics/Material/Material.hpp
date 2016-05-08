@@ -76,6 +76,10 @@ class Material
         float GetMetallic() const;
         void SetMetallic(float m);
 
+        // Transparency
+        float GetTransparency() const;
+        void SetTransparency(float m);
+
         // Normal Map texture
         GLuint GetNormalMapTexture() const;
         void SetNormalMapTexture(GLuint id);
@@ -101,6 +105,9 @@ class Material
 
         // Metallic
         float mMetallic;
+
+        // Transparency
+        float mTransparency;
 
         // Normal mapping properties
         GLuint mNMapTexture;

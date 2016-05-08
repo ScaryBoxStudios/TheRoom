@@ -15,6 +15,7 @@ struct Material
     float roughness;
     float fresnel;
     float metallic;
+    float transparency;
 };
 
 // Attenuation light properties
@@ -138,6 +139,7 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
     float roughness    = material.roughness;
     float reflectivity = material.fresnel;
     float metallic     = material.metallic;
+    float transparency = material.transparency;
     float NdotL = saturate(dot(normal, lightDir));
 
     // Calculate visibility

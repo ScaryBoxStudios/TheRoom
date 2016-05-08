@@ -202,8 +202,8 @@ SceneFile SceneLoader::Load(const Buffer& data)
                 mt.metallic = static_cast<float>(m["metallic"].GetDouble());
 
             // Opacity
-            if (m.HasMember("opacity"))
-                mt.opacity = static_cast<float>(m["opacity"].GetDouble());
+            if (m.HasMember("transparency"))
+                mt.transparency = static_cast<float>(m["transparency"].GetDouble());
 
             // Transparent
             if (m.HasMember("transparent"))

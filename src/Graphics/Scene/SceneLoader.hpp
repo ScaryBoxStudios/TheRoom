@@ -126,7 +126,7 @@ struct SceneFile
         float roughness;    // "roughness"
         float fresnel;      // "fresnel"
         float metallic;     // "metallic"
-        float opacity;      // "opacity"
+        float transparency; // "transparency"
         bool transparent;   // "transparent"
         bool wireframe;     // "wireframe"
         Id map;             // "map" - Diffuse map

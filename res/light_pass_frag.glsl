@@ -29,6 +29,7 @@ struct MaterialProperties
     float roughness;
     float fresnel;
     float metallic;
+    float transparency;
     vec3  diffCol;
     vec3  specCol;
     vec3  emissiveCol;
@@ -61,6 +62,7 @@ void main(void)
     material.roughness = materialProps[MatIdx].roughness;
     material.fresnel   = materialProps[MatIdx].fresnel;
     material.metallic  = materialProps[MatIdx].metallic;
+    material.transparency = materialProps[MatIdx].transparency;
 
     // Properties
     vec3 norm = normalize(Normal);

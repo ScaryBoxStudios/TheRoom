@@ -9,6 +9,7 @@ Material::Material()
   , mRoughness(0)
   , mFresnel(0)
   , mMetallic(0.2f)
+  , mTransparency(0.0f)
   , mNMapTexture(0)
 {
 }
@@ -97,6 +98,16 @@ float Material::GetMetallic() const
 void Material::SetMetallic(float m)
 {
     mMetallic = m;
+}
+
+float Material::GetTransparency() const
+{
+    return mTransparency;
+}
+
+void Material::SetTransparency(float t)
+{
+    mTransparency = t;
 }
 
 //

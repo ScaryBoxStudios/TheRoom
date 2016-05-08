@@ -87,6 +87,7 @@ void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materia
         newMat.SetRoughness(material.roughness);
         newMat.SetFresnel(material.fresnel);
         newMat.SetMetallic(material.metallic);
+        newMat.SetTransparency(material.transparency);
 
         mMaterialStore->Load(std::to_string(material.id), newMat);
     }

@@ -35,7 +35,7 @@ void MaterialStore::Load(const std::string& name, const Material& material)
         float roughness;
         float fresnel;
         float metallic;
-        float padding;
+        float transparency;
 
         float diffCol[3];
         float padding2;
@@ -54,16 +54,20 @@ void MaterialStore::Load(const std::string& name, const Material& material)
         MatData md = {};
         md.roughness = matDesc.material.GetRoughness();
         md.fresnel = matDesc.material.GetFresnel();
+        md.metallic = matDesc.material.GetMetallic();
+        md.transparency = matDesc.material.GetTransparency();
+
         md.diffCol[0] = matDesc.material.GetDiffuseColor().r / 255.0f;
         md.diffCol[1] = matDesc.material.GetDiffuseColor().g / 255.0f;
         md.diffCol[2] = matDesc.material.GetDiffuseColor().b / 255.0f;
+
         md.specCol[0] = matDesc.material.GetSpecularColor().r / 255.0f;
         md.specCol[1] = matDesc.material.GetSpecularColor().g / 255.0f;
         md.specCol[2] = matDesc.material.GetSpecularColor().b / 255.0f;
+
         md.emissiveCol[0] = matDesc.material.GetEmissiveColor().r / 255.0f;
         md.emissiveCol[1] = matDesc.material.GetEmissiveColor().g / 255.0f;
         md.emissiveCol[2] = matDesc.material.GetEmissiveColor().b / 255.0f;
-        md.metallic       = matDesc.material.GetMetallic();
         matData.push_back(md);
     }
 

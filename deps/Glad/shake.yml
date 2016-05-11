@@ -1,3 +1,2 @@
 ProjectName: Glad
 ProjectType: StaticLib
-AdditionalIncludes: ["../KHR/include"]

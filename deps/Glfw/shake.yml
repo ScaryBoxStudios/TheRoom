@@ -33,4 +33,4 @@ OSDefines:
       - "_GLFW_X11"
       - "_GLFW_GLX"
       - "_GLFW_HAS_GLXGETPROCADDRESS"
-AdditionalIncludes: ["../GL/include", "../EGL/include"]
+AdditionalIncludes: ["contrib/GL/include", "contrib/EGL/include"]

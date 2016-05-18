@@ -2,6 +2,7 @@
 #extension GL_ARB_texture_query_levels : enable
 
 uniform samplerCube skybox;
+uniform samplerCube irrMap;
 uniform sampler2D   skysphere;
 
 float saturate(float v) { return clamp(v, 0.0, 1.0); }
@@ -104,17 +105,13 @@ vec3 Fresnel(vec3 R0, float VdotH)
     //return mix(vec3(u5), vec3(1.0), R0.rgb));
 }
 
-vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity)
+vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity, vec3 cdiff, vec3 cspec)
 {
     vec3  H     = normalize(L + V);
     float NdotL = saturate(dot(N, L));
     float NdotH = max(1e-5, dot(N, H));
     float NdotV = max(1e-5, dot(N, V));
     float VdotH = clamp(dot(V, H), 1e-5, 1.0);
-
-    // Calc colors
-    vec3 cdiff = (1 - metallic) * baseColor;
-    vec3 cspec = mix(vec3(1.0), baseColor, metallic);
 
     // Calculate fresnel
     vec3 F = Fresnel(cspec, VdotH);
@@ -131,6 +128,16 @@ vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughnes
     vec3 d = Kd * cdiff / pi;
     vec3 s = Ks * D * G / (NdotV * NdotL * 4);
     return d + s;
+}
+
+// BRDF simplification that calculates diffuse and specular colors instead of getting them as input
+vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity)
+{
+    // Calc colors
+    vec3 cdiff = (1 - metallic) * baseColor;
+    vec3 cspec = mix(vec3(1.0), baseColor, metallic);
+
+    return BRDF(N, L, V, baseColor, metallic, roughness, reflectivity, cdiff, cspec);
 }
 
 vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)
@@ -155,6 +162,32 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
 }
 
 // Calculates the enviroment light contribution
+vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
+{
+    vec3 baseColor     = material.diffuse;
+    float roughness    = material.roughness;
+    float reflectivity = material.fresnel;
+    float metallic     = material.metallic;
+
+    // Calculate reflection dir
+    vec3 reflectDir = reflect(-viewDir, normal);
+
+    // Get radiance and irradiance colors
+    vec3 rad = texture(skybox, reflectDir).rgb + texture(skysphere, reflectDir.xy).rgb;
+    vec3 irr = texture(irrMap, reflectDir).rgb;
+    irr *= material.diffuse;
+
+    // BRDF
+    vec3 brdfResult = BRDF(normal, reflectDir, viewDir, baseColor, metallic, roughness, reflectivity, irr, rad);
+
+    // Combine results
+    float NdotL = saturate(dot(normal, reflectDir));
+    return brdfResult * NdotL * NdotL;
+}
+
+/*
+// Old env light calculation function that used mipmaps
+// It is commented out for reference
 vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 {
     // Calculate mipmap level based on roughness
@@ -183,6 +216,7 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
     // Calculate final light color
     return CalcLight(color.rgb, normal, lightDir, viewDir, material, 0.0);
 }
+*/
 
 // Calculates the color of directional light
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow)

@@ -295,17 +295,23 @@ void Renderer::LightPass(float interpolation, const IntForm& intForm)
     glBindTexture(GL_TEXTURE_2D_ARRAY, mShadowRenderer.DepthMapId());
     glUniform1i(glGetUniformLocation(progId, "uShadowMap"), 4);
 
+    // Bind the irradiance cube
+    GLuint irrMapId = intForm.irrMapId;
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, irrMapId);
+    glUniform1i(glGetUniformLocation(progId, "irrMap"), 5);
+
     // Bind the skybox cube
     GLuint envMapId = intForm.skyboxId;
-    glActiveTexture(GL_TEXTURE5);
-    glUniform1i(glGetUniformLocation(progId, "skybox"), 5);
+    glActiveTexture(GL_TEXTURE6);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envMapId);
+    glUniform1i(glGetUniformLocation(progId, "skybox"), 6);
 
     // Bind the skysphere
     GLuint skysphereId = intForm.skysphereId;
-    glActiveTexture(GL_TEXTURE6);
+    glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_2D, skysphereId);
-    glUniform1i(glGetUniformLocation(progId, "skysphere"), 6);
+    glUniform1i(glGetUniformLocation(progId, "skysphere"), 7);
 
     // Pass the screen size
     glUniform2i(glGetUniformLocation(progId, "gScreenSize"), mScreenWidth, mScreenHeight);

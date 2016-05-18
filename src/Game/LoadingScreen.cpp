@@ -40,6 +40,14 @@ void LoadingScreen::LoadFileData()
     , "ext/Assets/Textures/Skybox/Bluesky/bottom.jpg"
     , "ext/Assets/Textures/Skybox/Bluesky/back.jpg"
     , "ext/Assets/Textures/Skybox/Bluesky/front.jpg"
+    // Irradiance map
+    , "ext/Assets/Textures/Skybox/Bluesky/Irradiance/right.jpg"
+    , "ext/Assets/Textures/Skybox/Bluesky/Irradiance/left.jpg"
+    , "ext/Assets/Textures/Skybox/Bluesky/Irradiance/top.jpg"
+    , "ext/Assets/Textures/Skybox/Bluesky/Irradiance/bottom.jpg"
+    , "ext/Assets/Textures/Skybox/Bluesky/Irradiance/back.jpg"
+    , "ext/Assets/Textures/Skybox/Bluesky/Irradiance/front.jpg"
+
       // Skysphere
     , "ext/Assets/Textures/Skysphere/Day Sun Peak Summersky.png"
       // Textures

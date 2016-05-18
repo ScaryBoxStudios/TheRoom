@@ -60,6 +60,19 @@ void MainScreen::onInit(ScreenContext& sc)
         }
     );
 
+    // Load the irr map
+    mIrrMap = std::make_unique<Skybox>();
+    mIrrMap->Load(
+        {
+            { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/right.jpg"], "jpg") },
+            { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/left.jpg"],  "jpg") },
+            { Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/top.jpg"],   "jpg") },
+            { Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/bottom.jpg"],"jpg") },
+            { Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/back.jpg"],  "jpg") },
+            { Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/front.jpg"], "jpg") }
+        }
+    );
+
     // Do not show AABBs by default
     mShowAABBs = false;
 
@@ -334,8 +347,9 @@ void MainScreen::onRender(float interpolation)
     // Convert render form to int form
     auto intForm = bakeIntForm(*mRenderformCreator);
 
-    // Add skybox id to intform
+    // Add skybox and irrMap id to intform
     intForm.skyboxId = mSkybox->GetCubemap()->Id();
+    intForm.irrMapId = mIrrMap->GetCubemap()->Id();
 
     // Render
     mEngine->GetRenderer().SetView(view);

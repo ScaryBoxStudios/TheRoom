@@ -83,6 +83,7 @@ void main(void)
         result += CalcPointLight(pLight, norm, FragPos, viewDir, material);
     else if (lMode == 3)
         result += CalcEnvLight(norm, FragPos, viewDir, material);
+        //result += vec3(0.0);
 
     // result += CalcSpotLight(spotLight, norm, FragPos, viewDir, material);
 

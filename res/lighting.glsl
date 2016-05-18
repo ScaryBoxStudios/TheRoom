@@ -112,25 +112,25 @@ vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughnes
     float NdotV = max(1e-5, dot(N, V));
     float VdotH = clamp(dot(V, H), 1e-5, 1.0);
 
-    // Specular vs Diffuse
-    //vec3 C0 = mix(vec3(1.0), baseColor, metallic)
-    vec3 C0 = baseColor * metallic + vec3(1.0) * (1.0 - metallic);
+    // Calc colors
+    vec3 cdiff = (1 - metallic) * baseColor;
+    vec3 cspec = mix(vec3(1.0), baseColor, metallic);
 
     // Calculate fresnel
-    vec3 F = Fresnel(C0, VdotH);
+    vec3 F = Fresnel(cspec, VdotH);
 
     // Specular and diffuse contributions
     vec3 Ks = F * reflectivity;
-    vec3 Kd = (1.0 - Ks) * (1.0 - metallic); // * (1.0 - transparency);
+    vec3 Kd = (1.0 - Ks); // * (1.0 - transparency);
 
     // Calculate Distribution and Geometrical Attenuation
     float G = GeometricalAttenuation(NdotH, NdotV, VdotH, NdotL);
     float D = BeckmannDistribution(roughness, NdotH);
 
     // Final results
-    vec3 specular = Ks * D * G / (NdotV * NdotL * 4);
-    vec3 diffuse  = Kd * baseColor / pi;
-    return specular + diffuse;
+    vec3 d = Kd * cdiff / pi;
+    vec3 s = Ks * D * G / (NdotV * NdotL * 4);
+    return d + s;
 }
 
 vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Material material, float shadowFactor)

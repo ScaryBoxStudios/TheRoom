@@ -374,7 +374,7 @@
             "type": "goldr3",
             "color":  [255, 213, 98, 255],
             "roughness": 0.3,
-            "fresnel": 0.1,
+            "fresnel": 0.9,
             "metallic": 1
         },
         {
@@ -382,7 +382,7 @@
             "type": "goldr5",
             "color":  [255, 213, 98, 255],
             "roughness": 0.5,
-            "fresnel": 0.1,
+            "fresnel": 0.9,
             "metallic": 1
         },
         {
@@ -390,7 +390,7 @@
             "type": "goldr7",
             "color":  [255, 213, 98, 255],
             "roughness": 0.7,
-            "fresnel": 0.1,
+            "fresnel": 0.9,
             "metallic": 1
         },
         {
@@ -398,7 +398,7 @@
             "type": "goldr9",
             "color":  [255, 213, 98, 255],
             "roughness": 0.9,
-            "fresnel": 0.1,
+            "fresnel": 0.9,
             "metallic": 1
         },
         {
@@ -406,7 +406,7 @@
             "type": "yellowr3",
             "color":  [255, 213, 98, 255],
             "roughness": 0.3,
-            "fresnel": 0.1,
+            "fresnel": 0.02,
             "metallic": 0
         },
         {
@@ -414,7 +414,7 @@
             "type": "yellowr5",
             "color":  [255, 213, 98, 255],
             "roughness": 0.5,
-            "fresnel": 0.1,
+            "fresnel": 0.02,
             "metallic": 0
         },
         {
@@ -422,7 +422,7 @@
             "type": "yellowr7",
             "color":  [255, 213, 98, 255],
             "roughness": 0.7,
-            "fresnel": 0.1,
+            "fresnel": 0.02,
             "metallic": 0
         },
         {
@@ -430,7 +430,7 @@
             "type": "yellowr9",
             "color":  [255, 213, 98, 255],
             "roughness": 0.9,
-            "fresnel": 0.1,
+            "fresnel": 0.02,
             "metallic": 0
         }
 

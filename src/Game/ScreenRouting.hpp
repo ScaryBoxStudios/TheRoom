@@ -47,7 +47,6 @@ class ScreenRouter
         ScreenContext mScrContext;
         // Various transition callbacks
         std::function<void()> mOnMainScrNext;
-        std::function<void()> mOnMatScrNext;
 };
 
 #endif // ! _SCREEN_ROUTING_HPP_

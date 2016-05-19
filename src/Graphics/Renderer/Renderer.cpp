@@ -307,12 +307,6 @@ void Renderer::LightPass(float interpolation, const IntForm& intForm)
     glBindTexture(GL_TEXTURE_CUBE_MAP, envMapId);
     glUniform1i(glGetUniformLocation(progId, "skybox"), 6);
 
-    // Bind the skysphere
-    GLuint skysphereId = intForm.skysphereId;
-    glActiveTexture(GL_TEXTURE7);
-    glBindTexture(GL_TEXTURE_2D, skysphereId);
-    glUniform1i(glGetUniformLocation(progId, "skysphere"), 7);
-
     // Pass the screen size
     glUniform2i(glGetUniformLocation(progId, "gScreenSize"), mScreenWidth, mScreenHeight);
 

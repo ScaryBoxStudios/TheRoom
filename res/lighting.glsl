@@ -4,7 +4,6 @@
 
 uniform samplerCube skybox;
 uniform samplerCube irrMap;
-uniform sampler2D   skysphere;
 
 float saturate(float v) { return clamp(v, 0.0, 1.0); }
 vec3 saturate(vec3 v) { return clamp(v, 0.0, 1.0); }
@@ -282,9 +281,9 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
     //float mipmapLevel = CalcMipmapLevel(roughness);
 
     // Get radiance and irradiance colors
-    //vec3 rad = textureLod(skybox, reflectDir, mipmapLevel).rgb + textureLod(skysphere, reflectDir.xy, mipmapLevel).rgb;
+    //vec3 rad = textureLod(skybox, reflectDir, mipmapLevel).rgb;
     //vec3 rad = radiance(normal, viewDir, metallic, roughness);
-    vec3 rad = texture(skybox, reflectDir).rgb + texture(skysphere, reflectDir.xy).rgb;
+    vec3 rad = texture(skybox, reflectDir).rgb;
     vec3 irr = texture(irrMap, reflectDir).rgb;
     irr *= material.diffuse;
 
@@ -313,7 +312,7 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
     vec3 mixed = reflectDir;
 
     // Get color from env map
-    vec4 color = textureLod(skybox, mixed, mipmapLevel) + textureLod(skysphere, mixed.xy, mipmapLevel);
+    vec4 color = textureLod(skybox, mixed, mipmapLevel);
 
     // Set lightDir
     vec3 lightDir = reflectDir;

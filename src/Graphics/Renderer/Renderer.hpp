@@ -71,7 +71,6 @@ class Renderer
             std::vector<MaterialVecEntry> materials;
             GLuint                        skyboxId    = 0;
             GLuint                        irrMapId    = 0;
-            GLuint                        skysphereId = 0;
         };
 
         struct ShaderPrograms

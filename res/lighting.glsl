@@ -94,16 +94,23 @@ float BeckmannDistribution(float roughness, float NdotH)
 {
     float a  = roughness * roughness;
     float NdotH2 = NdotH * NdotH;
-    return exp((NdotH2 - 1.0) / (a * NdotH2)) / (pi * a * pow(NdotH, 4.0));
+    return exp((NdotH2 - 1.0) / (0.01 + a * NdotH2)) / (0.01 + pi * a * NdotH2 * NdotH2);
 }
 
 // Slick's approximation
 // Pass the reflected color at normal angle directly
-vec3 Fresnel(vec3 R0, float VdotH)
+//vec3 Fresnel(vec3 R0, float VdotH)
+//{
+//    float u5 = pow(1.0 - VdotH, 5);
+//    return R0.rgb + (vec3(1.0) - R0.rgb) * vec3(u5);
+//    //return mix(vec3(u5), vec3(1.0), R0.rgb));
+//}
+
+float Fresnel(float F0, float VdotH)
 {
-    float u5 = pow(1.0 - VdotH, 5);
-    return R0.rgb + (vec3(1.0) - R0.rgb) * vec3(u5);
-    //return mix(vec3(u5), vec3(1.0), R0.rgb));
+    float u = 1.0 - VdotH;
+    float u5 = u * u * u * u * u;
+    return mix(u5, 1.0, F0);
 }
 
 vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity, vec3 cdiff, vec3 cspec)
@@ -115,11 +122,12 @@ vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughnes
     float VdotH = clamp(dot(V, H), 1e-5, 1.0);
 
     // Calculate fresnel
-    vec3 F = Fresnel(cspec, VdotH);
+    //vec3 F = Fresnel(cspec, VdotH);
+    float F = Fresnel(reflectivity, VdotH);
 
     // Specular and diffuse contributions
-    vec3 Ks = F * reflectivity;
-    vec3 Kd = (1.0 - Ks); // * (1.0 - transparency);
+    vec3 Ks = F * cspec;
+    vec3 Kd = vec3(1.0 - F); // * (1.0 - transparency);
 
     // Calculate Distribution and Geometrical Attenuation
     float G = GeometricalAttenuation(NdotH, NdotV, VdotH, NdotL);
@@ -127,7 +135,7 @@ vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughnes
 
     // Final results
     vec3 d = Kd * cdiff / pi;
-    vec3 s = Ks * D * G / (NdotV * NdotL * 4);
+    vec3 s = 0.25 * Ks * D * G / (1.0 + NdotV * NdotL);
     return d + s;
 }
 
@@ -281,10 +289,7 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 
     // BRDF
     vec3 brdfResult = BRDF(normal, reflectDir, viewDir, baseColor, metallic, roughness, reflectivity, irr, rad);
-
-    // Combine results
-    float NdotL = saturate(dot(normal, reflectDir));
-    return brdfResult * NdotL * NdotL;
+    return brdfResult;
 }
 
 /*
@@ -325,7 +330,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, 
 {
     vec3 lightDir = normalize(-light.direction);
     // Color
-    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow);
+    vec3 color = CalcLight(2 * light.color, normal, lightDir, viewDir, material, shadow);
     return color;
 }
 

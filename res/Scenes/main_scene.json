@@ -372,65 +372,65 @@
         {
             "id": 10,
             "type": "goldr3",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.3,
-            "fresnel": 0.9,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.12,
+            "fresnel": 0.4,
             "metallic": 1
         },
         {
             "id": 11,
             "type": "goldr5",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.5,
-            "fresnel": 0.9,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.2,
+            "fresnel": 0.4,
             "metallic": 1
         },
         {
             "id": 12,
             "type": "goldr7",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.7,
-            "fresnel": 0.9,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.3,
+            "fresnel": 0.4,
             "metallic": 1
         },
         {
             "id": 13,
             "type": "goldr9",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.9,
-            "fresnel": 0.9,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.4,
+            "fresnel": 0.4,
             "metallic": 1
         },
         {
             "id": 14,
             "type": "yellowr3",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.3,
-            "fresnel": 0.3,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.1,
+            "fresnel": 0.05,
             "metallic": 0
         },
         {
             "id": 15,
             "type": "yellowr5",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.5,
-            "fresnel": 0.3,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.2,
+            "fresnel": 0.05,
             "metallic": 0
         },
         {
             "id": 16,
             "type": "yellowr7",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.7,
-            "fresnel": 0.3,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.4,
+            "fresnel": 0.05,
             "metallic": 0
         },
         {
             "id": 17,
             "type": "yellowr9",
-            "color":  [255, 213, 98, 255],
-            "roughness": 0.9,
-            "fresnel": 0.3,
+            "color":  [255, 150, 90, 255],
+            "roughness": 0.6,
+            "fresnel": 0.05,
             "metallic": 0
         }
 

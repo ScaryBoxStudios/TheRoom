@@ -24,6 +24,9 @@ static std::unordered_map<std::string, ShaderProgram> LoadShaders()
       , "res/Shaders/light_pass_frag.glsl"
       , "res/Shaders/lighting.glsl"
       , "res/Shaders/shadowing.glsl"
+      , "res/Shaders/material.glsl"
+      , "res/Shaders/brdf.glsl"
+      , "res/Shaders/math.glsl"
     };
 
     std::unordered_map<std::string, std::string> loadedShaders;

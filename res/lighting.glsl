@@ -80,13 +80,6 @@ float BeckmannDistribution(float roughness, float NdotH)
 
 // Slick's approximation
 // Pass the reflected color at normal angle directly
-//vec3 Fresnel(vec3 R0, float VdotH)
-//{
-//    float u5 = pow(1.0 - VdotH, 5);
-//    return R0.rgb + (vec3(1.0) - R0.rgb) * vec3(u5);
-//    //return mix(vec3(u5), vec3(1.0), R0.rgb));
-//}
-
 float Fresnel(float F0, float VdotH)
 {
     float u = 1.0 - VdotH;
@@ -103,7 +96,6 @@ vec3 BRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float roughnes
     float VdotH = clamp(dot(V, H), 1e-5, 1.0);
 
     // Calculate fresnel
-    //vec3 F = Fresnel(cspec, VdotH);
     float F = Fresnel(reflectivity, VdotH);
 
     // Specular and diffuse contributions
@@ -291,39 +283,6 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
     vec3 brdfResult = BRDF(normal, reflectDir, viewDir, baseColor, metallic, roughness, reflectivity, irr, rad);
     return brdfResult;
 }
-
-/*
-// Old env light calculation function that used mipmaps
-// It is commented out for reference
-vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
-{
-    // Calculate mipmap level based on roughness
-    float lodRegulator = 512.0;
-    float levels = float(textureQueryLevels(skybox)) - 1;
-    float mx = log2(material.roughness * lodRegulator + 1) / log2(lodRegulator);
-    float mipmapLevel = mx * levels;
-    if (mipmapLevel > 6)
-        mipmapLevel = 6;
-
-    // Calculate reflection dir
-    vec3 reflectDir = reflect(-viewDir, normal);
-    //vec3 mixed = mix(normal, reflectDir, material.roughness);
-    //vec3 mixed = mix(reflectDir, normal, material.roughness);
-    vec3 mixed = reflectDir;
-
-    // Get color from env map
-    vec4 color = textureLod(skybox, mixed, mipmapLevel);
-
-    // Set lightDir
-    vec3 lightDir = reflectDir;
-    //vec3 lightDir = normal;
-    float NdotL   = max(dot(normal, lightDir), 0.0);
-    color *= NdotL;
-
-    // Calculate final light color
-    return CalcLight(color.rgb, normal, lightDir, viewDir, material, 0.0);
-}
-*/
 
 // Calculates the color of directional light
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, float shadow)

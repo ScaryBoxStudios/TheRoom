@@ -381,7 +381,7 @@
             "id": 11,
             "type": "bronzer2",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.2,
+            "roughness": 0.25,
             "fresnel": 0.4,
             "metallic": 1
         },
@@ -413,7 +413,7 @@
             "id": 15,
             "type": "brownr2",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.2,
+            "roughness": 0.25,
             "fresnel": 0.05,
             "metallic": 0
         },

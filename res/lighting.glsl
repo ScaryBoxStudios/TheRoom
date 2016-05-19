@@ -64,24 +64,6 @@ float CalcAttenuationValue(AttenuationProps attProps, vec3 lightPos, vec3 fragPo
     return attenuation;
 }
 
-// Calculates specular intensity according to the Phong model
-float CalcPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
-{
-    vec3 reflectDir = reflect(-lightDir, normal);
-    float specAngle = max(dot(viewDir, reflectDir), 0.0);
-    float spec = pow(specAngle, shininess);
-    return spec;
-}
-
-// Calculates specular intensity according to the Blinn - Phong model
-float CalcBlinnPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
-{
-    vec3 halfDir = normalize(lightDir + viewDir);
-    float specAngle = max(dot(halfDir, normal), 0.0);
-    float spec = pow(specAngle, shininess * 4);
-    return spec;
-}
-
 float GeometricalAttenuation(float NdotH, float NdotV, float VdotH, float NdotL)
 {
     float NH2 = 2.0 * NdotH;
@@ -358,4 +340,25 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Mat
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     return color * attenuation * intensity;
+}
+
+//--------------------------------------------------
+// Legacy
+//--------------------------------------------------
+// Calculates specular intensity according to the Phong model
+float CalcPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
+{
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float specAngle = max(dot(viewDir, reflectDir), 0.0);
+    float spec = pow(specAngle, shininess);
+    return spec;
+}
+
+// Calculates specular intensity according to the Blinn - Phong model
+float CalcBlinnPhongSpec(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
+{
+    vec3 halfDir = normalize(lightDir + viewDir);
+    float specAngle = max(dot(halfDir, normal), 0.0);
+    float spec = pow(specAngle, shininess * 4);
+    return spec;
 }

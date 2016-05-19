@@ -65,17 +65,18 @@ float CalcAttenuationValue(AttenuationProps attProps, vec3 lightPos, vec3 fragPo
 
 float GeometricalAttenuation(float NdotH, float NdotV, float VdotH, float NdotL)
 {
-    float NH2 = 2.0 * NdotH;
-    float g1  = (NH2 * NdotV) / VdotH;
-    float g2  = (NH2 * NdotL) / VdotH;
+    float NH2 = 2.0 * NdotH / VdotH;
+    float g1  = NH2 * NdotV;
+    float g2  = NH2 * NdotL;
     return min(1.0, min(g1, g2));
 }
 
 float BeckmannDistribution(float roughness, float NdotH)
 {
     float a  = roughness * roughness;
-    float NdotH2 = NdotH * NdotH;
-    return exp((NdotH2 - 1.0) / (0.01 + a * NdotH2)) / (0.01 + pi * a * NdotH2 * NdotH2);
+    float NdotH2  = NdotH * NdotH;
+    float aNdotH2 = a * NdotH2;
+    return exp((NdotH2 - 1.0) / (0.01 + aNdotH2)) / (0.01 + pi * aNdotH2 * NdotH2);
 }
 
 // Slick's approximation
@@ -160,7 +161,7 @@ vec3 MakeSample(float Theta, float Phi)
 
 // Calculates the specular influence for a surface at the current fragment
 // location. This is an approximation of the lighting integral itself.
-vec3 radiance(vec3 N, vec3 V, float metallic, float roughness)
+vec3 radiance(vec3 N, vec3 V, vec3 baseColor, float metallic, float roughness, float reflectivity)
 {
     // Helper variables
     vec3 ZAxis = vec3(0.0, 0.0, 1.0);
@@ -191,31 +192,17 @@ vec3 radiance(vec3 N, vec3 V, float metallic, float roughness)
         float phi   = pi2 * Xi.y;
         vec3 Li = MakeSample(theta, phi);
 
-        vec3 H  = normalize(Li.x * TangentX + Li.y * TangentY + Li.z * N);
-        vec3 L  = normalize(-reflect(V, H));
-
-        // Calculate dot products for BRDF
-        float NoL = abs(dot(N, L));
-        float NoH = abs(dot(N, H));
-        float VoH = abs(dot(V, H));
-        float lod = compute_lod(NumSamples, NoH, roughness);
-
-        // Fresnel
-        float Kmetallic = metallic;
-        float F = Kmetallic + (1.0 - Kmetallic) * pow(1.0 - VoH, 5.0);
-
-        // Geometrical Attenuation
-        float k = r2 * sqrt(pi2);
-        float G = NoV / (NoV * (1.0 - k) + k);
-
         // Calculate Color
+        vec3 H      = normalize(Li.x * TangentX + Li.y * TangentY + Li.z * N);
+        vec3 L      = normalize(-reflect(V, H));
+        float NoH   = abs(dot(N, H));
+        float lod   = compute_lod(NumSamples, NoH, roughness);
         vec3 LColor = textureLod(skybox, L, lod).rgb;
 
-        // Since the sample is skewed towards the Distribution, we don't need
-        // to evaluate all of the factors for the lighting equation. Also note
-        // that this function is calculating the specular portion, so we absolutely
-        // do not add any more diffuse here.
-        fColor += F * G * LColor * VoH / (NoH * NoV);
+        // BRDF
+        vec3 brdfResult = BRDF(N, L, V, baseColor, metallic, roughness, reflectivity);
+
+        fColor += brdfResult * LColor;
     }
 
     // Average the results
@@ -274,7 +261,7 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 
     // Get radiance and irradiance colors
     //vec3 rad = textureLod(skybox, reflectDir, mipmapLevel).rgb;
-    //vec3 rad = radiance(normal, viewDir, metallic, roughness);
+    //vec3 rad = radiance(normal, viewDir, baseColor, metallic, roughness, reflectivity);
     vec3 rad = texture(skybox, reflectDir).rgb;
     vec3 irr = texture(irrMap, reflectDir).rgb;
     irr *= material.diffuse;

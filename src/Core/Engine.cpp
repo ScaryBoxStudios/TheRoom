@@ -18,12 +18,12 @@ static std::unordered_map<std::string, ShaderProgram> LoadShaders()
     // Load the shader files
     std::vector<std::string> shaderFiles =
     {
-        "res/geometry_pass_vert.glsl"
-      , "res/geometry_pass_frag.glsl"
-      , "res/light_pass_vert.glsl"
-      , "res/light_pass_frag.glsl"
-      , "res/lighting.glsl"
-      , "res/shadowing.glsl"
+        "res/Shaders/geometry_pass_vert.glsl"
+      , "res/Shaders/geometry_pass_frag.glsl"
+      , "res/Shaders/light_pass_vert.glsl"
+      , "res/Shaders/light_pass_frag.glsl"
+      , "res/Shaders/lighting.glsl"
+      , "res/Shaders/shadowing.glsl"
     };
 
     std::unordered_map<std::string, std::string> loadedShaders;
@@ -55,15 +55,15 @@ static std::unordered_map<std::string, ShaderProgram> LoadShaders()
         {
             "geometry_pass",
             {
-                { Shader::Type::Vertex,   "res/geometry_pass_vert.glsl" },
-                { Shader::Type::Fragment, "res/geometry_pass_frag.glsl" },
+                { Shader::Type::Vertex,   "res/Shaders/geometry_pass_vert.glsl" },
+                { Shader::Type::Fragment, "res/Shaders/geometry_pass_frag.glsl" },
             }
         },
         {
             "light_pass",
             {
-                { Shader::Type::Vertex,   "res/light_pass_vert.glsl" },
-                { Shader::Type::Fragment, "res/light_pass_frag.glsl" },
+                { Shader::Type::Vertex,   "res/Shaders/light_pass_vert.glsl" },
+                { Shader::Type::Fragment, "res/Shaders/light_pass_frag.glsl" },
             }
         }
     };

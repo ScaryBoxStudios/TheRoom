@@ -323,9 +323,9 @@
             "map": 17,
             "specMap": 15,
             "nmap": 16,
-            "roughness": 0.3,
-            "fresnel": 0.02,
-            "metallic": 0,
+            "roughness": 0.5,
+            "fresnel": 0.2,
+            "metallic": 1,
             "transparency": 0.0
         },
         {
@@ -335,8 +335,8 @@
             "specMap": 18,
             "nmap": 19,
             "roughness": 0.3,
-            "fresnel": 0.8,
-            "metallic": 1,
+            "fresnel": 0.02,
+            "metallic": 0,
             "transparency": 0.0
         },
         {
@@ -345,9 +345,9 @@
             "map": 23,
             "specMap": 21,
             "nmap": 22,
-            "roughness": 0.6,
-            "fresnel": 0.9,
-            "metallic": 1,
+            "roughness": 0.5,
+            "fresnel": 0.02,
+            "metallic": 0,
             "transparency": 0.0
         },
         {
@@ -371,15 +371,15 @@
         },
         {
             "id": 10,
-            "type": "goldr3",
+            "type": "bronzer1",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.12,
+            "roughness": 0.1,
             "fresnel": 0.4,
             "metallic": 1
         },
         {
             "id": 11,
-            "type": "goldr5",
+            "type": "bronzer2",
             "color":  [255, 150, 90, 255],
             "roughness": 0.2,
             "fresnel": 0.4,
@@ -387,7 +387,7 @@
         },
         {
             "id": 12,
-            "type": "goldr7",
+            "type": "bronzer3",
             "color":  [255, 150, 90, 255],
             "roughness": 0.3,
             "fresnel": 0.4,
@@ -395,7 +395,7 @@
         },
         {
             "id": 13,
-            "type": "goldr9",
+            "type": "bronzer4",
             "color":  [255, 150, 90, 255],
             "roughness": 0.4,
             "fresnel": 0.4,
@@ -403,7 +403,7 @@
         },
         {
             "id": 14,
-            "type": "yellowr3",
+            "type": "brownr1",
             "color":  [255, 150, 90, 255],
             "roughness": 0.1,
             "fresnel": 0.05,
@@ -411,7 +411,7 @@
         },
         {
             "id": 15,
-            "type": "yellowr5",
+            "type": "brownr2",
             "color":  [255, 150, 90, 255],
             "roughness": 0.2,
             "fresnel": 0.05,
@@ -419,7 +419,7 @@
         },
         {
             "id": 16,
-            "type": "yellowr7",
+            "type": "brownr4",
             "color":  [255, 150, 90, 255],
             "roughness": 0.4,
             "fresnel": 0.05,
@@ -427,7 +427,7 @@
         },
         {
             "id": 17,
-            "type": "yellowr9",
+            "type": "brownr6",
             "color":  [255, 150, 90, 255],
             "roughness": 0.6,
             "fresnel": 0.05,
@@ -629,89 +629,89 @@
             {
                 "id": 20,
                 "type": "Mesh",
-                "name": "goldShaderBall",
+                "name": "bronzeShaderBall",
                 "transform": {
                     "position": [-20, -7, -32],
                     "scale": [3, 3, 3]
                 },
-                "materials": [10, 0],
+                "materials": [10, 4],
                 "geometry": 7
             },
             {
                 "id": 21,
                 "type": "Mesh",
-                "name": "goldShaderBall2",
+                "name": "bronzeShaderBall2",
                 "transform": {
                     "position": [-20, -7, -40],
                     "scale": [3, 3, 3]
                 },
-                "materials": [11, 0],
+                "materials": [11, 4],
                 "geometry": 7
             },
             {
                 "id": 22,
                 "type": "Mesh",
-                "name": "goldShaderBall3",
+                "name": "bronzeShaderBall3",
                 "transform": {
                     "position": [-20, -7, -48],
                     "scale": [3, 3, 3]
                 },
-                "materials": [12, 0],
+                "materials": [12, 4],
                 "geometry": 7
             },
             {
                 "id": 23,
                 "type": "Mesh",
-                "name": "goldShaderBall4",
+                "name": "bronzeShaderBall4",
                 "transform": {
                     "position": [-20, -7, -56],
                     "scale": [3, 3, 3]
                 },
-                "materials": [13, 0],
+                "materials": [13, 4],
                 "geometry": 7
             },
             {
                 "id": 24,
                 "type": "Mesh",
-                "name": "yellowBall",
+                "name": "brownBall",
                 "transform": {
                     "position": [20, -7, -32],
                     "scale": [3, 3, 3]
                 },
-                "materials": [14, 0],
+                "materials": [14, 4],
                 "geometry": 7
             },
             {
                 "id": 25,
                 "type": "Mesh",
-                "name": "yellowBall2",
+                "name": "brownBall2",
                 "transform": {
                     "position": [20, -7, -40],
                     "scale": [3, 3, 3]
                 },
-                "materials": [15, 0],
+                "materials": [15, 4],
                 "geometry": 7
             },
             {
                 "id": 26,
                 "type": "Mesh",
-                "name": "yellowBall3",
+                "name": "brownBall3",
                 "transform": {
                     "position": [20, -7, -48],
                     "scale": [3, 3, 3]
                 },
-                "materials": [16, 0],
+                "materials": [16, 4],
                 "geometry": 7
             },
             {
                 "id": 27,
                 "type": "Mesh",
-                "name": "yellowBall4",
+                "name": "brownBall4",
                 "transform": {
                     "position": [20, -7, -56],
                     "scale": [3, 3, 3]
                 },
-                "materials": [17, 0],
+                "materials": [17, 4],
                 "geometry": 7
             }
         ]

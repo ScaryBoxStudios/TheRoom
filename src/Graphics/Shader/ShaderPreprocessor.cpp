@@ -2,9 +2,9 @@
 #include <cstdint>
 #include <algorithm>
 #include <sstream>
-#include <unordered_map>
 #include <functional>
 #include <cctype>
+#include <unordered_map>
 
 // Trim from start
 static std::string& ltrim(std::string& s)
@@ -113,8 +113,7 @@ std::vector<std::string> GetModuleDeps(const std::string& source)
     return moduleDeps;
 }
 
-// Replaces the include pragma lines with their respecting contents if found on resolve map
-std::string PreprocessIncludes(const std::string& source, const std::unordered_map<std::string, std::string>& moduleMap)
+std::vector<std::string> SplitToLineChunks(const std::string& source)
 {
     // Split string to line chunks initially
     std::vector<std::string> sourceChunks;
@@ -122,7 +121,12 @@ std::string PreprocessIncludes(const std::string& source, const std::unordered_m
     std::string lineBuf;
     while (std::getline(iss, lineBuf))
         sourceChunks.push_back(std::move(lineBuf));
+    return sourceChunks;
+}
 
+// Recursively replaces the include pragma lines with their respective contents
+auto PreprocessIncludesR(const std::unordered_map<std::string, std::string>& moduleMap, std::vector<std::string>& usedModules, std::vector<std::string>& sourceChunks) -> std::vector<std::string>
+{
     // Replace include module lines with resolved content
     for (std::size_t i = 0; i < sourceChunks.size(); ++i)
     {
@@ -132,13 +136,41 @@ std::string PreprocessIncludes(const std::string& source, const std::unordered_m
             std::string include = ParseIncludeName(curLine);
             // Remove include line and replace it with module's contents
             auto modulesIt = moduleMap.find(include);
-            if (modulesIt != moduleMap.end())
+            auto usedIt = std::find(std::begin(usedModules), std::end(usedModules), include);
+            if (modulesIt != std::end(moduleMap))
             {
+                // Remove include line
                 sourceChunks.erase(std::begin(sourceChunks) + i);
-                sourceChunks.insert(std::begin(sourceChunks) + i, modulesIt->second);
+
+                // Add module source if not already added before
+                if (usedIt == std::end(usedModules))
+                {
+                    // Split module to chunks and add them to the original source chunks
+                    auto moduleChunks = SplitToLineChunks(modulesIt->second);
+                    sourceChunks.insert(std::begin(sourceChunks) + i, std::begin(moduleChunks), std::end(moduleChunks));
+
+                    // Mark module as used
+                    usedModules.push_back(include);
+
+                    // Start preprocessing from the start
+                    return PreprocessIncludesR(moduleMap, usedModules, sourceChunks);
+                }
             }
         }
     }
+
+    return sourceChunks;
+}
+
+// Replaces include pragma in source and modules with their respective contents
+std::string PreprocessIncludes(const std::string& source, const std::unordered_map<std::string, std::string>& moduleMap)
+{
+    // Split code to chunks
+    std::vector<std::string> sourceChunks = SplitToLineChunks(source);
+
+    // Preprocess those chunks
+    std::vector<std::string> usedModules;
+    sourceChunks = PreprocessIncludesR(moduleMap, usedModules, sourceChunks);
 
     // Join source chunks to single string
     std::string result;
@@ -151,32 +183,44 @@ std::string PreprocessIncludes(const std::string& source, const std::unordered_m
 // Preprocesses a given source, removing the module directive and replacing the include
 // directives with the already parsed module sources in the given map
 //
-std::string PreprocessSource(const std::string& source, const std::unordered_map<std::string, std::string>& moduleMap)
+std::string PreprocessSource(std::string& source, std::unordered_map<std::string, std::string>& moduleMap)
 {
-    std::string result = source;
-    RemoveModulePragma(result);
-    return PreprocessIncludes(result, moduleMap);
+    return PreprocessIncludes(source, moduleMap);
 }
 
-auto ShaderPreprocessor::Preprocess(const std::string& source, const std::vector<std::string>& deps) -> std::string
+auto PreprocessModules(const std::string& source, const std::vector<std::string>& deps, std::unordered_map<std::string, std::string>& loadedModules) -> std::string
 {
+    std::string sourceCopy(source);
+
     // Preparse all the needed deps
     std::vector<std::string> neededModules = GetModuleDeps(source);
-    std::unordered_map<std::string, std::string> neededModulesSources;
+
     for (const auto& dep : deps)
     {
         // Get source's corresponding module name
         std::string moduleName = GetModuleName(dep);
 
         // Check if it is on the needed module list
-        auto it = std::find(std::begin(neededModules), std::end(neededModules), moduleName);
+        auto it  = std::find(std::begin(neededModules), std::end(neededModules), moduleName);
         if (it != std::end(neededModules))
         {
+            // Check if module is already loaded
+            if (loadedModules.find(moduleName) != std::end(loadedModules))
+                continue;
+
             // Preprocess it and add its preprocessed source to the list
-            std::string preprSrc = Preprocess(dep, deps);
-            neededModulesSources.insert({moduleName, preprSrc});
+            std::string preprSrc = PreprocessModules(dep, deps, loadedModules);
+            loadedModules.insert({moduleName, preprSrc});
         }
     }
 
-    return PreprocessSource(source, neededModulesSources);
+    RemoveModulePragma(sourceCopy);
+    return sourceCopy;
+}
+
+auto ShaderPreprocessor::Preprocess(const std::string& source, const std::vector<std::string>& deps) -> std::string
+{
+    std::unordered_map<std::string, std::string> loadedModules;
+    std::string output = PreprocessModules(source, deps, loadedModules);
+    return PreprocessSource(output, loadedModules);
 }

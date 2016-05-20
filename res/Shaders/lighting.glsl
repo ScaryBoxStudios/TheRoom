@@ -1,9 +1,7 @@
 #module lighting
 #include material
 #include brdf
-
-// TODO: Add include guards to shader preprocessor
-//#include math
+#include math
 
 #extension GL_ARB_texture_query_levels : enable
 #extension GL_ARB_gpu_shader5 : enable

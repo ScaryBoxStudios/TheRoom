@@ -201,7 +201,7 @@ auto PreprocessModules(const std::string& source, const std::vector<std::string>
         std::string moduleName = GetModuleName(dep);
 
         // Check if it is on the needed module list
-        auto it  = std::find(std::begin(neededModules), std::end(neededModules), moduleName);
+        auto it = std::find(std::begin(neededModules), std::end(neededModules), moduleName);
         if (it != std::end(neededModules))
         {
             // Check if module is already loaded

@@ -18,15 +18,17 @@ static std::unordered_map<std::string, ShaderProgram> LoadShaders()
     // Load the shader files
     std::vector<std::string> shaderFiles =
     {
+        // Shaders
         "res/Shaders/geometry_pass_vert.glsl"
       , "res/Shaders/geometry_pass_frag.glsl"
       , "res/Shaders/light_pass_vert.glsl"
       , "res/Shaders/light_pass_frag.glsl"
-      , "res/Shaders/lighting.glsl"
-      , "res/Shaders/shadowing.glsl"
-      , "res/Shaders/material.glsl"
-      , "res/Shaders/brdf.glsl"
-      , "res/Shaders/math.glsl"
+        // Includes
+      , "res/Shaders/include/lighting.glsl"
+      , "res/Shaders/include/shadowing.glsl"
+      , "res/Shaders/include/material.glsl"
+      , "res/Shaders/include/brdf.glsl"
+      , "res/Shaders/include/math.glsl"
     };
 
     std::unordered_map<std::string, std::string> loadedShaders;

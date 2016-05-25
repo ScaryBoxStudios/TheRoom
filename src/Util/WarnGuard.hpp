@@ -30,55 +30,38 @@
 //=======================================================
 // Gcc
 //=======================================================
-#define GCC_WARN_GUARD_ON                           \
+#define GCC_WARN_GUARD_CLIST                        \
     DO_PRAGMA(GCC diagnostic push)                  \
     DO_PRAGMA(GCC diagnostic ignored "-Wabi")                           \
     DO_PRAGMA(GCC diagnostic ignored "-Wabi-tag")                       \
     DO_PRAGMA(GCC diagnostic ignored "-Waddress")                       \
     DO_PRAGMA(GCC diagnostic ignored "-Waggregate-return")              \
     DO_PRAGMA(GCC diagnostic ignored "-Waggressive-loop-optimizations") \
-    DO_PRAGMA(GCC diagnostic ignored "-Waliasing")                      \
-    DO_PRAGMA(GCC diagnostic ignored "-Walign-commons")                 \
     DO_PRAGMA(GCC diagnostic ignored "-Wall")                           \
-    DO_PRAGMA(GCC diagnostic ignored "-Wampersand")                     \
     DO_PRAGMA(GCC diagnostic ignored "-Warray-bounds")                  \
-    DO_PRAGMA(GCC diagnostic ignored "-Warray-temporaries")             \
-    DO_PRAGMA(GCC diagnostic ignored "-Wassign-intercept")              \
     DO_PRAGMA(GCC diagnostic ignored "-Wattributes")                    \
-    DO_PRAGMA(GCC diagnostic ignored "-Wbad-function-cast")             \
     DO_PRAGMA(GCC diagnostic ignored "-Wbool-compare")                  \
     DO_PRAGMA(GCC diagnostic ignored "-Wbuiltin-macro-redefined")       \
-    DO_PRAGMA(GCC diagnostic ignored "-Wc++-compat")                    \
     DO_PRAGMA(GCC diagnostic ignored "-Wc++11-compat")                  \
     DO_PRAGMA(GCC diagnostic ignored "-Wc++14-compat")                  \
-    DO_PRAGMA(GCC diagnostic ignored "-Wc-binding-type")                \
-    DO_PRAGMA(GCC diagnostic ignored "-Wc90-c99-compat")                \
-    DO_PRAGMA(GCC diagnostic ignored "-Wc99-c11-compat")                \
     DO_PRAGMA(GCC diagnostic ignored "-Wcast-align")                    \
     DO_PRAGMA(GCC diagnostic ignored "-Wcast-qual")                     \
     DO_PRAGMA(GCC diagnostic ignored "-Wchar-subscripts")               \
-    DO_PRAGMA(GCC diagnostic ignored "-Wcharacter-truncation")          \
     DO_PRAGMA(GCC diagnostic ignored "-Wchkp")                          \
     DO_PRAGMA(GCC diagnostic ignored "-Wclobbered")                     \
     DO_PRAGMA(GCC diagnostic ignored "-Wcomment")                       \
-    DO_PRAGMA(GCC diagnostic ignored "-Wcompare-reals")                 \
     DO_PRAGMA(GCC diagnostic ignored "-Wconditionally-supported")       \
     DO_PRAGMA(GCC diagnostic ignored "-Wconversion")                    \
-    DO_PRAGMA(GCC diagnostic ignored "-Wconversion-extra")              \
     DO_PRAGMA(GCC diagnostic ignored "-Wconversion-null")               \
     DO_PRAGMA(GCC diagnostic ignored "-Wcoverage-mismatch")             \
     DO_PRAGMA(GCC diagnostic ignored "-Wcpp")                           \
     DO_PRAGMA(GCC diagnostic ignored "-Wctor-dtor-privacy")             \
     DO_PRAGMA(GCC diagnostic ignored "-Wdate-time")                     \
-    DO_PRAGMA(GCC diagnostic ignored "-Wdeclaration-after-statement")   \
     DO_PRAGMA(GCC diagnostic ignored "-Wdelete-incomplete")             \
     DO_PRAGMA(GCC diagnostic ignored "-Wdelete-non-virtual-dtor")       \
     DO_PRAGMA(GCC diagnostic ignored "-Wdeprecated")                    \
     DO_PRAGMA(GCC diagnostic ignored "-Wdeprecated-declarations")       \
-    DO_PRAGMA(GCC diagnostic ignored "-Wdesignated-init")               \
     DO_PRAGMA(GCC diagnostic ignored "-Wdisabled-optimization")         \
-    DO_PRAGMA(GCC diagnostic ignored "-Wdiscarded-array-qualifiers")    \
-    DO_PRAGMA(GCC diagnostic ignored "-Wdiscarded-qualifiers")          \
     DO_PRAGMA(GCC diagnostic ignored "-Wdiv-by-zero")                   \
     DO_PRAGMA(GCC diagnostic ignored "-Wdouble-promotion")              \
     DO_PRAGMA(GCC diagnostic ignored "-Weffc++")                        \
@@ -96,27 +79,15 @@
     DO_PRAGMA(GCC diagnostic ignored "-Wformat-y2k")                    \
     DO_PRAGMA(GCC diagnostic ignored "-Wformat-zero-length")            \
     DO_PRAGMA(GCC diagnostic ignored "-Wfree-nonheap-object")           \
-    DO_PRAGMA(GCC diagnostic ignored "-Wfunction-elimination")          \
     DO_PRAGMA(GCC diagnostic ignored "-Wignored-qualifiers")            \
-    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit")                      \
-    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit-function-declaration") \
-    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit-int")                  \
-    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit-interface")            \
-    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit-procedure")            \
-    DO_PRAGMA(GCC diagnostic ignored "-Wincompatible-pointer-types")    \
     DO_PRAGMA(GCC diagnostic ignored "-Winherited-variadic-ctor")       \
     DO_PRAGMA(GCC diagnostic ignored "-Winit-self")                     \
     DO_PRAGMA(GCC diagnostic ignored "-Winline")                        \
-    DO_PRAGMA(GCC diagnostic ignored "-Wint-conversion")                \
     DO_PRAGMA(GCC diagnostic ignored "-Wint-to-pointer-cast")           \
-    DO_PRAGMA(GCC diagnostic ignored "-Wintrinsic-shadow")              \
-    DO_PRAGMA(GCC diagnostic ignored "-Wintrinsics-std")                \
     DO_PRAGMA(GCC diagnostic ignored "-Winvalid-memory-model")          \
     DO_PRAGMA(GCC diagnostic ignored "-Winvalid-offsetof")              \
     DO_PRAGMA(GCC diagnostic ignored "-Winvalid-pch")                   \
-    DO_PRAGMA(GCC diagnostic ignored "-Wjump-misses-init")              \
     DO_PRAGMA(GCC diagnostic ignored "-Wlarger-than-")                  \
-    DO_PRAGMA(GCC diagnostic ignored "-Wline-truncation")               \
     DO_PRAGMA(GCC diagnostic ignored "-Wliteral-suffix")                \
     DO_PRAGMA(GCC diagnostic ignored "-Wlogical-not-parentheses")       \
     DO_PRAGMA(GCC diagnostic ignored "-Wlogical-op")                    \
@@ -128,24 +99,18 @@
     DO_PRAGMA(GCC diagnostic ignored "-Wmissing-declarations")          \
     DO_PRAGMA(GCC diagnostic ignored "-Wmissing-field-initializers")    \
     DO_PRAGMA(GCC diagnostic ignored "-Wmissing-include-dirs")          \
-    DO_PRAGMA(GCC diagnostic ignored "-Wmissing-parameter-type")        \
-    DO_PRAGMA(GCC diagnostic ignored "-Wmissing-prototypes")            \
     DO_PRAGMA(GCC diagnostic ignored "-Wmultichar")                     \
     DO_PRAGMA(GCC diagnostic ignored "-Wnarrowing")                     \
-    DO_PRAGMA(GCC diagnostic ignored "-Wnested-externs")                \
     DO_PRAGMA(GCC diagnostic ignored "-Wnoexcept")                      \
     DO_PRAGMA(GCC diagnostic ignored "-Wnon-template-friend")           \
     DO_PRAGMA(GCC diagnostic ignored "-Wnon-virtual-dtor")              \
     DO_PRAGMA(GCC diagnostic ignored "-Wnonnull")                       \
     DO_PRAGMA(GCC diagnostic ignored "-Wodr")                           \
     DO_PRAGMA(GCC diagnostic ignored "-Wold-style-cast")                \
-    DO_PRAGMA(GCC diagnostic ignored "-Wold-style-declaration")         \
-    DO_PRAGMA(GCC diagnostic ignored "-Wold-style-definition")          \
     DO_PRAGMA(GCC diagnostic ignored "-Wopenmp-simd")                   \
     DO_PRAGMA(GCC diagnostic ignored "-Woverflow")                      \
     DO_PRAGMA(GCC diagnostic ignored "-Woverlength-strings")            \
     DO_PRAGMA(GCC diagnostic ignored "-Woverloaded-virtual")            \
-    DO_PRAGMA(GCC diagnostic ignored "-Woverride-init")                 \
     DO_PRAGMA(GCC diagnostic ignored "-Wpacked")                        \
     DO_PRAGMA(GCC diagnostic ignored "-Wpacked-bitfield-compat")        \
     DO_PRAGMA(GCC diagnostic ignored "-Wpadded")                        \
@@ -153,8 +118,6 @@
     DO_PRAGMA(GCC diagnostic ignored "-Wpedantic")                      \
     DO_PRAGMA(GCC diagnostic ignored "-Wpmf-conversions")               \
     DO_PRAGMA(GCC diagnostic ignored "-Wpointer-arith")                 \
-    DO_PRAGMA(GCC diagnostic ignored "-Wpointer-sign")                  \
-    DO_PRAGMA(GCC diagnostic ignored "-Wpointer-to-int-cast")           \
     DO_PRAGMA(GCC diagnostic ignored "-Wpragmas")                       \
     DO_PRAGMA(GCC diagnostic ignored "-Wproperty-assign-default")       \
     DO_PRAGMA(GCC diagnostic ignored "-Wprotocol")                      \
@@ -230,6 +193,39 @@
     DO_PRAGMA(GCC diagnostic ignored "-Wzero-as-null-pointer-constant") \
     DO_PRAGMA(GCC diagnostic ignored "-Wzerotrip")                      \
     DO_PRAGMA(GCC diagnostic ignored "-frequire-return-statement")
+
+#ifdef __cplusplus
+#define GCC_WARN_GUARD_CPPLIST \
+    DO_PRAGMA(GCC diagnostic ignored "-Wassign-intercept")              \
+    DO_PRAGMA(GCC diagnostic ignored "-Wbad-function-cast")             \
+    DO_PRAGMA(GCC diagnostic ignored "-Wc++-compat")                    \
+    DO_PRAGMA(GCC diagnostic ignored "-Wc90-c99-compat")                \
+    DO_PRAGMA(GCC diagnostic ignored "-Wc99-c11-compat")                \
+    DO_PRAGMA(GCC diagnostic ignored "-Wdeclaration-after-statement")   \
+    DO_PRAGMA(GCC diagnostic ignored "-Wdesignated-init")               \
+    DO_PRAGMA(GCC diagnostic ignored "-Wdiscarded-qualifiers")          \
+    DO_PRAGMA(GCC diagnostic ignored "-Wdiscarded-array-qualifiers")    \
+    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit")                      \
+    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit-function-declaration") \
+    DO_PRAGMA(GCC diagnostic ignored "-Wimplicit-int")                  \
+    DO_PRAGMA(GCC diagnostic ignored "-Wincompatible-pointer-types")    \
+    DO_PRAGMA(GCC diagnostic ignored "-Wint-conversion")                \
+    DO_PRAGMA(GCC diagnostic ignored "-Wjump-misses-init")              \
+    DO_PRAGMA(GCC diagnostic ignored "-Wmissing-parameter-type")        \
+    DO_PRAGMA(GCC diagnostic ignored "-Wnested-externs")                \
+    DO_PRAGMA(GCC diagnostic ignored "-Wold-style-definition")          \
+    DO_PRAGMA(GCC diagnostic ignored "-Wold-style-declaration")         \
+    DO_PRAGMA(GCC diagnostic ignored "-Woverride-init")                 \
+    DO_PRAGMA(GCC diagnostic ignored "-Wmissing-prototypes")            \
+    DO_PRAGMA(GCC diagnostic ignored "-Wpointer-sign")                  \
+    DO_PRAGMA(GCC diagnostic ignored "-Wpointer-to-int-cast")
+#else
+#define GCC_WARN_GUARD_CPPLIST
+#endif
+
+#define GCC_WARN_GUARD_ON  \
+    GCC_WARN_GUARD_CLIST   \
+    GCC_WARN_GUARD_CPPLIST
 
 #define GCC_WARN_GUARD_OFF                          \
     DO_PRAGMA(GCC diagnostic pop)

@@ -133,6 +133,15 @@ Session.vim
 *.vcxproj.user
 *.vcxproj.filters
 
+#----------------------------------
+# TeXworks
+#----------------------------------
+
+*.aux
+*.synctex.gz
+*.toc
+
+
 # Build generated
 *.obj
 *.exe
@@ -155,6 +164,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+[Dd]oc/*.pdf
 
 # Precompiled Headers
 *.ipch

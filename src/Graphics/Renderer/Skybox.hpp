@@ -53,7 +53,7 @@ class Skybox
         ~Skybox();
 
         // Loads the given image data to the current Skybox
-        void Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images);
+        void Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images, GLuint level = 0);
 
         // Renders the current Skybox
         void Render(const glm::mat4& projection, const glm::mat4& view) const;

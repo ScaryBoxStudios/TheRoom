@@ -73,6 +73,23 @@ void MainScreen::onInit(ScreenContext& sc)
         }
     );
 
+    // Load the rad map
+    mRadMap = std::make_unique<Skybox>();
+    for (unsigned int i = 0; i < 7; ++i) {
+        std::string pathPrefix = "ext/Assets/Textures/Skybox/Bluesky/Radiance/" + std::to_string(i);
+        mRadMap->Load(
+            {
+                { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/right.jpg"], "jpg") },
+                { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/left.jpg"],  "jpg") },
+                { Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)[pathPrefix + "/top.jpg"],   "jpg") },
+                { Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)[pathPrefix + "/bottom.jpg"],"jpg") },
+                { Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/back.jpg"],  "jpg") },
+                { Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/front.jpg"], "jpg") }
+            }
+            , i
+        );
+    }
+
     // Do not show AABBs by default
     mShowAABBs = false;
 
@@ -348,6 +365,7 @@ void MainScreen::onRender(float interpolation)
     // Add skybox and irrMap id to intform
     intForm.skyboxId = mSkybox->GetCubemap()->Id();
     intForm.irrMapId = mIrrMap->GetCubemap()->Id();
+    intForm.radMapId = mRadMap->GetCubemap()->Id();
 
     // Render
     mEngine->GetRenderer().SetView(view);

@@ -69,8 +69,9 @@ class Renderer
         struct IntForm
         {
             std::vector<MaterialVecEntry> materials;
-            GLuint                        skyboxId    = 0;
-            GLuint                        irrMapId    = 0;
+            GLuint skyboxId = 0;
+            GLuint irrMapId = 0;
+            GLuint radMapId = 0;
         };
 
         struct ShaderPrograms

@@ -105,9 +105,9 @@ Skybox::~Skybox()
     glDeleteVertexArrays(1, &mVao);
 }
 
-void Skybox::Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images)
+void Skybox::Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images, GLuint level /*= 0*/)
 {
-    mCubemap->SetData(images);
+    mCubemap->SetData(images, level);
 }
 
 void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const

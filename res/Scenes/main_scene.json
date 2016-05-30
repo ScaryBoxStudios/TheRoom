@@ -123,7 +123,7 @@
             "id": 11,
             "type": "bronzer2",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.25,
+            "roughness": 0.3,
             "fresnel": 0.4,
             "metallic": 1
         },
@@ -131,7 +131,7 @@
             "id": 12,
             "type": "bronzer3",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.3,
+            "roughness": 0.5,
             "fresnel": 0.4,
             "metallic": 1
         },
@@ -139,7 +139,7 @@
             "id": 13,
             "type": "bronzer4",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.4,
+            "roughness": 0.8,
             "fresnel": 0.4,
             "metallic": 1
         },
@@ -155,7 +155,7 @@
             "id": 15,
             "type": "brownr2",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.25,
+            "roughness": 0.3,
             "fresnel": 0.05,
             "metallic": 0
         },
@@ -163,7 +163,7 @@
             "id": 16,
             "type": "brownr4",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.4,
+            "roughness": 0.5,
             "fresnel": 0.05,
             "metallic": 0
         },
@@ -171,7 +171,7 @@
             "id": 17,
             "type": "brownr6",
             "color":  [255, 150, 90, 255],
-            "roughness": 0.6,
+            "roughness": 0.8,
             "fresnel": 0.05,
             "metallic": 0
         }

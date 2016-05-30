@@ -79,6 +79,9 @@ class MainScreen : public Screen
         // The irradiance skybox
         std::unique_ptr<Skybox> mIrrMap;
 
+        // The radiance skybox
+        std::unique_ptr<Skybox> mRadMap;
+
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();

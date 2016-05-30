@@ -15,7 +15,7 @@ GLuint Cubemap::Id() const
     return mTextureId;
 }
 
-void Cubemap::SetData(const std::unordered_map<Target, RawImage<>>& images)
+void Cubemap::SetData(const std::unordered_map<Target, RawImage<>>& images, GLuint level /*= 0*/)
 {
     glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
 
@@ -26,7 +26,7 @@ void Cubemap::SetData(const std::unordered_map<Target, RawImage<>>& images)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     for (const auto& p : images)
-        glTexImage2D(static_cast<GLenum>(p.first), 0, GL_RGB,
+        glTexImage2D(static_cast<GLenum>(p.first), level, GL_RGB,
                      p.second.GetProperties().width,
                      p.second.GetProperties().height,
                      0, GL_RGB, GL_UNSIGNED_BYTE, p.second.Data());

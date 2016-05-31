@@ -286,7 +286,7 @@ void MainScreen::onUpdate(float dt)
         UpdateLight(renderer, scene.get(), mMovingLightIndex, move);
     };
 
-    float increase = 0.7f;
+    float increase = 0.3f;
     if(window.IsKeyPressed(Key::Kp8))
         updLight(glm::vec3(0.0f, increase, 0.0f));
     if(window.IsKeyPressed(Key::Kp4))

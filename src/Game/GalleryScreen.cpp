@@ -45,7 +45,8 @@ void GalleryScreen::onInit(ScreenContext& sc)
     lights.dirLights.push_back(dirLight);
 
     // Camera initial position
-    mCamera.SetPos(glm::vec3(0, 0, 8));
+    mCamera.SetPos(glm::vec3(-6, 8, 12));
+    mCamera.Look(std::make_tuple(450.0f, 450.0f));
 
     // Load the skybox
     ImageLoader imLoader;

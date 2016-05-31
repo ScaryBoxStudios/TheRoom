@@ -460,30 +460,6 @@
     "images":
     [
         {
-            "id": 0,
-            "url" : "ext/Assets/Textures/Skybox/Bluesky/right.jpg"
-        },
-        {
-            "id": 1,
-            "url" : "ext/Assets/Textures/Skybox/Bluesky/left.jpg"
-        },
-        {
-            "id": 2,
-            "url" : "ext/Assets/Textures/Skybox/Bluesky/top.jpg"
-        },
-        {
-            "id": 3,
-            "url" : "ext/Assets/Textures/Skybox/Bluesky/bottom.jpg"
-        },
-        {
-            "id": 4,
-            "url" : "ext/Assets/Textures/Skybox/Bluesky/back.jpg"
-        },
-        {
-            "id": 5,
-            "url" : "ext/Assets/Textures/Skybox/Bluesky/front.jpg"
-        },
-        {
             "id": 6,
             "url" : "ext/Assets/Textures/Materials/Mahogany/mahogany_wood.jpg"
         },
@@ -566,30 +542,6 @@
     ],
     "textures":
     [
-        {
-            "id" : 0,
-            "image": 0
-        },
-        {
-            "id" : 1,
-            "image": 1
-        },
-        {
-            "id" : 2,
-            "image": 2
-        },
-        {
-            "id" : 3,
-            "image": 3
-        },
-        {
-            "id" : 4,
-            "image": 4
-        },
-        {
-            "id" : 5,
-            "image": 5
-        },
         {
             "id" : 6,
             "image": 6

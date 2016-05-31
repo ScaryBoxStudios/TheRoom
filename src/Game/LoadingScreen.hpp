@@ -32,6 +32,8 @@
 #define _LOADING_SCREEN_HPP_
 
 #include "Screen.hpp"
+#include <vector>
+#include <string>
 #include <functional>
 #include <unordered_map>
 
@@ -46,6 +48,7 @@ class LoadingScreen : public Screen
         // Transition interface
         using OnLoadedCb = std::function<void()>;
         void SetOnLoadedCb(OnLoadedCb cb);
+        void SetFileList(const std::vector<std::string>& fileList);
     private:
         // Loads file data into memory cache
         void LoadFileData();
@@ -58,6 +61,8 @@ class LoadingScreen : public Screen
         bool mFileCacheIsReady;
         // Holds the currently loading file
         std::string mCurrentlyLoading;
+        // File list to load
+        std::vector<std::string> mFileList;
         // Observer cb for finish event
         OnLoadedCb mOnLoadedCb;
 };

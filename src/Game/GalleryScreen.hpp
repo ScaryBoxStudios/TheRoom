@@ -28,26 +28,56 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SCREEN_ROUTING_HPP_
-#define _SCREEN_ROUTING_HPP_
+#ifndef _GALLERY_SCREEN_HPP_
+#define _GALLERY_SCREEN_HPP_
 
-#include "ScreenManager.hpp"
+#include "Screen.hpp"
+#include "../Graphics/Util/Camera.hpp"
+#include "../Graphics/Scene/Scene.hpp"
+#include "../Graphics/Scene/RenderformCreator.hpp"
+#include "../Graphics/Renderer/Skybox.hpp"
 
-class ScreenRouter
+class GalleryScreen : public Screen
 {
     public:
-        // Constructor
-        ScreenRouter(ScreenContext screenContext);
-
-        // Main routing setup function
-        void SetupScreenRouting(ScreenManager* screenMgr);
-
+        // Screen interface
+        void onInit(ScreenContext& sc);
+        void onUpdate(float dt);
+        void onKey(Key k, KeyAction ka);
+        void onRender(float interpolation);
+        void onShutdown();
+        // Transition interface
+        using OnNextScreenCb = std::function<void()>;
+        void SetOnNextScreenCb(OnNextScreenCb cb);
     private:
-        // The context passed to the screen instantiation actions
-        ScreenContext mScrContext;
-        // Various transition callbacks
-        std::function<void()> mOnMainScrNext;
-        std::function<void()> mOnGalleryScrNext;
+        // Engine ref
+        Engine* mEngine;
+
+        // File Data Cache ref
+        ScreenContext::FileDataCache* mFileDataCache;
+
+        // The camera view
+        std::vector<Camera::MoveDirection> CameraMoveDirections();
+        std::tuple<float, float> CameraLookOffset();
+        Camera mCamera;
+
+        // Scene
+        std::unique_ptr<Scene> mScene;
+
+        // Scene graphical handler converter
+        std::unique_ptr<RenderformCreator> mRenderformCreator;
+
+        // Callback called when transition event to next screen occurs
+        OnNextScreenCb mOnNextScreenCb;
+
+        // The skybox used
+        std::unique_ptr<Skybox> mSkybox;
+
+        // The irradiance skybox
+        std::unique_ptr<Skybox> mIrrMap;
+
+        // The radiance skybox
+        std::unique_ptr<Skybox> mRadMap;
 };
 
-#endif // ! _SCREEN_ROUTING_HPP_
+#endif // ! _GALLERY_SCREEN_HPP_

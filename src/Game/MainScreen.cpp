@@ -109,7 +109,6 @@ void MainScreen::SetupWorld()
         throw std::runtime_error("Couldn't load file (" + sceneFile + ")");
     SceneLoader sceneLoader;
     SceneFile sf = sceneLoader.Load(*sceneFileData);
-    (void) sf;
 
     SceneFactory factory(
         &mEngine->GetTextureStore(),
@@ -234,6 +233,8 @@ void MainScreen::onKey(Key k, KeyAction ka)
         else if (mMovingLightIndex == 1)
             mMovingLightIndex = 0;
     }
+    if(k == Key::F2 && ka == KeyAction::Release)
+        mOnNextScreenCb();
 }
 
 void MainScreen::onUpdate(float dt)

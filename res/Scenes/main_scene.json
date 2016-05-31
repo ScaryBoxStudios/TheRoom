@@ -347,8 +347,7 @@
                 "type": "PointLight",
                 "name": "teapot",
                 "transform": {
-                    "position": [4, 0, 0],
-                    "scale": [0.3, 0.3, 0.3]
+                    "position": [4, 0, 0]
                 },
                 "materials": [1],
                 "geometry": 1,

@@ -112,6 +112,8 @@ void Engine::Init()
     mWindow.SetFramebufferResizeHandler(
         [this](int w, int h)
         {
+            if (w == 0 && h == 0)
+                return;
             glViewport(0, 0, w, h);
             mRenderer.Resize(w, h);
             mDbgRenderer.SetWindowDimensions(w, h);

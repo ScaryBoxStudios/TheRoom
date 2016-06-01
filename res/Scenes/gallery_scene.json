@@ -22,6 +22,26 @@
         {
             "id": 3,
             "url" : "ext/Assets/Textures/Materials/Stone/brickwall_NM.jpg"
+        },
+        {
+            "id": 4,
+            "url": "ext/Assets/Textures/Models/Room/ConcreteDiff.png"
+        },
+        {
+            "id": 5,
+            "url": "ext/Assets/Textures/Models/Room/ConcreteNrm.png"
+        },
+        {
+            "id": 6,
+            "url": "ext/Assets/Textures/Models/Room/FloorDiff.png"
+        },
+        {
+            "id": 7,
+            "url": "ext/Assets/Textures/Models/Room/FloorNrm.png"
+        },
+        {
+            "id": 8,
+            "url": "ext/Assets/Textures/Models/Room/MarbleTex.png"
         }
     ],
     "textures":
@@ -41,6 +61,26 @@
         {
             "id" : 3,
             "image": 3
+        },
+        {
+            "id" : 4,
+            "image": 4
+        },
+        {
+            "id" : 5,
+            "image": 5
+        },
+        {
+            "id" : 6,
+            "image": 6
+        },
+        {
+            "id" : 7,
+            "image": 7
+        },
+        {
+            "id" : 8,
+            "image": 8
         }
     ],
     "geometries":
@@ -59,6 +99,11 @@
             "id": 2,
             "type": "shaderball",
             "url" : "ext/Assets/Models/ShaderBall.fbx"
+        },
+        {
+            "id": 3,
+            "type": "room",
+            "url" : "ext/Assets/Models/Room.fbx"
         }
     ],
     "materials":
@@ -101,6 +146,32 @@
             "fresnel": 0.9,
             "metallic": 1,
             "transparency": 0.0
+        },
+        {
+            "id": 4,
+            "type": "concrete",
+            "map": 4,
+            "nmap": 5,
+            "roughness": 0.5,
+            "fresnel": 0.04,
+            "metallic": 0
+        },
+        {
+            "id": 5,
+            "type": "floor",
+            "map": 6,
+            "nmap": 7,
+            "roughness": 0.5,
+            "fresnel": 0.04,
+            "metallic": 0
+        },
+        {
+            "id": 6,
+            "type": "marble",
+            "map": 8,
+            "roughness": 0.5,
+            "fresnel": 0.04,
+            "metallic": 0
         }
     ],
     "object":
@@ -165,6 +236,17 @@
                 },
                 "materials": [1, 3],
                 "geometry": 2
+            },
+            {
+                "id": 5,
+                "type": "Mesh",
+                "name": "room",
+                "transform": {
+                    "position": [0, -2, 0],
+                    "scale": [1, 1, 1]
+                },
+                "materials": [4, 4, 5, 6, 0, 5, 4, 5, 4, 4],
+                "geometry": 3
             }
         ]
     }

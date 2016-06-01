@@ -105,10 +105,16 @@ const std::vector<std::string> galleryFileList = {
     , "ext/Assets/Textures/Materials/Mahogany/mahogany_wood_spec.jpg"
     , "ext/Assets/Textures/Materials/Stone/brickwall.jpg"
     , "ext/Assets/Textures/Materials/Stone/brickwall_NM.jpg"
+    , "ext/Assets/Textures/Models/Room/ConcreteDiff.png"
+    , "ext/Assets/Textures/Models/Room/ConcreteNrm.png"
+    , "ext/Assets/Textures/Models/Room/FloorDiff.png"
+    , "ext/Assets/Textures/Models/Room/FloorNrm.png"
+    , "ext/Assets/Textures/Models/Room/MarbleTex.png"
       // Models
     , "ext/Assets/Models/Cube.obj"
     , "ext/Assets/Models/Teapot.obj"
     , "ext/Assets/Models/ShaderBall.fbx"
+    , "ext/Assets/Models/Room.fbx"
 };
 
 ScreenRouter::ScreenRouter(ScreenContext context)

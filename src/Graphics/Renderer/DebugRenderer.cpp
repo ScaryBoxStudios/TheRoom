@@ -25,6 +25,8 @@ out vec4 color;
 uniform ivec2 gScreenSize;
 uniform ivec2 offset;
 uniform sampler2D sampler;
+uniform sampler2DArray samplerArray;
+uniform int samplerArrayIndex;
 
 uniform int mode;
 
@@ -33,8 +35,12 @@ void main(void)
     vec2 UVCoords = (gl_FragCoord.xy - offset) / gScreenSize;
     if (mode == 0)
         color = texture(sampler, UVCoords);
-    else
+    else if (mode == 1)
         color = vec4(vec3((texture(sampler, UVCoords)).r), 1.0);
+    else if (mode == 2)
+        color = vec4(vec3(texture(samplerArray, vec3(UVCoords, samplerArrayIndex)).r), 1.0);
+    else
+        color = vec4(1.0);
 }
 )foo";
 
@@ -61,38 +67,65 @@ void DebugRenderer::Render(float interpolation)
     glDisable(GL_DEPTH_TEST);
 
     glUseProgram(mProgram->Id());
-    // Setup sampler texture
-    glUniform1i(glGetUniformLocation(mProgram->Id(), "sampler"), 0);
-    glActiveTexture(GL_TEXTURE0);
+
+    // Count total textures
+    unsigned int totalTextures = 0;
+    for (unsigned int i = 0; i < mDbgTextures.size(); ++i)
+        totalTextures += std::get<0>(mDbgTextures[i]);
+
     // Mini screen width and height
     float padding = 10;
-    float totalPadding = (mDbgTextures.size() + 1) * padding;
-    float scaleFactor = ((mWndWidth - totalPadding) / mDbgTextures.size()) / mWndWidth;
+    float totalPadding = (totalTextures + 1) * padding;
+    float scaleFactor = ((mWndWidth - totalPadding) / totalTextures) / mWndWidth;
     int curWidth = static_cast<int>(mWndWidth * scaleFactor);
     int curHeight = static_cast<int>(mWndHeight * scaleFactor);
     glUniform2i(glGetUniformLocation(mProgram->Id(), "gScreenSize"), curWidth, curHeight);
 
+    unsigned int curTex = 0;
     for (std::size_t i = 0; i < mDbgTextures.size(); ++i)
     {
+        // Get the texture count with given texture object (might be a texture array)
+        std::int8_t numTextures = std::get<0>(mDbgTextures[i]);
         // Get texture channel number
         std::uint8_t channels = std::get<1>(mDbgTextures[i]);
-
-        // Set the shader mode
-        glUniform1i(glGetUniformLocation(mProgram->Id(), "mode"), channels == 3 ? 0 : 1);
-
         // Current rendering texture
         GLuint tex = std::get<2>(mDbgTextures[i]);
 
-        // Set the viewport
-        int xOffset = static_cast<int>(padding + (curWidth + padding) * i);
-        int yOffset = static_cast<int>(padding);
-        glViewport(xOffset, yOffset, curWidth, curHeight);
-        glUniform2i(glGetUniformLocation(mProgram->Id(), "offset"), xOffset, yOffset);
+        int mode = -1;
+        GLenum texType = GL_TEXTURE_2D;
+        if (channels == 3 && numTextures == 1)
+            mode = 0;
+        else if (channels == 1 && numTextures == 1)
+            mode = 1;
+        else if (channels == 1 && numTextures > 1)
+        {
+            mode = 2;
+            texType = GL_TEXTURE_2D_ARRAY;
+        }
 
-        // Render
-        glBindTexture(GL_TEXTURE_2D, tex);
-        RenderQuad();
-        glBindTexture(GL_TEXTURE_2D, 0);
+        // Set the shader mode
+        glUniform1i(glGetUniformLocation(mProgram->Id(), "mode"), mode);
+
+        for (int j = 0; j < numTextures; ++j)
+        {
+            // Setup sampler texture
+            glActiveTexture(GL_TEXTURE0);
+            const char* samplerUniformName = texType == GL_TEXTURE_2D ? "sampler" : "samplerArray";
+            glUniform1i(glGetUniformLocation(mProgram->Id(), samplerUniformName), 0);
+            glUniform1i(glGetUniformLocation(mProgram->Id(), "samplerArrayIndex"), j);
+
+            // Set the viewport
+            int xOffset = static_cast<int>(padding + (curWidth + padding) * curTex);
+            int yOffset = static_cast<int>(padding);
+            glViewport(xOffset, yOffset, curWidth, curHeight);
+            glUniform2i(glGetUniformLocation(mProgram->Id(), "offset"), xOffset, yOffset);
+
+            // Render
+            glBindTexture(texType, tex);
+            RenderQuad();
+            glBindTexture(texType, 0);
+            ++curTex;
+        }
     }
     glUseProgram(0);
 

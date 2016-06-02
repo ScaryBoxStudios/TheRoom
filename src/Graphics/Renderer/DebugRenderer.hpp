@@ -53,7 +53,7 @@ class DebugRenderer
         // Deinitializes the renderer state
         void Shutdown();
 
-        // Channel offset - channel number - texture
+        // Array texture size - channel number - texture
         using TextureTarget = std::tuple<std::uint8_t, std::uint8_t, GLuint>;
         // Sets the debug texture targets to show
         void SetDebugTextures(const std::vector<TextureTarget>& dbgTex);

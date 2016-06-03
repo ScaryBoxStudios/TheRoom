@@ -49,3 +49,8 @@ void Console::OnKey(char k)
         mCommandBuffer += k;
     }
 }
+
+const std::string& Console::GetCommandBuffer()
+{
+    return mCommandBuffer;
+}

@@ -1,7 +1,7 @@
 #include "Skysphere.hpp"
 #include <glm/gtc/type_ptr.hpp>
-#include "../Geometry/Geometry.hpp"
-#include "../Image/PixelBufferTraits.hpp"
+#include "../../Asset/Geometry/Geometry.hpp"
+#include "../../Asset/Image/PixelBufferTraits.hpp"
 
 static const char* ssVShader = R"foo(
 #version 330 core

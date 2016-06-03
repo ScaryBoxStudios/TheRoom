@@ -35,7 +35,7 @@
 #include <vector>
 #include <unordered_map>
 #include <glad/glad.h>
-#include "Geometry.hpp"
+#include "../../Asset/Geometry/Geometry.hpp"
 
 // MeshDescription
 struct MeshDescription

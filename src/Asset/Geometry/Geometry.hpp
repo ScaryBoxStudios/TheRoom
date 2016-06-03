@@ -28,77 +28,36 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _TEXTURESTORE_HPP_
-#define _TEXTURESTORE_HPP_
+#ifndef _GEOMETRY_HPP_
+#define _GEOMETRY_HPP_
 
-#include <unordered_map>
-#include <string>
+#include <vector>
+#include <cstdint>
 #include <glad/glad.h>
-#include "../Image/PixelBufferTraits.hpp"
-#include "../Image/RawImageTraits.hpp"
+#include "../../Graphics/Scene/AABB.hpp"
 
-struct TextureDescription
+struct VertexData
 {
-    GLuint texId;
+    GLfloat vx,  vy,  vz,  // Vertices
+            nx,  ny,  nz,  // Normals
+            tx,  ty,       // TexCoords
+            tnx, tny, tnz; // Tangents
 };
 
-class TextureStore
+struct MeshData
 {
-    public:
-        // Constructor
-        TextureStore();
-
-        // Destructor
-        ~TextureStore();
-
-        // Disable copy construction
-        TextureStore(const TextureStore& other) = delete;
-        TextureStore& operator=(const TextureStore& other) = delete;
-
-        // Enable move construction
-        TextureStore(TextureStore&& other) = default;
-        TextureStore& operator=(TextureStore&& other) = default;
-
-        // Loads given texture to the gpu, returns mapping
-        template <typename PixelBuffer>
-        void Load(const std::string& name, const PixelBuffer& pb);
-
-        // Retrieves a pointer to a loader texture object
-        TextureDescription* operator[](const std::string& name);
-
-        // Unloads stored textures in the store
-        void Clear();
-
-    private:
-        std::unordered_map<std::string, TextureDescription> mTextures;
+    std::vector<VertexData> data;
+    std::vector<uint32_t> indices;
+    std::uint32_t meshIndex;
 };
 
-template <typename PixelBuffer>
-void TextureStore::Load(const std::string& name, const PixelBuffer& pb)
+struct ModelData
 {
-    // Gen texture
-    GLuint id;
-    glGenTextures(1, &id);
+    std::vector<MeshData> meshes;
+    AABB boundingBox;
+};
 
-    // Load data
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+// Generates UVSphere geometry data for the given properties
+ModelData GenUVSphere(float radius, std::uint32_t rings, std::uint32_t sectors);
 
-    GLint format = PixelBufferTraits<PixelBuffer>::Channels(pb) == 4 ? GL_RGBA : GL_RGB;
-    uint32_t width = PixelBufferTraits<PixelBuffer>::Width(pb);
-    uint32_t height = PixelBufferTraits<PixelBuffer>::Height(pb);
-    const GLvoid* data = PixelBufferTraits<PixelBuffer>::GetData(pb);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Store
-    TextureDescription td;
-    td.texId = id;
-    mTextures.insert({name, td});
-}
-
-#endif // ! _TEXTURESTORE_HPP_
+#endif // ! _GEOMETRY_HPP_

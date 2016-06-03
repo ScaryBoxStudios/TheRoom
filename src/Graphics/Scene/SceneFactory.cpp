@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <assert.h>
-#include "../Image/ImageLoader.hpp"
-#include "../Geometry/ModelLoader.hpp"
+#include "../../Asset/Image/ImageLoader.hpp"
+#include "../../Asset/Geometry/ModelLoader.hpp"
 #include "../../Util/FileLoad.hpp"
 
 SceneFactory::SceneFactory(TextureStore* tStore, ModelStore* mdlStore, MaterialStore* matStore, ScreenContext::FileDataCache* fdc)

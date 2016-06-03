@@ -33,7 +33,7 @@
 
 #include <unordered_map>
 #include <glad/glad.h>
-#include "../Image/RawImage.hpp"
+#include "../../Asset/Image/RawImage.hpp"
 #include "../../Util/Hash.hpp"
 
 class Cubemap

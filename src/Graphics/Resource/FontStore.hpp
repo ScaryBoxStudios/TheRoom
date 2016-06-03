@@ -28,36 +28,24 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _GEOMETRY_HPP_
-#define _GEOMETRY_HPP_
+#ifndef _FONT_STORE_HPP_
+#define _FONT_STORE_HPP_
 
-#include <vector>
-#include <cstdint>
-#include <glad/glad.h>
-#include "../Scene/AABB.hpp"
+#include <unordered_map>
+#include <string>
+#include "../../Asset/Font/Font.hpp"
 
-struct VertexData
+class FontStore
 {
-    GLfloat vx,  vy,  vz,  // Vertices
-            nx,  ny,  nz,  // Normals
-            tx,  ty,       // TexCoords
-            tnx, tny, tnz; // Tangents
+    public:
+        // Loads given font with name from file
+        void LoadFont(const std::string& name, const std::string& fontfile);
+
+        // Retrieves the Font for the given name
+        const Font* operator[](const std::string& name);
+
+    private:
+        std::unordered_map<std::string, Font> mFonts;
 };
 
-struct MeshData
-{
-    std::vector<VertexData> data;
-    std::vector<uint32_t> indices;
-    std::uint32_t meshIndex;
-};
-
-struct ModelData
-{
-    std::vector<MeshData> meshes;
-    AABB boundingBox;
-};
-
-// Generates UVSphere geometry data for the given properties
-ModelData GenUVSphere(float radius, std::uint32_t rings, std::uint32_t sectors);
-
-#endif // ! _GEOMETRY_HPP_
+#endif // ! _FONT_STORE_HPP_

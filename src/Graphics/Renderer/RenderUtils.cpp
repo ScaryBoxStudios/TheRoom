@@ -1,7 +1,7 @@
 #include "RenderUtils.hpp"
 #include <glad/glad.h>
 #include <GL/gl.h>
-#include "../Geometry/Geometry.hpp"
+#include "../../Asset/Geometry/Geometry.hpp"
 #include "../Util/GLUtils.hpp"
 
 void RenderQuad()

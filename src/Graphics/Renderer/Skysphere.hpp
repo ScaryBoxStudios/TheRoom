@@ -33,7 +33,7 @@
 
 #include <memory>
 #include <glad/glad.h>
-#include "../Image/RawImage.hpp"
+#include "../../Asset/Image/RawImage.hpp"
 #include "../Shader/Shader.hpp"
 
 #include "../../Util/WarnGuard.hpp"

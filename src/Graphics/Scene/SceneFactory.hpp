@@ -33,10 +33,10 @@
 
 #include <memory>
 #include "Scene.hpp"
-#include "SceneLoader.hpp"
-#include "../Texture/TextureStore.hpp"
-#include "../Geometry/ModelStore.hpp"
-#include "../Material/MaterialStore.hpp"
+#include "../../Asset/Scene/SceneLoader.hpp"
+#include "../Resource/TextureStore.hpp"
+#include "../Resource/ModelStore.hpp"
+#include "../Resource/MaterialStore.hpp"
 #include "../../Game/Screen.hpp"
 
 class SceneFactory

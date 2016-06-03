@@ -1,8 +1,8 @@
 #include "LoadingScreen.hpp"
 #include <thread>
 WARN_GUARD_ON
-#include "../Graphics/Image/ImageLoader.hpp"
-#include "../Graphics/Geometry/ModelLoader.hpp"
+#include "../Asset/Image/ImageLoader.hpp"
+#include "../Asset/Geometry/ModelLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 

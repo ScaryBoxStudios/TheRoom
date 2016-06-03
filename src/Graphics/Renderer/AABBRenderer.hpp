@@ -32,7 +32,7 @@
 #define _AABB_RENDERER_HPP_
 
 #include <memory>
-#include "../Geometry/ModelStore.hpp"
+#include "../Resource/ModelStore.hpp"
 #include "../Shader/Shader.hpp"
 #include "../Scene/Scene.hpp"
 

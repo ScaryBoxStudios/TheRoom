@@ -30,7 +30,7 @@
 /*********************************************************************************************************************/
 #include <functional>
 #include <chrono>
-#include "System/HeartBeat.hpp"
+#include "Core/HeartBeat.hpp"
 #include "Window/GlfwContext.hpp"
 #include "Game/Game.hpp"
 #include "Util/MsgBox.hpp"

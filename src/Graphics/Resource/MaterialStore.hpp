@@ -35,7 +35,7 @@
 #include <vector>
 #include <unordered_map>
 #include <glad/glad.h>
-#include "Material.hpp"
+#include "../../Asset/Material/Material.hpp"
 
 struct MaterialDescription
 {

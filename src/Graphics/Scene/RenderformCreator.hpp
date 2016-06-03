@@ -35,8 +35,8 @@
 #include <memory>
 #include <unordered_map>
 #include "Scene.hpp"
-#include "../Geometry/ModelStore.hpp"
-#include "../Material/MaterialStore.hpp"
+#include "../Resource/ModelStore.hpp"
+#include "../Resource/MaterialStore.hpp"
 #include "../Renderer/Renderer.hpp"
 
 // Forward declaration of RenderformCreator

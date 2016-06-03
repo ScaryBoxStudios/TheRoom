@@ -37,7 +37,7 @@
 #include "Light.hpp"
 #include "ShadowRenderer.hpp"
 #include "../Scene/Transform.hpp"
-#include "../Material/MaterialStore.hpp"
+#include "../Resource/MaterialStore.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON

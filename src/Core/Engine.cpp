@@ -121,6 +121,39 @@ void Engine::Init()
         }
     );
 
+    // Setup console
+    mConsole.Init();
+    mConsoleIsActive = false;
+    mWindow.AddKeyHook(
+        [this](Key k, KeyAction ka) -> bool
+        {
+            if (k == Key::F10 && ka == KeyAction::Press)
+                mConsoleIsActive = !mConsoleIsActive;
+            if (mConsoleIsActive)
+            {
+                if (k == Key::Enter && ka == KeyAction::Press)
+                {
+                    mConsole.OnKey('\r');
+                    mConsoleIsActive = false;
+                }
+                if (k == Key::Backspace && (ka == KeyAction::Press || ka == KeyAction::Repeat))
+                    mConsole.OnKey('\b');
+            }
+            return !mConsoleIsActive;
+        },
+        Window::HookPos::Start
+    );
+    mWindow.AddCharHook(
+        [this](char c) -> bool
+        {
+            if (mConsoleIsActive)
+                mConsole.OnKey(c);
+            return !mConsoleIsActive;
+        },
+        Window::HookPos::Start
+    );
+    mWindow.SetCharEnterHandler([](char){});
+
     // Load the needed shaders
     std::unordered_map<std::string, ShaderProgram> shdrProgs = LoadShaders();
 
@@ -203,6 +236,9 @@ void Engine::Render(float interpolation)
 
 void Engine::Shutdown()
 {
+    // Console
+    mConsole.Shutdown();
+
     // DebugRenderer
     mDbgRenderer.Shutdown();
 
@@ -228,6 +264,11 @@ void Engine::Shutdown()
 Window& Engine::GetWindow()
 {
     return mWindow;
+}
+
+Console& Engine::GetConsole()
+{
+    return mConsole;
 }
 
 ModelStore& Engine::GetModelStore()

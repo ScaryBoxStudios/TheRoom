@@ -28,78 +28,36 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _ENGINE_HPP_
-#define _ENGINE_HPP_
+#ifndef _CONSOLE_HPP_
+#define _CONSOLE_HPP_
 
-#include "Console.hpp"
-#include "../Window/Window.hpp"
-#include "../Graphics/Resource/TextureStore.hpp"
-#include "../Graphics/Resource/ModelStore.hpp"
-#include "../Graphics/Resource/MaterialStore.hpp"
-#include "../Graphics/Renderer/Renderer.hpp"
-#include "../Graphics/Renderer/AABBRenderer.hpp"
-#include "../Graphics/Renderer/TextRenderer.hpp"
-#include "../Graphics/Renderer/DebugRenderer.hpp"
+#include <string>
+#include <functional>
+#include <map>
+#include "../Window/Input.hpp"
 
-class Engine
+class Console
 {
     public:
-        /*! Initializes all the low level modules of the game */
+        /// Explicit initialization interface
         void Init();
-        /*! Called when updating the game state */
-        void Update(float dt);
-        /*! Called when rendering the current frame */
-        void Render(float interpolation);
-        /*! Deinitializes all the low level modules of the game */
+        /// Explicit de-initialization interface
         void Shutdown();
-
-        // Retrieves the window instance
-        Window& GetWindow();
-        // Retrieves the console instance
-        Console& GetConsole();
-
-        // Retrieves the ModelStore instance
-        ModelStore& GetModelStore();
-        // Retrieves the TextureStore instance
-        TextureStore& GetTextureStore();
-        // Retrieves the MaterialStore instance
-        MaterialStore& GetMaterialStore();
-
-        // Retrieves the renderer instance
-        Renderer& GetRenderer();
-        // Retrieves the AABB renderer instance
-        AABBRenderer& GetAABBRenderer();
-        // Retrieves the text renderer instance
-        TextRenderer& GetTextRenderer();
-        // Retrieves the debug renderer instance
-        DebugRenderer& GetDebugRenderer();
-
-        // Tries to reload the Renderer's shaders from disk
-        void ReloadShaders();
+        /// Command callback data type
+        using CommandCb = std::function<void()>;
+        /// Registers given callback to the given command
+        /// Overrides command with given name if it already exists
+        void RegisterCommand(const std::string& command, CommandCb cb);
+        /// Indicates whether a command with the given name is already registered
+        bool HasCommand(const std::string& command);
+        /// To be called when input headed towards console is received
+        void OnKey(char k);
 
     private:
-        // The interactive console instance
-        Console mConsole;
-        bool mConsoleIsActive;
-
-        // The Game Window
-        Window mWindow;
-
-        // Stores the geometry data loaded in the gpu
-        ModelStore mModelStore;
-        // Stores the textures loaded in the gpu
-        TextureStore mTextureStore;
-        // Stores the loaded materials
-        MaterialStore mMaterialStore;
-
-        // The Renderer
-        Renderer mRenderer;
-        // The AABB rendering utility
-        AABBRenderer mAABBRenderer;
-        // The Text Renderer
-        TextRenderer mTextRenderer;
-        // The Debug Renderer
-        DebugRenderer mDbgRenderer;
+        /// Holds the registered commands and their callbacks
+        std::map<std::string, CommandCb> mCommandMap;
+        /// Holds given command so far
+        std::string mCommandBuffer;
 };
 
-#endif // ! _ENGINE_HPP_
+#endif // ! _CONSOLE_HPP_

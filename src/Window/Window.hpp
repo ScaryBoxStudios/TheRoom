@@ -33,6 +33,8 @@
 
 #include <string>
 #include <functional>
+#include <vector>
+#include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Input.hpp"
@@ -63,6 +65,7 @@ class Window
         using CursorPositionChangedCb = std::function<void(double, double)>;
         using MouseScrollCb = std::function<void(double, double)>;
         using KeyPressedCb = std::function<void(Key, KeyAction)>;
+        using CharEnterCb = std::function<void(char)>;
 
         /// Default ctor
         Window();
@@ -142,6 +145,12 @@ class Window
         /// Retrieves the key press callback handler
         KeyPressedCb GetKeyPressedHandler() const;
 
+        /// Sets the char enter callback handler
+        void SetCharEnterHandler(CharEnterCb cb);
+
+        /// Retrieves the char enter callback handler
+        CharEnterCb GetCharEnterHandler() const;
+
         /// Returns true if in the frame that the function was called, the given Key was pressed
         bool IsKeyPressed(Key k) const;
 
@@ -164,6 +173,18 @@ class Window
         /// Updates also the cursor state variables for making the Cursor Diff functions usable
         void Update();
 
+        /// Hook insertion position (start or end of chain)
+        enum class HookPos { Start, End };
+        /// Key hook type
+        /// (return value of true indicates that no other callback should be called
+        using KeyPressedHookCb = std::function<bool(Key, KeyAction)>;
+        /// Registers keyboard hook to given position
+        void AddKeyHook(KeyPressedHookCb cb, HookPos pos);
+        /// Char enter hook type
+        /// (return value of true indicates that no other callback should be called
+        using CharEnterHookCb = std::function<bool(char)>;
+        void AddCharHook(CharEnterHookCb cb, HookPos pos);
+
     private:
         // Main window properties
         GLFWwindow* mWindow;
@@ -179,6 +200,14 @@ class Window
         CursorPositionChangedCb mCursorPosCb;
         MouseScrollCb mMouseScrollCb;
         KeyPressedCb mKeyPressCb;
+        CharEnterCb mCharEnterCb;
+
+        // Key state map
+        std::map<Key, KeyAction> mKeyState;
+
+        // The stored hooks
+        std::vector<KeyPressedHookCb> mKeyHooks;
+        std::vector<CharEnterHookCb> mCharHooks;
 
         // Appends current statistics to the window title if flag is true
         void UpdateTitleStats();

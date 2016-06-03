@@ -15,6 +15,8 @@ Window::Window() :
     mShowStats(false),
     mPrevTimeTicks(0)
 {
+    for (int i = 0; i < (int) Key::KeyLast; ++i)
+        mKeyState[static_cast<Key>(i)] = KeyAction::Release;
 }
 
 Window::~Window()
@@ -256,6 +258,17 @@ void Window::SetKeyPressedHandler(KeyPressedCb cb)
         Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
         Key k = static_cast<Key>(key);
         KeyAction ka = static_cast<KeyAction>(action);
+        // Run through keyboard hooks first
+        for (const auto& hook : wnd->mKeyHooks)
+        {
+            bool r = hook(k, ka);
+            if (!r)
+                return;
+        }
+        // Set key state
+        wnd->mKeyState[k] = ka;
+
+        // Call actual callback
         wnd->GetKeyPressedHandler()(k, ka);
     };
     glfwSetKeyCallback(mWindow, f);
@@ -266,9 +279,36 @@ Window::KeyPressedCb Window::GetKeyPressedHandler() const
     return mKeyPressCb;
 }
 
+void Window::SetCharEnterHandler(CharEnterCb cb)
+{
+    mCharEnterCb = cb;
+    GLFWcharfun f = [](GLFWwindow* w, unsigned int c)
+    {
+        // Char as utf8
+        char u8 = (char) c;
+        Window* wnd = static_cast<Window*>(glfwGetWindowUserPointer(w));
+        // Run through char hooks first
+        for (const auto& hook : wnd->mCharHooks)
+        {
+            bool r = hook(u8);
+            if (!r)
+                return;
+        }
+        // Call actual callback
+        wnd->GetCharEnterHandler()(u8);
+    };
+    glfwSetCharCallback(mWindow, f);
+}
+
+Window::CharEnterCb Window::GetCharEnterHandler() const
+{
+    return mCharEnterCb;
+}
+
 bool Window::IsKeyPressed(Key k) const
 {
-    return glfwGetKey(mWindow, static_cast<int>(k)) == GLFW_PRESS;
+    KeyAction ka = mKeyState.at(k);
+    return (ka == KeyAction::Press || ka == KeyAction::Repeat);
 }
 
 void Window::SetMouseGrabEnabled(bool on)
@@ -328,3 +368,28 @@ void Window::Update()
     glfwGetCursorPos(mWindow, &mCursorX, &mCursorY);
 }
 
+void Window::AddKeyHook(KeyPressedHookCb cb, HookPos pos)
+{
+    switch (pos)
+    {
+        case HookPos::Start:
+            mKeyHooks.insert(std::begin(mKeyHooks), cb);
+            break;
+        case HookPos::End:
+            mKeyHooks.insert(std::end(mKeyHooks), cb);
+            break;
+    }
+}
+
+void Window::AddCharHook(CharEnterHookCb cb, HookPos pos)
+{
+    switch (pos)
+    {
+        case HookPos::Start:
+            mCharHooks.insert(std::begin(mCharHooks), cb);
+            break;
+        case HookPos::End:
+            mCharHooks.insert(std::end(mCharHooks), cb);
+            break;
+    }
+}

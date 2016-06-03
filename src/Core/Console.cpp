@@ -50,6 +50,11 @@ void Console::OnKey(char k)
     }
 }
 
+void Console::Cancel()
+{
+    mCommandBuffer = "";
+}
+
 const std::string& Console::GetCommandBuffer()
 {
     return mCommandBuffer;

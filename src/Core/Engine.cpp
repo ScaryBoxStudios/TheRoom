@@ -139,6 +139,12 @@ void Engine::Init()
                     mConsole.OnKey('\r');
                     mConsoleIsActive = false;
                 }
+                if (k == Key::Escape && ka == KeyAction::Release)
+                {
+                    mConsole.Cancel();
+                    mConsoleIsActive = false;
+                    return false; // Do not propagate this event
+                }
                 if (k == Key::Backspace && (ka == KeyAction::Press || ka == KeyAction::Repeat))
                     mConsole.OnKey('\b');
             }

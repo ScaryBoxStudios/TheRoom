@@ -52,6 +52,8 @@ class Console
         bool HasCommand(const std::string& command);
         /// To be called when input headed towards console is received
         void OnKey(char k);
+        /// Called when the command being entered is discarded
+        void Cancel();
         /// Data fetchers to be used by the Console's renderer
         const std::string& GetCommandBuffer();
 

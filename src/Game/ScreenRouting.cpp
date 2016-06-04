@@ -5,10 +5,8 @@
 #include "MainScreen.hpp"
 #include "GalleryScreen.hpp"
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4592)
-#endif
+#include "../Util/WarnGuard.hpp"
+WARN_GUARD_ON
 const std::vector<std::string> commonFileList = {
       // Skybox
       "ext/Assets/Textures/Skybox/Bluesky/right.jpg"
@@ -120,9 +118,8 @@ const std::vector<std::string> galleryFileList = {
     , "ext/Assets/Models/ShaderBall.fbx"
     , "ext/Assets/Models/Room.fbx"
 };
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+WARN_GUARD_OFF
+
 ScreenRouter::ScreenRouter(ScreenContext context)
   : mScrContext(context)
 {

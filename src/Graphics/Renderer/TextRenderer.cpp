@@ -62,7 +62,40 @@ void TextRenderer::Init(int width, int height)
     glBindVertexArray(0);
 }
 
-void TextRenderer::RenderText(const std::string& text, float x, float y, glm::vec3 color, const std::string& font)
+/*
+ * Glyph metrics:
+ * --------------
+ *
+ *                       xmin                     xmax
+ *                        |                         |
+ *                        |<-------- width -------->|
+ *                        |                         |
+ *              |         +-------------------------+----------------- ymax
+ *              |         |    ggggggggg   ggggg    |     ^        ^
+ *              |         |   g:::::::::ggg::::g    |     |        |
+ *              |         |  g:::::::::::::::::g    |     |        |
+ *              |         | g::::::ggggg::::::gg    |     |        |
+ *              |         | g:::::g     g:::::g     |     |        |
+ *    offset_x -|-------->| g:::::g     g:::::g     |  offset_y    |
+ *              |         | g:::::g     g:::::g     |     |        |
+ *              |         | g::::::g    g:::::g     |     |        |
+ *              |         | g:::::::ggggg:::::g     |     |        |
+ *              |         |  g::::::::::::::::g     |     |      height
+ *              |         |   gg::::::::::::::g     |     |        |
+ *  baseline ---*---------|---- gggggggg::::::g-----*--------      |
+ *            / |         |             g:::::g     |              |
+ *     origin   |         | gggggg      g:::::g     |              |
+ *              |         | g:::::gg   gg:::::g     |              |
+ *              |         |  g::::::ggg:::::::g     |              |
+ *              |         |   gg:::::::::::::g      |              |
+ *              |         |     ggg::::::ggg        |              |
+ *              |         |         gggggg          |              v
+ *              |         +-------------------------+----------------- ymin
+ *              |                                   |
+ *              |------------- advance_x ---------->|
+ */
+
+void TextRenderer::RenderText(const std::string& text, float x, float y, int pixelHeight, glm::vec3 color, const std::string& font)
 {
     // Store previous blending state
     GLboolean blend = glIsEnabled(GL_BLEND);
@@ -84,16 +117,19 @@ void TextRenderer::RenderText(const std::string& text, float x, float y, glm::ve
     glActiveTexture(GL_TEXTURE0);
 
     float curX = x;
+    const Font* fontFace = mFontStore[font];
+    const int loadedPixelHeight = fontFace->GetPixelHeight();
+
     // Iterate through all input characters
     for (const char c : text)
     {
-        const Font* fontFace = mFontStore[font];
         const Font::Glyph* glyph = (*fontFace)[c];
 
-        GLfloat xPos = curX + glyph->bearing.x;
-        GLfloat yPos = y - (glyph->size.y - glyph->bearing.y);
-        GLfloat width = static_cast<GLfloat>(glyph->size.x);
-        GLfloat height = static_cast<GLfloat>(glyph->size.y);
+        GLfloat scale = (1.0f / loadedPixelHeight) * pixelHeight;
+        GLfloat xPos = curX + glyph->bearing.x * scale;
+        GLfloat yPos = y - (glyph->size.y - glyph->bearing.y) * scale;
+        GLfloat width = glyph->size.x * scale;
+        GLfloat height = glyph->size.y * scale;
 
         GLfloat vertices[6][4] =
         {
@@ -112,7 +148,7 @@ void TextRenderer::RenderText(const std::string& text, float x, float y, glm::ve
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Advance cursor for next glyph (advance is number of 1/64 pixels)
-        curX += (glyph->advance >> 6);
+        curX += (glyph->advance >> 6) * scale;
     }
 
     glBindVertexArray(0);

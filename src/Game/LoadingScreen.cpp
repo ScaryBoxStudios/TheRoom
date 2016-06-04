@@ -62,7 +62,7 @@ void LoadingScreen::onRender(float interpolation)
     std::string indicator = "Loading ";
     indicator += mCurrentlyLoading;
     indicator += "...";
-    mEngine->GetTextRenderer().RenderText(indicator, 10, 10, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
+    mEngine->GetTextRenderer().RenderText(indicator, 10, 10, 28, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");
 }
 
 void LoadingScreen::onShutdown()

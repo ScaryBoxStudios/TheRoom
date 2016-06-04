@@ -245,7 +245,7 @@ void Engine::Render(float interpolation)
         const std::string& cmdbuf = mConsole.GetCommandBuffer();
         mTextRenderer.RenderText(
             cmdbuf,
-            10, mWindow.GetHeight() - 20,
+            10, mWindow.GetHeight() - 20, 20,
             glm::vec3(0.0f, 0.0f, 1.0f),
             "visitor"
         );

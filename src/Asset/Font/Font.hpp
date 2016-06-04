@@ -72,12 +72,17 @@ class Font
         // Retrieves Glyph from the loaded font set
         const Glyph* operator[](const char c) const;
 
+        // Retrieves the loaded bitmap height in pixels
+        int GetPixelHeight() const;
+
         // Unloads the loaded font data
         void Destroy();
 
     private:
         // Stores the loaded Glyph data
         std::map<char, Glyph> mGlyphs;
+        // Stores the loaded pixel size
+        int mPixelHeight;
 };
 
 #endif // ! _FONT_HPP_

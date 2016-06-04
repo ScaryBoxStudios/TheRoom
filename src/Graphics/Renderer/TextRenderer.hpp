@@ -49,7 +49,7 @@ class TextRenderer
         void Init(int width, int height);
 
         /*! Called when rendering the current frame */
-        void RenderText(const std::string& text, float x, float y, glm::vec3 color, const std::string& font);
+        void RenderText(const std::string& text, float x, float y, int pixelHeight, glm::vec3 color, const std::string& font);
 
         /*! Deinitializes the renderer */
         void Shutdown();

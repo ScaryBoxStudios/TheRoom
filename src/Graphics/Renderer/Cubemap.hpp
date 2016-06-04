@@ -62,6 +62,9 @@ class Cubemap
         // Loads the given image data to the current Cubemap
         void SetData(const std::unordered_map<Target, RawImage<>>& images, GLuint level = 0);
 
+        // Loads image data from cross formatted image
+        void SetData(const RawImage<>& cross, GLuint level = 0);
+
     private:
         GLuint mTextureId;
 };

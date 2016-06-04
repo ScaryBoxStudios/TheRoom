@@ -110,6 +110,11 @@ void Skybox::Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images,
     mCubemap->SetData(images, level);
 }
 
+void Skybox::Load(const RawImage<>& image)
+{
+    mCubemap->SetData(image, 0);
+}
+
 void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
 {
     glDepthFunc(GL_LEQUAL);

@@ -24,7 +24,7 @@ std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const SceneFile& sceneF
 
     BakeScene(scene.get(), sceneFile.object.children);
 
-    return std::move(scene);
+    return scene;
 }
 
 void SceneFactory::LoadTextures(const std::vector<SceneFile::Texture>& textures, const std::vector<SceneFile::Image>& images)

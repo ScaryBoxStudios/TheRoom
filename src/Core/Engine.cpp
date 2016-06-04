@@ -122,9 +122,6 @@ void Engine::Init()
         }
     );
 
-    // Load default font
-    mTextRenderer.GetFontStore().LoadFont("visitor", "ext/Assets/Fonts/visitor.ttf");
-
     // Setup console
     mConsole.Init();
     mConsoleIsActive = false;
@@ -205,6 +202,9 @@ void Engine::Init()
         mWindow.GetHeight()
     );
     mDbgRenderer.SetDebugTextures(mRenderer.GetTextureTargets());
+
+    // Initialize the ConsoleRenderer
+    mConsoleRenderer.Init(&mTextRenderer);
 }
 
 void Engine::ReloadShaders()
@@ -242,15 +242,8 @@ void Engine::Render(float interpolation)
     (void) interpolation;
     // Render console
     if (mConsoleIsActive)
-    {
-        const std::string& cmdbuf = mConsole.GetCommandBuffer();
-        mTextRenderer.RenderText(
-            cmdbuf,
-            10, mWindow.GetHeight() - 20, 20,
-            glm::vec3(0.0f, 0.0f, 1.0f),
-            "visitor"
-        );
-    }
+        mConsoleRenderer.Render(mConsole, mWindow.GetWidth(), mWindow.GetHeight());
+
     // Show rendered backbuffer
     mWindow.SwapBuffers();
 }
@@ -259,6 +252,9 @@ void Engine::Shutdown()
 {
     // Console
     mConsole.Shutdown();
+
+    // ConsoleRenderer
+    mConsoleRenderer.Shutdown();
 
     // DebugRenderer
     mDbgRenderer.Shutdown();

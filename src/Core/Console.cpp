@@ -55,7 +55,7 @@ void Console::Cancel()
     mCommandBuffer = "";
 }
 
-const std::string& Console::GetCommandBuffer()
+const std::string& Console::GetCommandBuffer() const
 {
     return mCommandBuffer;
 }

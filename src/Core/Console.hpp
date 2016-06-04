@@ -55,7 +55,7 @@ class Console
         /// Called when the command being entered is discarded
         void Cancel();
         /// Data fetchers to be used by the Console's renderer
-        const std::string& GetCommandBuffer();
+        const std::string& GetCommandBuffer() const;
 
     private:
         /// Holds the registered commands and their callbacks

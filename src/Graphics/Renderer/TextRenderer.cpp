@@ -36,8 +36,8 @@ void main()
 
 void TextRenderer::Init(int width, int height)
 {
-    // Setup the ortho projection matrix
-    mProjection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
+    // Initial sizing
+    Resize(width, height);
 
     // Setup the text rendering program
     Shader vShader(textVertexSh, Shader::Type::Vertex);
@@ -60,6 +60,12 @@ void TextRenderer::Init(int width, int height)
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     glBindVertexArray(0);
+}
+
+void TextRenderer::Resize(int width, int height)
+{
+    // Setup the ortho projection matrix
+    mProjection = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height));
 }
 
 /*

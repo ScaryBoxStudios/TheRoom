@@ -116,6 +116,7 @@ void Engine::Init()
                 return;
             glViewport(0, 0, w, h);
             mRenderer.Resize(w, h);
+            mTextRenderer.Resize(w, h);
             mDbgRenderer.SetWindowDimensions(w, h);
             mDbgRenderer.SetDebugTextures(mRenderer.GetTextureTargets());
         }

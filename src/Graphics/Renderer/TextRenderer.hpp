@@ -48,6 +48,9 @@ class TextRenderer
         /*! Initializes the renderer */
         void Init(int width, int height);
 
+        /*! Called when the viewport dimensions change */
+        void Resize(int width, int height);
+
         /*! Called when rendering the current frame */
         void RenderText(const std::string& text, float x, float y, int pixelHeight, glm::vec3 color, const std::string& font);
 

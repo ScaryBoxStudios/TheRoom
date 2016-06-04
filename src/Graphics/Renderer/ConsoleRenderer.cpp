@@ -75,7 +75,7 @@ void ConsoleRenderer::Render(const Console& c, int width, int height)
 
         mTextRenderer->RenderText(
             cmdbuf,
-            xOffset + 2, yOffset + 4, 12,
+            static_cast<float>(xOffset + 2), static_cast<float>(yOffset + 4), 12,
             glm::vec3(0.1f, 0.2f, 0.7f),
             "atari"
         );

@@ -28,110 +28,37 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _PROPERTIES_HPP_
-#define _PROPERTIES_HPP_
+#ifndef _PROPERTIES_LOADER_HPP_
+#define _PROPERTIES_LOADER_HPP_
 
-#include <stdint.h>
-#include <string>
 #include <vector>
-#include "../../Util/Maybe.hpp"
+#include <stdint.h>
+#include "Properties.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
-#include <glm/glm.hpp>
+#include <rapidjson/document.h>
 WARN_GUARD_OFF
 
-namespace Properties
+void parseJson(const std::vector<std::uint8_t>& data, rapidjson::Document& doc);
+
+class PropertiesLoader
 {
-    using Id = Maybe<std::string>;
+    public:
+        using Buffer = std::vector<std::uint8_t>;
 
-    struct Color
-    {
-        std::uint8_t r = 0;
-        std::uint8_t g = 0;
-        std::uint8_t b = 0;
-        std::uint8_t a = 0;
-    };
+        template <typename T>
+        T Load(const Buffer& buf)
+        {
+            // Parse JSON
+            rapidjson::Document doc;
+            parseJson(buf, doc);
+            return Load<T>(doc);
+        }
 
-    struct Geometry
-    {
-        Id id;            // "id"
-        std::string name; // "name"
-        std::string url;  // "url"
-    };
+    private:
+        template <typename T>
+        T Load(rapidjson::Document& doc);
+};
 
-    struct Texture
-    {
-        Id id;           // "id"
-        std::string url; // "url"
-    };
-
-    struct Material
-    {
-        Id id;                      // "id"
-        Id dmap;                    // "dmap"
-        Id smap;                    // "smap"
-        Id nmap;                    // "nmap"
-        std::string name;           // "name"
-        Color color;                // "color"
-        Color emissive;             // "emissive"
-        float roughness    = 0.1f;  // "roughness"
-        float reflectivity = 0.02f; // "reflectivity"
-        float metallic     = 0;     // "metallic"
-        float transparency = 0;     // "transparency"
-        bool  wireframe    = false; // "wireframe"
-    };
-
-    struct Transform
-    {
-        glm::vec3 position; // "position"
-        glm::vec3 rotation; // "rotation"
-        glm::vec3 scale;    // "scale"
-    };
-
-    struct Model
-    {
-        Id id;                     // "id"
-        Id geometry;               // "geometry"
-        std::string name;          // "name"
-        Transform transform;       // "transform"
-        std::vector<Id> materials; // "materials"
-    };
-
-    struct ModelGroup
-    {
-        Id id;                     // "id"
-        std::vector<Model> models; // "models"
-        Transform transform;       // "transform"
-    };
-
-    struct Scene
-    {
-        std::vector<Id> models;      // "models"
-        std::vector<Id> modelGroups; // "modelGroups"
-        std::vector<Id> pointLights; // "pointLights"
-    };
-
-    // TODO: Remove them from Properties namespace during integration
-    struct MaterialFile
-    {
-        std::vector<Properties::Texture> textures;   // "textures"
-        std::vector<Properties::Material> materials; // "materials"
-    };
-
-    struct ModelFile
-    {
-        Id id;                                        // "groupId"
-        std::vector<Properties::Geometry> geometries; // "geometries"
-        std::vector<Properties::Model> models;        // "models"
-    };
-
-    struct SceneFile
-    {
-        MaterialFile extraMaterials; // "extraMaterials"
-        ModelFile extraModels;       // "extraModels"
-        Properties::Scene scene;     // "scene"
-    };
-}
-
-#endif // ! _PROPERTIES_HPP_
+#endif // ! _PROPERTIES_LOADER_HPP_

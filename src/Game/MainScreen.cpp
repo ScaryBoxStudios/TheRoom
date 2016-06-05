@@ -8,6 +8,7 @@ WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
+#include "../Asset/Properties/PropertiesLoader.hpp"
 
 // Skybox, irrmap and Radmap names for cubemap store
 const std::string skybox = "main_skybox";
@@ -80,6 +81,16 @@ void MainScreen::onInit(ScreenContext& sc)
 
 void MainScreen::SetupWorld()
 {
+    // Test new properties loader
+    {
+        std::string testFile = "res/Test/testscene.json";
+        auto testData = FileLoad<BufferType>(testFile);
+        if (!testData)
+            throw std::runtime_error("Couldn't load file (" + testFile + ")");
+        PropertiesLoader propertiesLoader;
+        auto test = propertiesLoader.Load<Properties::SceneFile>(*testData);
+    }
+
     // Load sample scene file
     std::string sceneFile = "res/Scenes/main_scene.json";
     auto sceneFileData = FileLoad<BufferType>(sceneFile);

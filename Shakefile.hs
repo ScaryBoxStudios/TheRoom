@@ -603,6 +603,29 @@ findProjectFile = do
                     return Nothing
                 Right cfg -> return $ Just cfg
 
+gatherIncPaths :: [FilePath] -> FilePath -> Action [String]
+gatherIncPaths addIncl depsFolder = do
+    depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
+    liftM (("include" : addIncl) ++) $
+          if depsFolderExists
+              then do
+                  deps <- Development.Shake.getDirectoryContents depsFolder
+                  rdeps <- mapM (gatherIncPaths []) [depsFolder </> l </> depsFolder | l <- deps]
+                  return $ [depsFolder </> l </> "include" | l <- deps] ++ concat rdeps
+              else
+                  return []
+
+gatherLibPaths :: Arch -> BuildVariant -> FilePath -> Action [String]
+gatherLibPaths arch variant depsFolder = do
+    depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
+    if depsFolderExists
+        then do
+          deps <- Development.Shake.getDirectoryContents depsFolder
+          rdeps <- mapM (gatherLibPaths arch variant) [depsFolder </> l </> depsFolder | l <- deps]
+          return $ [depsFolder </> l </> "lib" </> prettyShowArch arch </> show variant | l <- deps] ++ concat rdeps
+        else
+          return []
+
 main :: IO ()
 main = do
     -- Flips the second and third arguments of a function
@@ -697,13 +720,7 @@ main = do
 
                 -- Gather additional library paths
                 let depsFolder = "deps"
-                depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
-                libpaths <- if depsFolderExists
-                              then do
-                                deps <- Development.Shake.getDirectoryContents depsFolder
-                                return [depsFolder </> l </> "lib" </> prettyShowArch arch </> show variant | l <- deps]
-                              else
-                                return []
+                libpaths <- gatherLibPaths arch variant depsFolder
 
                 -- Construct the main output command
                 let outCommand =
@@ -746,14 +763,7 @@ main = do
 
                 -- Gather additional include paths
                 let depsFolder = "deps"
-                depsFolderExists <- Development.Shake.doesDirectoryExist depsFolder
-                includes <- liftM (("include" : addIncl) ++) $
-                                  if depsFolderExists
-                                    then do
-                                        deps <- Development.Shake.getDirectoryContents depsFolder
-                                        return [depsFolder </> l </> "include" | l <- deps]
-                                    else
-                                        return []
+                includes <- gatherIncPaths addIncl depsFolder
 
                 -- Construct the command to be executed
                 let compileCmd = genCompileCmd toolchain variant includes defines c out

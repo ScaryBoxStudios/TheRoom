@@ -74,10 +74,10 @@ class GalleryScreen : public Screen
         std::unique_ptr<Skybox> mSkybox;
 
         // The irradiance skybox
-        std::unique_ptr<Skybox> mIrrMap;
+        std::unique_ptr<Cubemap> mIrrMap;
 
         // The radiance skybox
-        std::unique_ptr<Skybox> mRadMap;
+        std::unique_ptr<Cubemap> mRadMap;
 };
 
 #endif // ! _GALLERY_SCREEN_HPP_

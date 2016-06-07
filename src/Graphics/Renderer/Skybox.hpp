@@ -53,7 +53,7 @@ class Skybox
         ~Skybox();
 
         // Loads skybox from faces
-        void Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images, GLuint level = 0);
+        void Load(const std::unordered_map<Cubemap::Target, RawImage<>>& images);
 
         // Loads skybox from cross image format
         void Load(const RawImage<>& image);

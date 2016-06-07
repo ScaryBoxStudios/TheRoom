@@ -61,8 +61,8 @@ void MainScreen::onInit(ScreenContext& sc)
     );
 
     // Load the irr map
-    mIrrMap = std::make_unique<Skybox>();
-    mIrrMap->Load(
+    mIrrMap = std::make_unique<Cubemap>();
+    mIrrMap->SetData(
         {
             { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/right.jpg"], "jpg") },
             { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/left.jpg"],  "jpg") },
@@ -74,10 +74,10 @@ void MainScreen::onInit(ScreenContext& sc)
     );
 
     // Load the rad map
-    mRadMap = std::make_unique<Skybox>();
+    mRadMap = std::make_unique<Cubemap>();
     for (unsigned int i = 0; i < 7; ++i) {
         std::string pathPrefix = "ext/Assets/Textures/Skybox/Bluesky/Radiance/" + std::to_string(i);
-        mRadMap->Load(
+        mRadMap->SetData(
             {
                 { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/right.jpg"], "jpg") },
                 { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/left.jpg"],  "jpg") },
@@ -365,8 +365,8 @@ void MainScreen::onRender(float interpolation)
 
     // Add skybox and irrMap id to intform
     intForm.skyboxId = mSkybox->GetCubemap()->Id();
-    intForm.irrMapId = mIrrMap->GetCubemap()->Id();
-    intForm.radMapId = mRadMap->GetCubemap()->Id();
+    intForm.irrMapId = mIrrMap->Id();
+    intForm.radMapId = mRadMap->Id();
 
     // Render
     mEngine->GetRenderer().SetView(view);

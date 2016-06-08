@@ -73,6 +73,11 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
     return lightColor * NdotL * (brdfResult + emissive) * visibility;
 }
 
+float MipmapFromRoughness(float roughness)
+{
+    return sqrt(roughness) * 7;
+}
+
 // Calculates the enviroment light contribution
 vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 {
@@ -85,7 +90,7 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
     vec3 reflectDir = reflect(-viewDir, normal);
 
     // Calculate mipmap level based on roughness
-    float mipmapLevel = min(roughness * 10, 6);
+    float mipmapLevel = MipmapFromRoughness(roughness);
 
     // Get radiance and irradiance colors
     vec3 rad = textureLod(radMap, reflectDir, mipmapLevel).rgb;

@@ -52,6 +52,9 @@ void Renderer::Init(int width, int height, std::unique_ptr<ShaderPrograms> shdrP
 
     // Define the range of the buffer that links to a uniform binding point
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, mUboMatrices, 0, 2 * sizeof(glm::mat4));
+
+    // Enable seamless cubemaps
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 }
 
 void Renderer::Resize(int width, int height)

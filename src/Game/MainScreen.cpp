@@ -47,47 +47,41 @@ void MainScreen::onInit(ScreenContext& sc)
     mCharacter.Init(&mEngine->GetWindow(), mScene.get());
 
     // Load the skybox
-    mSkybox = std::make_unique<Skybox>();
     ImageLoader imLoader;
-    mSkybox->Load(
-        {
-            { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/right.jpg"], "jpg") },
-            { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/left.jpg"],  "jpg") },
-            { Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/top.jpg"],   "jpg") },
-            { Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/bottom.jpg"],"jpg") },
-            { Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/back.jpg"],  "jpg") },
-            { Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/front.jpg"], "jpg") }
-        }
-    );
+
+    mSkybox = std::make_unique<Skybox>();
+    std::unordered_map<Cubemap::Target, RawImage> imgs;
+    imgs.emplace(std::make_pair(Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/right.jpg"],  "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/left.jpg"],   "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/top.jpg"],    "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/bottom.jpg"], "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/back.jpg"],   "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/front.jpg"],  "jpg")));
+    mSkybox->Load(imgs);
 
     // Load the irr map
     mIrrMap = std::make_unique<Cubemap>();
-    mIrrMap->SetData(
-        {
-            { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/right.jpg"], "jpg") },
-            { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/left.jpg"],  "jpg") },
-            { Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/top.jpg"],   "jpg") },
-            { Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/bottom.jpg"],"jpg") },
-            { Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/back.jpg"],  "jpg") },
-            { Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/front.jpg"], "jpg") }
-        }
-    );
+    imgs.clear();
+    imgs.emplace(std::make_pair(Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/right.jpg"],  "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/left.jpg"],   "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/top.jpg"],    "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/bottom.jpg"], "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/back.jpg"],   "jpg")));
+    imgs.emplace(std::make_pair(Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Bluesky/Irradiance/front.jpg"],  "jpg")));
+    mIrrMap->SetData(imgs);
 
     // Load the rad map
     mRadMap = std::make_unique<Cubemap>();
     for (unsigned int i = 0; i < 7; ++i) {
         std::string pathPrefix = "ext/Assets/Textures/Skybox/Bluesky/Radiance/" + std::to_string(i);
-        mRadMap->SetData(
-            {
-                { Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/right.jpg"], "jpg") },
-                { Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/left.jpg"],  "jpg") },
-                { Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)[pathPrefix + "/top.jpg"],   "jpg") },
-                { Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)[pathPrefix + "/bottom.jpg"],"jpg") },
-                { Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/back.jpg"],  "jpg") },
-                { Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/front.jpg"], "jpg") }
-            }
-            , i
-        );
+        imgs.clear();
+        imgs.emplace(std::make_pair(Cubemap::Target::Right,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/right.jpg"],  "jpg")));
+        imgs.emplace(std::make_pair(Cubemap::Target::Left,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/left.jpg"],   "jpg")));
+        imgs.emplace(std::make_pair(Cubemap::Target::Top,    imLoader.Load(*(*mFileDataCache)[pathPrefix + "/top.jpg"],    "jpg")));
+        imgs.emplace(std::make_pair(Cubemap::Target::Bottom, imLoader.Load(*(*mFileDataCache)[pathPrefix + "/bottom.jpg"], "jpg")));
+        imgs.emplace(std::make_pair(Cubemap::Target::Back,   imLoader.Load(*(*mFileDataCache)[pathPrefix + "/back.jpg"],   "jpg")));
+        imgs.emplace(std::make_pair(Cubemap::Target::Front,  imLoader.Load(*(*mFileDataCache)[pathPrefix + "/front.jpg"],  "jpg")));
+        mRadMap->SetData(imgs, i);
     }
 
     // Do not show AABBs by default

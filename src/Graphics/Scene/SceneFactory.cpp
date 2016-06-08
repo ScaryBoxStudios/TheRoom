@@ -50,8 +50,8 @@ void SceneFactory::LoadTextures(const std::vector<SceneFile::Texture>& textures,
         assert(img != std::end(images));
 
         std::string ext = img->url.substr(img->url.find_last_of(".") + 1);
-        RawImage<> pb = imageLoader.Load(*(*mFileDataCache)[img->url], ext);
-        mTextureStore->Load(std::to_string(texture.id), pb);
+        RawImage pb = imageLoader.Load(*(*mFileDataCache)[img->url], ext);
+        mTextureStore->Load(std::to_string(texture.id), std::move(pb));
     }
 }
 

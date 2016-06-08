@@ -51,7 +51,7 @@ class Skysphere
         ~Skysphere();
 
         // Loads the given image data to the current skysphere
-        void Load(const RawImage<>& image);
+        void Load(const RawImage& image);
 
         // Renders the current Skysphere
         void Render(const glm::mat4& projection, const glm::mat4& view) const;

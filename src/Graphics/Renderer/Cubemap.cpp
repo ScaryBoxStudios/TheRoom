@@ -15,7 +15,7 @@ GLuint Cubemap::Id() const
     return mTextureId;
 }
 
-void Cubemap::SetData(const std::unordered_map<Target, RawImage<>>& images, GLuint level /*= 0*/)
+void Cubemap::SetData(const std::unordered_map<Target, RawImage>& images, GLuint level /*= 0*/)
 {
     glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
 
@@ -27,8 +27,8 @@ void Cubemap::SetData(const std::unordered_map<Target, RawImage<>>& images, GLui
 
     for (const auto& p : images)
         glTexImage2D(static_cast<GLenum>(p.first), level, GL_RGB,
-                     p.second.GetProperties().width,
-                     p.second.GetProperties().height,
+                     p.second.Width(),
+                     p.second.Height(),
                      0, GL_RGB, GL_UNSIGNED_BYTE, p.second.Data());
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -67,7 +67,7 @@ static void crossFaceOffset(GLenum target, int* offx, int* offy, int width)
     }
 }
 
-void Cubemap::SetData(const RawImage<>& img, GLuint level /*= 0*/)
+void Cubemap::SetData(const RawImage& img, GLuint level /*= 0*/)
 {
     glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
 
@@ -78,10 +78,10 @@ void Cubemap::SetData(const RawImage<>& img, GLuint level /*= 0*/)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     // Calc image params
-    int stride = img.GetProperties().width;
-    int width = img.GetProperties().width / 4;
-    int height = img.GetProperties().height / 3;
-    int channels = img.GetProperties().channels;
+    int stride = img.Width();
+    int width = img.Width() / 4;
+    int height = img.Height() / 3;
+    int channels = img.Channels();
 
     // Set row read stride
     glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);

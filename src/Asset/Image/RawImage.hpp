@@ -33,47 +33,24 @@
 
 #include <vector>
 #include <cstdint>
+#include <assets/assetload.h>
 
-struct ImageProperties
-{
-    std::uint32_t width;
-    std::uint32_t height;
-    std::uint8_t channels;
-};
-
-template <typename Buffer = std::vector<std::uint8_t>>
 class RawImage
 {
     public:
-        RawImage(Buffer buf, ImageProperties props);
-        RawImage(const RawImage& other) = default;
-        RawImage& operator=(const RawImage& other) = default;
-        RawImage(RawImage&& other) = default;
-        RawImage& operator=(RawImage&& other) = default;
+        RawImage(struct image* im);
+        ~RawImage();
+        RawImage(const RawImage& other) = delete;
+        RawImage& operator=(const RawImage& other) = delete;
+        RawImage(RawImage&& other);
+        RawImage& operator=(RawImage&& other);
+        // Accessors
         const std::uint8_t* Data() const;
-        const ImageProperties& GetProperties() const;
+        std::int32_t Width() const;
+        std::int32_t Height() const;
+        std::int32_t Channels() const;
     private:
-        Buffer mData;
-        ImageProperties mProps;
+        struct image* mImage;
 };
-
-template <typename Buffer>
-RawImage<Buffer>::RawImage(Buffer buf, ImageProperties props)
-    : mData(buf),
-      mProps(props)
-{
-}
-
-template <typename Buffer>
-const std::uint8_t* RawImage<Buffer>::Data() const
-{
-    return mData.data();
-}
-
-template <typename Buffer>
-const ImageProperties& RawImage<Buffer>::GetProperties() const
-{
-    return mProps;
-}
 
 #endif // ! _RAWIMAGE_HPP_

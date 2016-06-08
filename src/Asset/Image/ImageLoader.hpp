@@ -40,10 +40,10 @@ class ImageLoader
         using Buffer = std::vector<uint8_t>;
 
         // Loads and converts image from memory
-        RawImage<Buffer> Load(const Buffer& buf, const std::string& hint);
+        RawImage Load(const Buffer& buf, const std::string& hint);
 
         // Loads and converts image from file
-        RawImage<Buffer> LoadFile(const std::string& file);
+        RawImage LoadFile(const std::string& file);
 };
 
 #endif // ! _IMAGE_LOADER_HPP_

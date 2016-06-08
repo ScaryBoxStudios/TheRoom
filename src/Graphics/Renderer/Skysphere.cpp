@@ -1,7 +1,6 @@
 #include "Skysphere.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "../../Asset/Geometry/Geometry.hpp"
-#include "../../Asset/Image/PixelBufferTraits.hpp"
 
 static const char* ssVShader = R"foo(
 #version 330 core
@@ -86,7 +85,7 @@ Skysphere::~Skysphere()
     glDeleteVertexArrays(1, &mVao);
 }
 
-void Skysphere::Load(const RawImage<>& image)
+void Skysphere::Load(const RawImage& image)
 {
     // Gen texture
     glGenTextures(1, &mTexture);
@@ -97,9 +96,9 @@ void Skysphere::Load(const RawImage<>& image)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Get upload parameters
-    GLint format = image.GetProperties().channels == 4 ? GL_RGBA : GL_RGB;
-    uint32_t width = image.GetProperties().width;
-    uint32_t height = image.GetProperties().height;
+    GLint format = image.Channels() == 4 ? GL_RGBA : GL_RGB;
+    uint32_t width = image.Width();
+    uint32_t height = image.Height();
     const GLvoid* data = image.Data();
 
     // Upload image data

@@ -38,6 +38,7 @@ void LoadingScreen::LoadFileData()
         if(!(*mFileDataCache)[file])
             throw std::runtime_error("Couldn't load file (" + file + ")");
     }
+    mCurrentlyLoading = "";
 };
 
 void LoadingScreen::onUpdate(float dt)

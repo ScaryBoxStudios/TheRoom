@@ -31,6 +31,8 @@
 #ifndef _FILELOAD_HPP_
 #define _FILELOAD_HPP_
 
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 #include <memory>
 #include <vector>
 #include <fstream>
@@ -40,30 +42,33 @@
 template <typename Buffer = std::vector<std::uint8_t>>
 std::unique_ptr<Buffer> FileLoad(const std::string& file)
 {
-    // Open file
-    std::ifstream ifs(file, std::ios::binary);
-    if (!ifs.good())
+    /* Filesize in bytes */
+    long int size = -1;
+
+    /* Try open the file */
+    FILE* f = 0;
+    f = fopen(file.c_str(), "rb");
+    if (!f)
         return std::unique_ptr<Buffer>(nullptr);
 
-    // Stop the istream_iterator from eating newlines
-    ifs.unsetf(std::ios::skipws);
+    /* Seek to its end */
+    fseek(f, 0, SEEK_END);
 
-    // Calculate total filesize
-    std::streampos sz;
-    ifs.seekg(0, std::ios::end);
-    sz = ifs.tellg();
+    /* Tell the size of the current pos */
+    size = ftell(f);
 
-    // Rewind file pointer
-    ifs.seekg(0, std::ios::beg);
+    /* Seek back */
+    fseek(f, 0, SEEK_SET);
 
     // Create buffer with preallocated size
-    Buffer buf(static_cast<std::size_t>(sz));
+    Buffer buf(static_cast<std::size_t>(size));
 
-    // Read the data into the buffer
-    buf.assign(std::istream_iterator<typename Buffer::value_type>(ifs),
-               std::istream_iterator<typename Buffer::value_type>());
+    /* Read the file in single IO operation */
+    fread(buf.data(), 1, size, f);
+
+    /* Close the file handle */
+    fclose(f);
 
     return std::make_unique<Buffer>(std::move(buf));
 }
-
 #endif // ! _FILELOAD_HPP_

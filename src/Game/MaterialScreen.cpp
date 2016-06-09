@@ -37,6 +37,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
             {
                 // Create and store the material
                 std::string materialName;
+                materialName += metallic == 1 ? "m" : "d";
                 materialName += "r" + std::to_string(roughness);
                 materialName += "f" + std::to_string(reflectivity);
                 Material m;

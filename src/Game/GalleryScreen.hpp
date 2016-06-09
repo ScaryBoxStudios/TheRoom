@@ -46,9 +46,6 @@ class GalleryScreen : public Screen
         void onKey(Key k, KeyAction ka);
         void onRender(float interpolation);
         void onShutdown();
-        // Transition interface
-        using OnNextScreenCb = std::function<void()>;
-        void SetOnNextScreenCb(OnNextScreenCb cb);
     private:
         // Engine ref
         Engine* mEngine;
@@ -66,9 +63,6 @@ class GalleryScreen : public Screen
 
         // Scene graphical handler converter
         std::unique_ptr<RenderformCreator> mRenderformCreator;
-
-        // Callback called when transition event to next screen occurs
-        OnNextScreenCb mOnNextScreenCb;
 
         // The skybox used
         std::unique_ptr<Skybox> mSkybox;

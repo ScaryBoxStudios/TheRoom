@@ -46,9 +46,6 @@ class MainScreen : public Screen
         void onKey(Key k, KeyAction ka);
         void onRender(float interpolation);
         void onShutdown();
-        // Transition interface
-        using OnNextScreenCb = std::function<void()>;
-        void SetOnNextScreenCb(OnNextScreenCb cb);
     private:
         // Called during initialization to setup the world
         void SetupWorld();
@@ -100,9 +97,6 @@ class MainScreen : public Screen
 
         // When flag on Debug info is shown
         bool mShowDbgInfo;
-
-        // Callback called when transition event to next screen occurs
-        OnNextScreenCb mOnNextScreenCb;
 };
 
 #endif // ! _MAIN_SCREEN_HPP_

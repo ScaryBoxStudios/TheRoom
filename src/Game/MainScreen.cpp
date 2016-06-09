@@ -227,8 +227,6 @@ void MainScreen::onKey(Key k, KeyAction ka)
         else if (mMovingLightIndex == 1)
             mMovingLightIndex = 0;
     }
-    if(k == Key::F2 && ka == KeyAction::Release)
-        mOnNextScreenCb();
 }
 
 void MainScreen::onUpdate(float dt)
@@ -400,9 +398,4 @@ void MainScreen::onShutdown()
     mEngine->GetModelStore().Clear();
     mEngine->GetMaterialStore().Clear();
     mEngine->GetTextureStore().Clear();
-}
-
-void MainScreen::SetOnNextScreenCb(OnNextScreenCb cb)
-{
-    mOnNextScreenCb = cb;
 }

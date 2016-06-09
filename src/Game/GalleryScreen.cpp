@@ -117,8 +117,6 @@ std::tuple<float, float> GalleryScreen::CameraLookOffset()
 
 void GalleryScreen::onKey(Key k, KeyAction ka)
 {
-    if(k == Key::F1 && ka == KeyAction::Release)
-        mOnNextScreenCb();
 }
 
 void GalleryScreen::onUpdate(float dt)
@@ -188,9 +186,4 @@ void GalleryScreen::onShutdown()
     mEngine->GetModelStore().Clear();
     mEngine->GetMaterialStore().Clear();
     mEngine->GetTextureStore().Clear();
-}
-
-void GalleryScreen::SetOnNextScreenCb(OnNextScreenCb cb)
-{
-    mOnNextScreenCb = cb;
 }

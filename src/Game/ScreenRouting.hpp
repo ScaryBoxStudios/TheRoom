@@ -45,9 +45,9 @@ class ScreenRouter
     private:
         // The context passed to the screen instantiation actions
         ScreenContext mScrContext;
-        // Various transition callbacks
-        std::function<void()> mOnMainScrNext;
-        std::function<void()> mOnGalleryScrNext;
+        // Helper functions
+        void ChangeToMainScreen(ScreenManager* screenMgr);
+        void ChangeToGalleryScreen(ScreenManager* screenMgr);
 };
 
 #endif // ! _SCREEN_ROUTING_HPP_

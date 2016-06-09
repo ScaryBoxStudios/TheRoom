@@ -125,41 +125,51 @@ ScreenRouter::ScreenRouter(ScreenContext context)
 {
 }
 
+void ScreenRouter::ChangeToMainScreen(ScreenManager* screenMgr)
+{
+    std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
+    std::vector<std::string> fl = commonFileList;
+    fl.insert(std::begin(fl), std::begin(mainFileList), std::end(mainFileList));
+    ls->SetFileList(fl);
+    ls->SetOnLoadedCb(
+        [this, screenMgr]()
+        {
+            std::unique_ptr<MainScreen> scr = std::make_unique<MainScreen>();
+            screenMgr->ReplaceScreen(std::move(scr), mScrContext);
+        }
+    );
+    screenMgr->ReplaceScreen(std::move(ls), mScrContext);
+}
+
+void ScreenRouter::ChangeToGalleryScreen(ScreenManager* screenMgr)
+{
+    std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
+    std::vector<std::string> fl = commonFileList;
+    fl.insert(std::begin(fl), std::begin(galleryFileList), std::end(galleryFileList));
+    ls->SetFileList(fl);
+    ls->SetOnLoadedCb(
+        [this, screenMgr]()
+        {
+            std::unique_ptr<GalleryScreen> scr = std::make_unique<GalleryScreen>();
+            screenMgr->ReplaceScreen(std::move(scr), mScrContext);
+        }
+    );
+    screenMgr->ReplaceScreen(std::move(ls), mScrContext);
+}
+
 void ScreenRouter::SetupScreenRouting(ScreenManager* screenMgr)
 {
-    mOnMainScrNext = [this, screenMgr]()
-    {
-        std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
-        std::vector<std::string> fl = commonFileList;
-        fl.insert(std::begin(fl), std::begin(galleryFileList), std::end(galleryFileList));
-        ls->SetFileList(fl);
-        ls->SetOnLoadedCb(
-            [this, screenMgr]()
-            {
-                std::unique_ptr<GalleryScreen> scr = std::make_unique<GalleryScreen>();
-                scr->SetOnNextScreenCb(mOnGalleryScrNext);
-                screenMgr->ReplaceScreen(std::move(scr), mScrContext);
-            }
-        );
-        screenMgr->ReplaceScreen(std::move(ls), mScrContext);
-    };
-
-    mOnGalleryScrNext = [this, screenMgr]()
-    {
-        std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
-        std::vector<std::string> fl = commonFileList;
-        fl.insert(std::begin(fl), std::begin(mainFileList), std::end(mainFileList));
-        ls->SetFileList(fl);
-        ls->SetOnLoadedCb(
-            [this, screenMgr]()
-            {
-                std::unique_ptr<MainScreen> scr = std::make_unique<MainScreen>();
-                scr->SetOnNextScreenCb(mOnMainScrNext);
-                screenMgr->ReplaceScreen(std::move(scr), mScrContext);
-            }
-        );
-        screenMgr->ReplaceScreen(std::move(ls), mScrContext);
-    };
+    mScrContext.GetEngine()->GetWindow().AddKeyHook(
+        [this, screenMgr](Key k, KeyAction ka) -> bool
+        {
+            if (k == Key::F1 && ka == KeyAction::Press)
+                ChangeToMainScreen(screenMgr);
+            else if (k == Key::F2 && ka == KeyAction::Press)
+                ChangeToGalleryScreen(screenMgr);
+            return true;
+        },
+        Window::HookPos::Start
+    );
 
     std::unique_ptr<LoadingScreen> ls = std::make_unique<LoadingScreen>();
     std::vector<std::string> fl = commonFileList;
@@ -169,7 +179,6 @@ void ScreenRouter::SetupScreenRouting(ScreenManager* screenMgr)
         [this, screenMgr]()
         {
             std::unique_ptr<MainScreen> mainScr = std::make_unique<MainScreen>();
-            mainScr->SetOnNextScreenCb(mOnMainScrNext);
             screenMgr->ReplaceScreen(std::move(mainScr), mScrContext);
         }
     );

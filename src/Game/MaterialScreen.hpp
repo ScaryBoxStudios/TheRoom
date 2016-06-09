@@ -28,27 +28,46 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SCREEN_ROUTING_HPP_
-#define _SCREEN_ROUTING_HPP_
+#ifndef _MATERIAL_SCREEN_HPP_
+#define _MATERIAL_SCREEN_HPP_
 
-#include "ScreenManager.hpp"
+#include "Screen.hpp"
+#include "../Graphics/Util/Camera.hpp"
+#include "../Graphics/Scene/Scene.hpp"
+#include "../Graphics/Scene/RenderformCreator.hpp"
+#include "../Graphics/Renderer/Skybox.hpp"
 
-class ScreenRouter
+class MaterialScreen : public Screen
 {
     public:
-        // Constructor
-        ScreenRouter(ScreenContext screenContext);
-
-        // Main routing setup function
-        void SetupScreenRouting(ScreenManager* screenMgr);
-
+        // Screen interface
+        void onInit(ScreenContext& sc);
+        void onUpdate(float dt);
+        void onKey(Key k, KeyAction ka);
+        void onRender(float interpolation);
+        void onShutdown();
     private:
-        // The context passed to the screen instantiation actions
-        ScreenContext mScrContext;
-        // Helper functions
-        void ChangeToMainScreen(ScreenManager* screenMgr);
-        void ChangeToGalleryScreen(ScreenManager* screenMgr);
-        void ChangeToMaterialScreen(ScreenManager* screenMgr);
+        // Engine ref
+        Engine* mEngine;
+        // File Data Cache ref
+        ScreenContext::FileDataCache* mFileDataCache;
+
+        // The camera view
+        std::vector<Camera::MoveDirection> CameraMoveDirections();
+        std::tuple<float, float> CameraLookOffset();
+        Camera mCamera;
+
+        // Scene
+        std::unique_ptr<Scene> mScene;
+        // Scene graphical handler converter
+        std::unique_ptr<RenderformCreator> mRenderformCreator;
+
+        // The skybox used
+        std::unique_ptr<Skybox> mSkybox;
+        // The irradiance cubemap
+        std::unique_ptr<Cubemap> mIrrMap;
+        // The radiance cubemap
+        std::unique_ptr<Cubemap> mRadMap;
 };
 
-#endif // ! _SCREEN_ROUTING_HPP_
+#endif // ! _MATERIAL_SCREEN_HPP_

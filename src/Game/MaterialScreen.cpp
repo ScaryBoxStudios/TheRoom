@@ -85,7 +85,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
 
     // Load the rad map
     mRadMap = std::make_unique<Cubemap>();
-    for (unsigned int i = 0; i < 7; ++i) {
+    for (unsigned int i = 0; i < 9; ++i) {
         mRadMap->SetData(
             imLoader.Load(*(*mFileDataCache)[
                 "ext/Assets/Textures/Skybox/Indoors/indoors_rad_" + std::to_string(i) + ".tga"], "tga"), i);

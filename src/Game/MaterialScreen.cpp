@@ -43,7 +43,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
                 m.SetMetallic(metallic);
                 m.SetRoughness(roughness);
                 m.SetFresnel(reflectivity);
-                m.SetDiffuseColor(glm::vec3(1.0f, 0.0f, 0.0f));
+                m.SetDiffuseColor(glm::vec3(255.0f, 0.0f, 0.0f));
                 mEngine->GetMaterialStore().Load(materialName, m);
 
                 // Create and store the object that will be made of the material previously defined
@@ -54,7 +54,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
                     Category::Normal,
                     sphereModel.boundingBox
                 );
-                node->Move(glm::vec3(roughness * 20.0f -10.0f, reflectivity * 20.0f - 10.0f, - 5 * metallic));
+                node->Move(glm::vec3(roughness * 20.0f -10.0f + 22.0f * metallic, reflectivity * 20.0f - 10.0f, 0.0f));
                 ++id;
             }
         }

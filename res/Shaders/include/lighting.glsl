@@ -94,13 +94,9 @@ vec3 CalcEnvLight(vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
 
     // Get radiance and irradiance colors
     vec3 rad = textureLod(radMap, reflectDir, mipmapLevel).rgb;
-    //vec3 rad = texture(skybox, reflectDir).rgb;
-    vec3 irr = texture(irrMap, reflectDir).rgb;
-    irr *= material.diffuse;
+    vec3 irr = texture(irrMap, normal).rgb;
 
-    // BRDF
-    vec3 brdfResult = BRDF(normal, reflectDir, viewDir, baseColor, metallic, roughness, reflectivity, irr, rad);
-    return brdfResult;
+    return EnvBRDF(normal, reflectDir, viewDir, baseColor, metallic, roughness, reflectivity, irr, rad);
 }
 
 // Calculates the color of directional light
@@ -108,7 +104,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material, 
 {
     vec3 lightDir = normalize(-light.direction);
     // Color
-    vec3 color = CalcLight(2 * light.color, normal, lightDir, viewDir, material, shadow);
+    vec3 color = CalcLight(light.color, normal, lightDir, viewDir, material, shadow);
     return color;
 }
 

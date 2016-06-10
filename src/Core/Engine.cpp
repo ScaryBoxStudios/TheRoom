@@ -205,6 +205,9 @@ void Engine::Init()
 
     // Initialize the ConsoleRenderer
     mConsoleRenderer.Init(&mTextRenderer);
+
+    // Initialize the SkyboxRenderer
+    mSkyboxRenderer.Init();
 }
 
 void Engine::ReloadShaders()
@@ -268,6 +271,9 @@ void Engine::Shutdown()
     // Renderer
     mRenderer.Shutdown();
 
+    // Skybox Renderer
+    mRenderer.Shutdown();
+
     // Explicitly deallocate GPU texture data
     mTextureStore.Clear();
 
@@ -321,4 +327,9 @@ TextRenderer& Engine::GetTextRenderer()
 DebugRenderer& Engine::GetDebugRenderer()
 {
     return mDbgRenderer;
+}
+
+SkyboxRenderer& Engine::GetSkyboxRenderer()
+{
+    return mSkyboxRenderer;
 }

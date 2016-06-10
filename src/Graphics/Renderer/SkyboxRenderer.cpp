@@ -1,4 +1,4 @@
-#include "Skybox.hpp"
+#include "SkyboxRenderer.hpp"
 #include <glm/gtc/type_ptr.hpp>
 
 // The skybox cube vertex data
@@ -76,7 +76,7 @@ void main()
 }
 )foo";
 
-Skybox::Skybox()
+void SkyboxRenderer::Init()
 {
     Shader vert(vShader, Shader::Type::Vertex);
     Shader frag(fShader, Shader::Type::Fragment);
@@ -99,23 +99,23 @@ Skybox::Skybox()
     mCubemap = std::make_unique<Cubemap>();
 }
 
-Skybox::~Skybox()
+void SkyboxRenderer::Shutdown()
 {
     glDeleteBuffers(1, &mVbo);
     glDeleteVertexArrays(1, &mVao);
 }
 
-void Skybox::Load(const std::unordered_map<Cubemap::Target, RawImage>& images)
+void SkyboxRenderer::Load(const std::unordered_map<Cubemap::Target, RawImage>& images)
 {
     mCubemap->SetData(images, 0);
 }
 
-void Skybox::Load(const RawImage& image)
+void SkyboxRenderer::Load(const RawImage& image)
 {
     mCubemap->SetData(image, 0);
 }
 
-void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
+void SkyboxRenderer::Render(const glm::mat4& projection, const glm::mat4& view) const
 {
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_FALSE);
@@ -140,7 +140,7 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view) const
     glDepthFunc(GL_LESS);
 }
 
-const Cubemap* Skybox::GetCubemap() const
+const Cubemap* SkyboxRenderer::GetCubemap() const
 {
     return mCubemap.get();
 }

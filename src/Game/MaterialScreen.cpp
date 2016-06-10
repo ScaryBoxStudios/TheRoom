@@ -76,9 +76,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
 
     // Load the skybox
     ImageLoader imLoader;
-
-    mSkybox = std::make_unique<Skybox>();
-    mSkybox->Load(imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Indoors/indoors.tga"], "tga"));
+    mEngine->GetSkyboxRenderer().Load(imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Indoors/indoors.tga"], "tga"));
 
     // Load the irr map
     mIrrMap = std::make_unique<Cubemap>();
@@ -156,6 +154,9 @@ void MaterialScreen::onUpdate(float dt)
 
 void MaterialScreen::onRender(float interpolation)
 {
+    auto& renderer = mEngine->GetRenderer();
+    auto& skyboxRenderer = mEngine->GetSkyboxRenderer();
+
     // Get the view matrix and pass it to the renderer
     glm::mat4 view = mCamera.InterpolatedView(interpolation);
 
@@ -166,17 +167,16 @@ void MaterialScreen::onRender(float interpolation)
     auto intForm = bakeIntForm(*mRenderformCreator);
 
     // Add skybox and irrMap id to intform
-    intForm.skyboxId = mSkybox->GetCubemap()->Id();
+    intForm.skyboxId = skyboxRenderer.GetCubemap()->Id();
     intForm.irrMapId = mIrrMap->Id();
     intForm.radMapId = mRadMap->Id();
 
     // Render
-    mEngine->GetRenderer().SetView(view);
-    mEngine->GetRenderer().Render(interpolation, intForm);
+    renderer.SetView(view);
+    renderer.Render(interpolation, intForm);
 
     // Render the skybox
-    if (mSkybox)
-        mSkybox->Render(mEngine->GetRenderer().GetProjection(), view);
+    skyboxRenderer.Render(mEngine->GetRenderer().GetProjection(), view);
 
     // Render sample text
     mEngine->GetTextRenderer().RenderText("ScaryBox Studios", 10, 10, 32, glm::vec3(1.0f, 0.5f, 0.3f), "visitor");

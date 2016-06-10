@@ -28,8 +28,8 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _SKYBOX_HPP_
-#define _SKYBOX_HPP_
+#ifndef _SKYBOX_RENDERER_HPP_
+#define _SKYBOX_RENDERER_HPP_
 
 #include <unordered_map>
 #include <memory>
@@ -43,14 +43,14 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 WARN_GUARD_OFF
 
-class Skybox
+class SkyboxRenderer 
 {
     public:
-        // Constructor
-        Skybox();
+        // Initializes the renderer
+        void Init();
 
-        // Destructor
-        ~Skybox();
+        // Deinitializes the renderer state 
+        void Shutdown();
 
         // Loads skybox from faces
         void Load(const std::unordered_map<Cubemap::Target, RawImage>& images);
@@ -68,6 +68,8 @@ class Skybox
         GLuint mVao, mVbo;
         std::unique_ptr<Cubemap> mCubemap;
         std::unique_ptr<ShaderProgram> mProgram;
+
+        void PreInit();
 };
 
-#endif // ! _SKYBOX_HPP_
+#endif // ! _SKYBOX_RENDERER_HPP_

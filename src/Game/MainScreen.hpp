@@ -36,7 +36,6 @@
 #include "../Graphics/Util/Camera.hpp"
 #include "../Graphics/Scene/Scene.hpp"
 #include "../Graphics/Scene/RenderformCreator.hpp"
-#include "../Graphics/Renderer/Skybox.hpp"
 
 class MainScreen : public Screen
 {
@@ -69,9 +68,6 @@ class MainScreen : public Screen
         int mMovingLightIndex;
         Character mCharacter;
         std::unique_ptr<RenderformCreator> mRenderformCreator;
-
-        // The skybox used
-        std::unique_ptr<Skybox> mSkybox;
 
         // The irradiance skybox
         std::unique_ptr<Cubemap> mIrrMap;

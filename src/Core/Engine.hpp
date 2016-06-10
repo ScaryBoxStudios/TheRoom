@@ -41,6 +41,7 @@
 #include "../Graphics/Renderer/TextRenderer.hpp"
 #include "../Graphics/Renderer/DebugRenderer.hpp"
 #include "../Graphics/Renderer/ConsoleRenderer.hpp"
+#include "../Graphics/Renderer/SkyboxRenderer.hpp"
 
 class Engine
 {
@@ -74,6 +75,8 @@ class Engine
         TextRenderer& GetTextRenderer();
         // Retrieves the debug renderer instance
         DebugRenderer& GetDebugRenderer();
+        // Retrieves the skybox renderer instance
+        SkyboxRenderer& GetSkyboxRenderer();
 
         // Tries to reload the Renderer's shaders from disk
         void ReloadShaders();
@@ -103,6 +106,8 @@ class Engine
         DebugRenderer mDbgRenderer;
         // The Console Renderer
         ConsoleRenderer mConsoleRenderer;
+        // The Skybox Renderer
+        SkyboxRenderer mSkyboxRenderer;
 };
 
 #endif // ! _ENGINE_HPP_

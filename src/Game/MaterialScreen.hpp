@@ -35,7 +35,6 @@
 #include "../Graphics/Util/Camera.hpp"
 #include "../Graphics/Scene/Scene.hpp"
 #include "../Graphics/Scene/RenderformCreator.hpp"
-#include "../Graphics/Renderer/Skybox.hpp"
 
 class MaterialScreen : public Screen
 {
@@ -62,8 +61,6 @@ class MaterialScreen : public Screen
         // Scene graphical handler converter
         std::unique_ptr<RenderformCreator> mRenderformCreator;
 
-        // The skybox used
-        std::unique_ptr<Skybox> mSkybox;
         // The irradiance cubemap
         std::unique_ptr<Cubemap> mIrrMap;
         // The radiance cubemap

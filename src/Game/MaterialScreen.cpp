@@ -9,6 +9,11 @@ WARN_GUARD_OFF
 #include "../Asset/Image/ImageLoader.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
 
+// Skybox, irrmap and Radmap names for cubemap store
+const std::string skybox = "material_skybox";
+const std::string irrmap = "material_irr";
+const std::string radmap = "material_rad";
+
 // BufferType for the files loaded
 using BufferType = std::vector<std::uint8_t>;
 
@@ -76,16 +81,17 @@ void MaterialScreen::onInit(ScreenContext& sc)
 
     // Load the skybox
     ImageLoader imLoader;
-    mEngine->GetSkyboxRenderer().Load(imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Indoors/indoors.tga"], "tga"));
+    auto& cubemapStore = mEngine->GetCubemapStore();
+    cubemapStore.Load(skybox, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Indoors/indoors.tga"], "tga"));
+    mEngine->GetSkyboxRenderer().SetCubemapId(cubemapStore[skybox]->id);
 
     // Load the irr map
-    mIrrMap = std::make_unique<Cubemap>();
-    mIrrMap->SetData(imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Indoors/indoors_irr.tga"], "tga"));
+    mEngine->GetCubemapStore().Load(irrmap, imLoader.Load(*(*mFileDataCache)["ext/Assets/Textures/Skybox/Indoors/indoors_irr.tga"], "tga"));
 
     // Load the rad map
-    mRadMap = std::make_unique<Cubemap>();
     for (unsigned int i = 0; i < 9; ++i) {
-        mRadMap->SetData(
+        mEngine->GetCubemapStore().Load(
+            radmap,
             imLoader.Load(*(*mFileDataCache)[
                 "ext/Assets/Textures/Skybox/Indoors/indoors_rad_" + std::to_string(i) + ".tga"], "tga"), i);
     }
@@ -154,8 +160,9 @@ void MaterialScreen::onUpdate(float dt)
 
 void MaterialScreen::onRender(float interpolation)
 {
-    auto& renderer = mEngine->GetRenderer();
+    auto& renderer       = mEngine->GetRenderer();
     auto& skyboxRenderer = mEngine->GetSkyboxRenderer();
+    auto& cubemapStore   = mEngine->GetCubemapStore();
 
     // Get the view matrix and pass it to the renderer
     glm::mat4 view = mCamera.InterpolatedView(interpolation);
@@ -167,9 +174,9 @@ void MaterialScreen::onRender(float interpolation)
     auto intForm = bakeIntForm(*mRenderformCreator);
 
     // Add skybox and irrMap id to intform
-    intForm.skyboxId = skyboxRenderer.GetCubemap()->Id();
-    intForm.irrMapId = mIrrMap->Id();
-    intForm.radMapId = mRadMap->Id();
+    intForm.skyboxId = cubemapStore[skybox]->id;
+    intForm.irrMapId = cubemapStore[irrmap]->id;
+    intForm.radMapId = cubemapStore[radmap]->id;
 
     // Render
     renderer.SetView(view);
@@ -192,4 +199,5 @@ void MaterialScreen::onShutdown()
     mEngine->GetModelStore().Clear();
     mEngine->GetMaterialStore().Clear();
     mEngine->GetTextureStore().Clear();
+    mEngine->GetCubemapStore().Clear();
 }

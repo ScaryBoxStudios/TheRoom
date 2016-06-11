@@ -34,7 +34,6 @@
 #include <unordered_map>
 #include <memory>
 #include <glad/glad.h>
-#include "Cubemap.hpp"
 #include "../../Asset/Image/RawImage.hpp"
 #include "../Shader/Shader.hpp"
 
@@ -52,24 +51,18 @@ class SkyboxRenderer
         // Deinitializes the renderer state 
         void Shutdown();
 
-        // Loads skybox from faces
-        void Load(const std::unordered_map<Cubemap::Target, RawImage>& images);
-
-        // Loads skybox from cross image format
-        void Load(const RawImage& image);
-
         // Renders the current Skybox
         void Render(const glm::mat4& projection, const glm::mat4& view) const;
 
+        // Sets the current cubemap
+        void SetCubemapId(GLuint id);
+
         // Retrieves the cubemap instance that the skybox uses
-        const Cubemap* GetCubemap() const;
+        GLuint GetCubemapId() const;
 
     private:
-        GLuint mVao, mVbo;
-        std::unique_ptr<Cubemap> mCubemap;
+        GLuint mVao, mVbo, mCubemap;
         std::unique_ptr<ShaderProgram> mProgram;
-
-        void PreInit();
 };
 
 #endif // ! _SKYBOX_RENDERER_HPP_

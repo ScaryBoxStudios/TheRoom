@@ -69,12 +69,6 @@ class MainScreen : public Screen
         Character mCharacter;
         std::unique_ptr<RenderformCreator> mRenderformCreator;
 
-        // The irradiance skybox
-        std::unique_ptr<Cubemap> mIrrMap;
-
-        // The radiance skybox
-        std::unique_ptr<Cubemap> mRadMap;
-
         // The camera view
         std::vector<Camera::MoveDirection> CameraMoveDirections();
         std::tuple<float, float> CameraLookOffset();

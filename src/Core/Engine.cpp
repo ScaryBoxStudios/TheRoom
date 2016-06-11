@@ -280,6 +280,9 @@ void Engine::Shutdown()
     // Explicitly deallocate GPU geometry data
     mModelStore.Clear();
 
+    // Explicitly deallocate GPU cubemap data
+    mCubemapStore.Clear();
+
     // Window
     mWindow.Destroy();
 }
@@ -307,6 +310,11 @@ TextureStore& Engine::GetTextureStore()
 MaterialStore& Engine::GetMaterialStore()
 {
     return mMaterialStore;
+}
+
+CubemapStore& Engine::GetCubemapStore()
+{
+    return mCubemapStore;
 }
 
 Renderer& Engine::GetRenderer()

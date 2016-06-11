@@ -1,23 +1,19 @@
-#include "Cubemap.hpp"
+#include "CubemapStore.hpp"
 
-Cubemap::Cubemap()
+CubemapStore::CubemapStore()
 {
-    glGenTextures(1, &mTextureId);
 }
 
-Cubemap::~Cubemap()
+CubemapStore::~CubemapStore()
 {
-    glDeleteTextures(1, &mTextureId);
+    Clear();
 }
 
-GLuint Cubemap::Id() const
+void CubemapStore::Load(const std::string& name, const std::unordered_map<Target, RawImage>& images, GLuint level /*= 0*/)
 {
-    return mTextureId;
-}
-
-void Cubemap::SetData(const std::unordered_map<Target, RawImage>& images, GLuint level /*= 0*/)
-{
-    glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
+    CubemapDescription cubemap;
+    glGenTextures(1, &cubemap.id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.id);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -33,6 +29,8 @@ void Cubemap::SetData(const std::unordered_map<Target, RawImage>& images, GLuint
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    mCubemaps.insert({name, cubemap});
 }
 
 static void crossFaceOffset(GLenum target, int* offx, int* offy, int width)
@@ -67,9 +65,11 @@ static void crossFaceOffset(GLenum target, int* offx, int* offy, int width)
     }
 }
 
-void Cubemap::SetData(const RawImage& img, GLuint level /*= 0*/)
+void CubemapStore::Load(const std::string& name, const RawImage& img, GLuint level /*= 0*/)
 {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, mTextureId);
+    CubemapDescription cubemap;
+    glGenTextures(1, &cubemap.id);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap.id);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -104,4 +104,19 @@ void Cubemap::SetData(const RawImage& img, GLuint level /*= 0*/)
 
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    mCubemaps.insert({name, cubemap});
+}
+
+CubemapDescription* CubemapStore::operator[](const std::string& name)
+{
+    auto it = mCubemaps.find(name);
+    return it == std::end(mCubemaps) ? nullptr : &(it->second);
+}
+
+void CubemapStore::Clear()
+{
+    for (const auto& p : mCubemaps)
+        glDeleteTextures(1, &p.second.id);
+    mCubemaps.clear();
 }

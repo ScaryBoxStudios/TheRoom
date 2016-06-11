@@ -33,6 +33,7 @@
 
 #include "Console.hpp"
 #include "../Window/Window.hpp"
+#include "../Graphics/Resource/CubemapStore.hpp"
 #include "../Graphics/Resource/TextureStore.hpp"
 #include "../Graphics/Resource/ModelStore.hpp"
 #include "../Graphics/Resource/MaterialStore.hpp"
@@ -66,6 +67,8 @@ class Engine
         TextureStore& GetTextureStore();
         // Retrieves the MaterialStore instance
         MaterialStore& GetMaterialStore();
+        // Retrieves the CubemapStore instance
+        CubemapStore& GetCubemapStore();
 
         // Retrieves the renderer instance
         Renderer& GetRenderer();
@@ -95,6 +98,8 @@ class Engine
         TextureStore mTextureStore;
         // Stores the loaded materials
         MaterialStore mMaterialStore;
+        // Stores the loaded cubemaps
+        CubemapStore mCubemapStore;
 
         // The Renderer
         Renderer mRenderer;

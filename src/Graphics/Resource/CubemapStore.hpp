@@ -28,15 +28,21 @@
 /*   ' ') '( (/                                                                                                      */
 /*     '   '  `                                                                                                      */
 /*********************************************************************************************************************/
-#ifndef _CUBEMAP_HPP_
-#define _CUBEMAP_HPP_
+#ifndef _CUBEMAP_STORE_HPP_
+#define _CUBEMAP_STORE_HPP_
 
 #include <unordered_map>
+#include <string>
 #include <glad/glad.h>
 #include "../../Asset/Image/RawImage.hpp"
 #include "../../Util/Hash.hpp"
 
-class Cubemap
+struct CubemapDescription
+{
+    GLuint id;
+};
+
+class CubemapStore
 {
     public:
         // The face of the Cubemap
@@ -51,22 +57,33 @@ class Cubemap
         };
 
         // Constructor
-        Cubemap();
+        CubemapStore();
 
         // Destructor
-        ~Cubemap();
+        ~CubemapStore();
 
-        // Retrieves the cubemap handle
-        GLuint Id() const;
+        // Disable copy construction
+        CubemapStore(const CubemapStore&) = delete;
+        CubemapStore& operator=(const CubemapStore&) = delete;
+
+        // Enable move construction
+        CubemapStore(CubemapStore&&) = default;
+        CubemapStore& operator=(CubemapStore&&) = default;
 
         // Loads the given image data to the current Cubemap
-        void SetData(const std::unordered_map<Target, RawImage>& images, GLuint level = 0);
+        void Load(const std::string& name, const std::unordered_map<Target, RawImage>& images, GLuint level = 0);
 
         // Loads image data from cross formatted image
-        void SetData(const RawImage& cross, GLuint level = 0);
+        void Load(const std::string& name, const RawImage& cross, GLuint level = 0);
+
+        // Retrieves a pointer to a loaded cubemap object
+        CubemapDescription* operator[](const std::string& name);
+
+        // Unloads stored textures in the store
+        void Clear();
 
     private:
-        GLuint mTextureId;
+        std::unordered_map<std::string, CubemapDescription> mCubemaps;
 };
 
-#endif // ! _CUBEMAP_HPP_
+#endif // ! _CUBEMAP_STORE_HPP_

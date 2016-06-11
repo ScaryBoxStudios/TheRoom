@@ -95,24 +95,12 @@ void SkyboxRenderer::Init()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     glBindVertexArray(0);
-
-    mCubemap = std::make_unique<Cubemap>();
 }
 
 void SkyboxRenderer::Shutdown()
 {
     glDeleteBuffers(1, &mVbo);
     glDeleteVertexArrays(1, &mVao);
-}
-
-void SkyboxRenderer::Load(const std::unordered_map<Cubemap::Target, RawImage>& images)
-{
-    mCubemap->SetData(images, 0);
-}
-
-void SkyboxRenderer::Load(const RawImage& image)
-{
-    mCubemap->SetData(image, 0);
 }
 
 void SkyboxRenderer::Render(const glm::mat4& projection, const glm::mat4& view) const
@@ -130,7 +118,7 @@ void SkyboxRenderer::Render(const glm::mat4& projection, const glm::mat4& view) 
         glUniform1i(glGetUniformLocation(mProgram->Id(), "skybox"), 0);
 
         glBindVertexArray(mVao);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemap->Id());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemap);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
         glBindVertexArray(0);
@@ -140,7 +128,12 @@ void SkyboxRenderer::Render(const glm::mat4& projection, const glm::mat4& view) 
     glDepthFunc(GL_LESS);
 }
 
-const Cubemap* SkyboxRenderer::GetCubemap() const
+void SkyboxRenderer::SetCubemapId(GLuint id)
 {
-    return mCubemap.get();
+    mCubemap = id;
+}
+
+GLuint SkyboxRenderer::GetCubemapId() const
+{
+    return mCubemap;
 }

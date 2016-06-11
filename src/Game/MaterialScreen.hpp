@@ -60,11 +60,6 @@ class MaterialScreen : public Screen
         std::unique_ptr<Scene> mScene;
         // Scene graphical handler converter
         std::unique_ptr<RenderformCreator> mRenderformCreator;
-
-        // The irradiance cubemap
-        std::unique_ptr<Cubemap> mIrrMap;
-        // The radiance cubemap
-        std::unique_ptr<Cubemap> mRadMap;
 };
 
 #endif // ! _MATERIAL_SCREEN_HPP_

@@ -62,12 +62,6 @@ class GalleryScreen : public Screen
 
         // Scene graphical handler converter
         std::unique_ptr<RenderformCreator> mRenderformCreator;
-
-        // The irradiance skybox
-        std::unique_ptr<Cubemap> mIrrMap;
-
-        // The radiance skybox
-        std::unique_ptr<Cubemap> mRadMap;
 };
 
 #endif // ! _GALLERY_SCREEN_HPP_

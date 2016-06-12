@@ -272,7 +272,7 @@ void Engine::Shutdown()
     mRenderer.Shutdown();
 
     // Skybox Renderer
-    mRenderer.Shutdown();
+    mSkyboxRenderer.Shutdown();
 
     // Explicitly deallocate GPU texture data
     mTextureStore.Clear();

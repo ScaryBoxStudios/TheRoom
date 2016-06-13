@@ -312,14 +312,16 @@ showvars: variables
 	@$(lcommand)
 
 # Command chunks that help generate dependency files in each toolchain
-msvc-dep-gen =  echo $@: $< |\
-	sed -e "s/^.*$$/&\\/" >$(basename $@)$(HDEPEXT) && \
-	$(1) /showIncludes |\
-	sed -e "/^Note: including file:/!d"\
-		-e "s/^Note: including file:\s*\(.*\)$$/\1/"\
-		-e "s/\\/\//g"\
-		-e "s/ /\\ /g"\
-		-e "s/^\(.*\)$$/\t\1 \\/" >> $(basename $@)$(HDEPEXT)
+sed-escape = $(subst /,\/,$(subst \,\\,$(1)))
+msvc-dep-gen = $(1) /showIncludes >$(basename $@)$(HDEPEXT) && \
+	$(if $(SILENT),,sed -e "/^Note: including file:/d" $(basename $@)$(HDEPEXT) &&) \
+	sed -i -e "/^Note: including file:/!d" \
+		-e "s/^Note: including file:\s*\(.*\)$$/\1/" \
+		-e "s/\\/\//g" \
+		-e "s/ /\\ /g" \
+		-e "s/^\(.*\)$$/\t\1 \\/" \
+		-e "2 s/^.*$$/$(call sed-escape,$@)\: $(call sed-escape,$<) &/g" \
+		$(basename $@)$(HDEPEXT)
 gcc-dep-gen = -MMD -MT $@ -MF $(basename $@)$(HDEPEXT)
 
 # Command wrapper that adds dependency generation functionality to given compile command

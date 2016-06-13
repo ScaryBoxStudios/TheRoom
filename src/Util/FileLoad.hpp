@@ -31,7 +31,6 @@
 #ifndef _FILELOAD_HPP_
 #define _FILELOAD_HPP_
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <memory>
 #include <vector>

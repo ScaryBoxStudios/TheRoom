@@ -11,7 +11,7 @@ In our case, files are being read in a single shot.
 \subsection{Rendering State Changes Minimization}
 Changing often the driver state (through OpenGL calls for example), can also steal precious time from the program.
 This occurs because a possible driver call may change the state in our graphics card hardware or not depending
-on the action we took. \footnote{Although, modern drivers often try to defer as much state change as possible
+on the action we took.\footnote{Although, modern drivers often try to defer as much state change as possible
 till the next draw call} Therefore, redundant graphics API calls are avoided and similar ones are batched
 as much as possible.
 

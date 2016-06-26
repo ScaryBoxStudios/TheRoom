@@ -5,14 +5,14 @@ creation algorithms that simulate the real world. The CG software is used in var
 industry to create virtual worlds and special effects, to interactive applications in personal entertainment
 industry (Games). The CG algorithms used vary mostly from the amount of interaction needed, as with the more
 time consuming algorithms (Raytracing family) it is not possible to achieve satisfying interactive image
-generation rates. For these algorithms to achieve high image generation rates (framerates) some simplifications
-\footnote{see for example, 'Direct - Indirect lighting separation'} and optimizations \footnote{see for example,
-'Deferred Rendering'} must be done. The simplifications mostly take away the small visual phenomena that are
-hard to calculate in runtime like recursive reflections, light refraction and accurate indirect lighting
+generation rates. For these algorithms to achieve high image generation rates (framerates) some
+simplifications\footnote{see for example, `Direct -- Indirect lighting separation'} and optimizations\footnote{see
+for example, `Deferred Rendering'} must be done. The simplifications mostly take away the small visual phenomena
+that are hard to calculate in runtime like recursive reflections, light refraction and accurate indirect lighting
 contribution on an object. The optimizations usually are about respecting how the hardware operates and allowing
 it to do it faster, with eliminating redundant calculations or batching similar ones. Also when implementing a
 CG software a good architecture is necessary to be established in order to manage the various algorithms and
 inputs that contribute to the final result. The inputs can be geometry data from various 3D model file formats,
-color data from various image formats and custom configuration files that can help in the external
-\footnote{Out of source} modification of the software. We explore all these aspects that where taken into
-account when developing this project, along with the gritty details of their implementations.
+color data from various image formats and custom configuration files that can help in the external\footnote{Out of
+source} modification of the software. We explore all these aspects that where taken into account when developing
+this project, along with the gritty details of their implementations.

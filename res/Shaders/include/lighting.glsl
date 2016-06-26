@@ -75,7 +75,7 @@ vec3 CalcLight(vec3 lightColor, vec3 normal, vec3 lightDir, vec3 viewDir, Materi
 
 float MipmapFromRoughness(float roughness)
 {
-    return sqrt(roughness) * 7;
+    return exp2(1 - 1 / pow(roughness, 1 / 2.5)) * 9;
 }
 
 // Calculates the enviroment light contribution

@@ -74,7 +74,7 @@ vec3 EnvBRDF(vec3 N, vec3 L, vec3 V, vec3 baseColor, float metallic, float rough
     float G = GeometricalAttenuation(NdotH, NdotV, VdotH, NdotL);
 
     // Final results
-    vec3 d = cdiff * irr / pi;
+    vec3 d = (1 - F) * cdiff * irr / pi;
     vec3 s = cspec * rad * F * G;
     return d + s * NdotL;
 }

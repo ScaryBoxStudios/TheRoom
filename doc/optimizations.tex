@@ -44,10 +44,19 @@ of the fragment shading stage all the above mentioned data are saved to their re
 in turn is bound and used when shading the given fragment in the Lighting Pass. The visualized contents of some GBuffer
 textures can be seen in figure~\ref{fig:gbuf}.
 
-
 \subsubsection{Lighting Pass}
+
 The lighting pass consists of multiple individual light passes one per direct light plus one for the
-environmental lighting. For each sub-pass one we compute the lighting for each screen space fragment using
-the data from the GBuffer and the bound ShadowMaps.
+environmental lighting. For each one sub-pass we compute the lighting for each screen space fragment using
+the data from the GBuffer and the bound ShadowMaps. Starting with an empty accumulation texture buffer (black)
+we add the final light contribution from every pass. For directional lights and environmental lighting a full screen
+quad render is performed, while for point lights only fragments of the area they affect are being rendered.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.18, clip=true]{./image/lightpasses.png}
+    \caption{Directional light, Environmental light and Accumulated light}
+\label{fig:lpasses}
+\end{figure}
 
 \subsection{Bounding Spheres Optimization}

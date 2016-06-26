@@ -1,0 +1,20 @@
+\section{Optimizations}
+
+\subsection{File Loading}
+When loading a data resource, the biggest bottleneck is in the fetch from a persistent storage medium.
+Doing multiple IO operations on a hard disk for example, can heavily increase the load time of a file
+due to their mix with other IO operations from the rest of the Operating System\footnote{Programs do
+not have exclusive ownership of the hard disk in a multitasking environment}. With this in mind, resources
+from Hard Drive or other persistent storages are best loaded with the fewest IO operations that can be done.
+In our case, files are being read in a single shot.
+
+\subsection{Rendering State Changes Minimization}
+Changing often the driver state (through OpenGL calls for example), can also steal precious time from the program.
+This occurs because a possible driver call may change the state in our graphics card hardware or not depending
+on the action we took. \footnote{Although, modern drivers often try to defer as much state change as possible
+till the next draw call} Therefore, redundant graphics API calls are avoided and similar ones are batched
+as much as possible.
+
+\subsection{Deferred Rendering}
+
+\subsection{Bounding Spheres Optimization}

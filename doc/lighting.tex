@@ -112,9 +112,23 @@ as images in a form of a cubemap and then we precalculate the rendering equation
 map as a light source. The results can also be stored in cubemaps that we can then query and use to calculate the environmental
 light contribution on a fragment.
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.18,clip=true]{./image/envl_ref.png}
+    \caption{Reference Environment}
+\label{fig:envlref}
+\end{figure}
+
 The environmental diffuse light contribution can be captured on something called Irradiance Map. The Irradiance map can be generated
 by precalculating Lambert Diffuse BRDF for all the points around an object, and giving the simplicity of the Lambert Diffuse BRDF
 function generating it is as simple as applying cosine filter to the reference environment.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.18,clip=true]{./image/envl_irr.png}
+    \caption{Irradiance Map}
+\label{fig:envlirr}
+\end{figure}
 
 The environmental specular light contribution can be captured on the relevant Radiance Map or also called Prefiltered mipmaped
 radiance environment map (PMREM). Solving the specular BRDF is more difficult than the diffuse BRDF though, due to the number of
@@ -124,6 +138,13 @@ the correct specular lobe. For this reason multiple versions of increasing rough
 for their relevant roughness value. These maps can be stored as different mipmaps of the radiance cubemap in order to sample uniformingly.
 A function that will choose the correct mipmap level according to an object roughness must be also created, that should be tweaked
 for a specific cubemap resolution.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.36,clip=true]{./image/envl_rad.png}
+    \caption{Radiance Map}
+\label{fig:envlrad}
+\end{figure}
 
 Note that still, this way only phong lobe shapes are possible to be matched, as the whole microfacet specular
 BRDF is not evaluated for the environment, although more advanced approximations also exist\footnote{Split sum approximation is a great

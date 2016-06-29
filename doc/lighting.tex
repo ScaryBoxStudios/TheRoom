@@ -101,3 +101,31 @@ roughness increasing from left to right and increasing from bottom to top:
     \caption{Metals}
 \label{fig:pbrmetals}
 \end{figure}
+
+\subsection{Environmental lighting}
+As said in a previous section, light arriving in a point may have been reflected or refracted from another point int the scene.
+Offline algorithms may be able to capture that effect but its realtime computation is impossible. So in order to emulate indirect
+lighting there is an imminent need for some preprocessing of the surrounding environment of an object.
+
+For this a technique called Image Base Lighting (IBL) can be used. In this technique we first capture the object's environment
+as images in a form of a cubemap and then we precalculate the rendering equation integrals treating each pixel in the environment
+map as a light source. The results can also be stored in cubemaps that we can then query and use to calculate the environmental
+light contribution on a fragment.
+
+The environmental diffuse light contribution can be captured on something called Irradiance Map. The Irradiance map can be generated
+by precalculating Lambert Diffuse BRDF for all the points around an object, and giving the simplicity of the Lambert Diffuse BRDF
+function generating it is as simple as applying cosine filter to the reference environment.
+
+The environmental specular light contribution can be captured on the relevant Radiance Map or also called Prefiltered mipmaped
+radiance environment map (PMREM). Solving the specular BRDF is more difficult than the diffuse BRDF though, due to the number of
+contributing factors. Specifically roughness is the main contributor on the tightness of the specular lobe, so with lower roughness
+values a less blurry lookup map is needed, while with the higher roughness values a more blurry map must be used in order to make
+the correct specular lobe. For this reason multiple versions of increasing roughness radiance maps are created that are choosen
+for their relevant roughness value. These maps can be stored as different mipmaps of the radiance cubemap in order to sample uniformingly.
+A function that will choose the correct mipmap level according to an object roughness must be also created, that should be tweaked
+for a specific cubemap resolution.
+
+Note that still, this way only phong lobe shapes are possible to be matched, as the whole microfacet specular
+BRDF is not evaluated for the environment, although more advanced approximations also exist\footnote{Split sum approximation is a great
+example, where the part of the BRDF not included in the PMREM is calculated as a separate lookup table that can be used to make
+specular lobes for the environment lighting that match the direct lighting model}.

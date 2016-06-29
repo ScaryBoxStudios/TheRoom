@@ -1,35 +1,39 @@
 \section{Architecture}
-Before moving on to the various algorithms used to improve the engine's visual output, a few
+Before moving on to the various algorithms used to compose the engine's visual output, a few
 words need to be said about its architecture.
 
-At its core, the engine operates on a loop, \textit{Updating} at least once per 5 frames 
-and \textit{Rendering} in the idle time between updates. The loop ends when it gets an exit
-signal. Note that the rendering is interpolated to improve quality and make it feel more natural.
-From an extremely distant point of view, that is all there is to it. Naturally there are various
-utilities that help with those two tasks and they will be briefly explained in the following
-sections.
+At its core, the engine operates on a single threaded loop with constant update time and
+variable rendering. The loop ends when it gets an exit signal. Each set of render frames,
+executed between updates, are interpolated for the purpose of achieving more fluent interactions
+on higher end hardware. From an extremely distant point of view, that is all there is to it.
+Naturally there are various utilities that help with those two tasks and they will be briefly
+explained in the following sections.
 
 \subsection{Window}
-Another decoupled yet important part of the engine is the Window. To create an OpenGL context
-GLFW is used. However, all the window creating logic is separated from everything else, hence it
-is easy to implement window utilities (e.g.\ change title, subscribe to events) or even replace
-GLFW if there is a need to do that.
+Another decoupled yet important part of the engine is the Window. All the window creating logic
+is separated from everything else, hence it is easy to implement window utilities (e.g.\ change
+title, subscribe to events) or even replace the whole context creation backend if needed.
 
 \subsection{State Management}
 State Management
 
-\subsection{Assets}
+\subsection{Assets and Resources}
 One of the governing aspects of a game engine is the Assets loading and management. For the
 purpose of promoting modularization and eliminating code duplication a convention was made.
 
-\noindent Assets are divided on two categories (or even better, two states):
-
 \begin{itemize}
-\item Assets that are loaded from disk and stored to RAM
-\item Assets that are loaded to the GPU
+\item Assets that are loaded (from disk, network, etc..) and stored to RAM
+\item Resources that are loaded to the GPU\@.
 \end{itemize}
 
-\noindent Of course, an asset needs to be loaded from disk first, in order to load it to the GPU\@.
+\noindent For example a model asset has the following lifecycle:
+
+\begin{enumerate}
+\item Its model file will be loaded from disk to memory buffer
+\item It will idle for sometime
+\item It will be added to Model Store which will uploaded it to GPU (its vertices, texture coords,
+      etc..)
+\end{enumerate}
 
 Basically, assets are discriminated based on their state. When one starts thinking of them that
 way, it is easy to notice that many modules do not actually require the asset itself. For
@@ -39,8 +43,17 @@ up debugging and developing.
 
 Throughout the code there are many independent asset loaders, for images, models, scenefiles etc..
 and \textit{Asset Stores}, which get as input the loaded data, upload it to the GPU and save an
-identifier to access them. All asset stores are maps with strings as key. That string represents
-a unique way to reference an asset, like a name or a UUID\@.
+identifier to access them. A store's assets can be referenced using a string key.
+
+\noindent For the time being, the supported asset types are the following:
+
+\begin{itemize}
+\item Geometry
+\item Image
+\item Material
+\item Scene
+\item Font
+\end{itemize}
 
 \subsection{Shader}
 One of the greatest and most annoying problems a graphics developer encounters is the hassle of

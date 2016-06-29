@@ -39,7 +39,7 @@ with his own purpose. Namely, so far there are Renderers for:
 
 \subsection{Assets and Resources}
 One of the governing aspects of a game engine is the Assets loading and management. For the
-purpose of promoting modularization and eliminating code duplication a convention was made.
+purpose of promoting modularization and better management, a convention was made.
 
 \begin{itemize}
 \item Assets that are loaded (from disk, network, etc..) and stored to RAM
@@ -76,15 +76,16 @@ identifier to access them. A store's assets can be referenced using a string key
 \end{itemize}
 
 \subsection{Shader}
-One of the greatest and most annoying problems a graphics developer encounters is the hassle of
-having to restart the whole program for just a simple alteration to a shader. To address that
-problem the following convention was made:
+Programming shaders is an indispensable part of graphics development. Small changes in shader
+computations occur frequently and being able to see the outcome immediately is a major
+advantage. Hardcoding the shaders and triggering a program recompilation on each change would
+be tedious for this kind of work. To address that problem the following convention was made:
 
 \noindent Shaders are divided to two categories:
 
 \begin{itemize}
 \item Static shaders, embedded in source code
-\item Normal shaders, in their own glsl files
+\item Normal shaders, in their own shader files
 \end{itemize}
 
 \noindent Static shaders are needed for independent features that are not likely to change often,
@@ -95,18 +96,17 @@ There were two features developed for that reason.
 
 \subsubsection{Shader Modularization}
 As the engine grows larger the features usually get more complex. GLSL is not an exception to that
-rule. The engine's GLSL is enchanced with a preprocessing mechanism that promotes code reusability
+rule. The engine's shader code is enchanced with a preprocessing mechanism that promotes code reusability
 and modularity. For the time being, the only preprocessor directives implemented are those of
 \textit{\#include} and \textit{\#module} which are respectively used to include a module to the
 current one and declare a file as a separate module. Note that multiple includes are ignored by
 default\footnote{Just like using include guards in C/C++}.
 
 \subsubsection{Shader Reloading}
-As stated earlier, many shaders needs to be reloaded many times during development. Restarting
-the program results in reloading all the assets which means more waiting time. The Shader Reloading feature
-comes to the rescue as it eliminates the need for program restarting for mere alterations in shaders.
-They can be reloaded on the fly, and if there is an error, a message box appears without stopping
-the program.
+A Shader Reloading feature allows on the fly shader recompilation and reload. When the reload
+mechanism is triggerd and a shader error is detected, a message box with possible information on
+the error appears while the program keeps running using the latest working shaders.
 
 \subsection{Embedded Shell}
-An embedded shell is implemented in order to provide a way to give commands on runtime.
+An embedded shell is implemented in order to provide a way to give commands on runtime. Those commands
+can help in runtime configuration or experimenting.

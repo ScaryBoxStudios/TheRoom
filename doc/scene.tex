@@ -30,7 +30,8 @@ details like Material Keys or Parent-Child relations. On the contrary, the ideal
 containing only descriptors for the GPU Resources; in OpenGL's case, integer IDs for the uploaded to GPU Resources. 
 
 For that purpose, an Intermediate Form was created and will be referenced as \textit{IntForm} hereafter. It contains
-all IDs needed by the Renderer. Those IDs are:
+all IDs\footnote{IDs are resource handles. In OpenGL's case, integers} needed by the Renderer.\\
+Those IDs are:
 
 \begin{itemize}
 \item Texture IDs for Diffuse, Normal and Specular Maps.
@@ -50,8 +51,8 @@ because that task needs to be repeated in every single frame. To eliminate that 
 Meshes but when it is time for Render the order in which a Mesh will be drawn depends on its Material.
 
 \subsection{Scenefile}
-Understanding how \textit{Scene Graph} works requires knowledge on the properties file, which is referred to as
-\textit{scenefile}. SceneFile helps defining material and model properties and putting them all together in a scene.
+Understanding how \textit{Scene Graph} works requires knowledge on the properties file\footnote{Referred to as
+\textit{scenefile}}. SceneFile helps defining material and model properties and putting them all together in a scene.
 The pipeline of the whole property module is summed up in the following figure.
 
 \begin{figure}[h]

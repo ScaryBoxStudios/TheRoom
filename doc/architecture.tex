@@ -9,6 +9,15 @@ From an extremely distant point of view, that is all there is to it. Naturally t
 utilities that help with those two tasks and they will be briefly explained in the following
 sections.
 
+\subsection{Window}
+Another decoupled yet important part of the engine is the Window. To create an OpenGL context
+GLFW is used. However, all the window creating logic is separated from everything else, hence it
+is easy to implement window utilities (e.g.\ change title, subscribe to events) or even replace
+GLFW if there is a need to do that.
+
+\subsection{State Management}
+State Management
+
 \subsection{Assets}
 One of the governing aspects of a game engine is the Assets loading and management. For the
 purpose of promoting modularization and eliminating code duplication a convention was made.
@@ -32,3 +41,9 @@ Throughout the code there are many independent asset loaders, for images, models
 and \textit{Asset Stores}, which get as input the loaded data, upload it to the GPU and save an
 identifier to access them. All asset stores are maps with strings as key. That string represents
 a unique way to reference an asset, like a name or a UUID\@.
+
+\subsection{Shader Reloading}
+Shader Reloading
+
+\subsection{Embedded Shell}
+Embedded Shell

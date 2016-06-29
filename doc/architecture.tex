@@ -15,7 +15,11 @@ is separated from everything else, hence it is easy to implement window utilitie
 title, subscribe to events) or even replace the whole context creation backend if needed.
 
 \subsection{State Management}
-State Management
+Each scene, is considered a different state\footnote{A scene can be anything that appears on
+screen. It can be a main menu screen or credits or a game scene etc\dots}The state management
+system allows selecting the next state of each screen and defining each scene's resources
+so they can be loaded independently. When the screen changes, a loading screen appears which loads
+all assets the scene is going to need.
 
 \subsection{Assets and Resources}
 One of the governing aspects of a game engine is the Assets loading and management. For the
@@ -89,4 +93,4 @@ They can be reloaded on the fly, and if there is an error, a message box appears
 the program.
 
 \subsection{Embedded Shell}
-Embedded Shell
+An embedded shell is implemented in order to provide a way to give commands on runtime.

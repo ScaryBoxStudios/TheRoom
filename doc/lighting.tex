@@ -8,7 +8,7 @@ its material properties. The Physical Based models are based around the laws of 
 matter depending on a number of environmental variables.
 
 \subsection{Background}
-All the physical based rendering models try to solve a simplified version of the rendering equation \cite{lighting:ref32}.
+All the physical based rendering models try to solve a simplified version of the rendering equation~\cite{lighting:ref32}.
 This equation is a function which gives the outgoing light in a particular direction $\omega_o$ from a point $p$ on a surface
 and looks like this:
 
@@ -38,3 +38,29 @@ from the direction $\omega_i$, and the normal attenuation is an attenuation fact
 dependent on the cosine of the angle between the normal $n$ and the incoming light direction $\omega_i$. Note that the
 incoming light doesn't have to come from a light source (direct light), it may have been reflected or refracted from another
 point int the scene (indirect light).
+
+\subsection{Diffuse and Specular lighting}
+When light hits a surface there are three possible outcomes. Light may be \textbf{absorbed} by the material, light may be
+\textbf{transmitted} through to the other side or light may be \textbf{reflected} back.
+Reflected light can be divided into two sub-types, specular reflection and diffuse reflection. Specular reflection reflects
+all light near the same angle, whereas diffuse reflection reflects in a broad range of directions.
+The Cook-Torrance model that is also used in the current implementation also makes this separation by describing the BRDF
+function as:
+
+$$f_r = k_d f_{lambert} + k_s f_{cook-torrance}$$
+
+Where $f_{lambert}$ describes the diffuse component, $f_{cook-torrance}$ describes the specular component, $k_d$ is the amount
+of incoming radiance that gets diffused and $k_s$ is the amount of light that is specularly reflected. If a given material
+exhibits a strong diffusive behaviour it have a high value for $k_d$, while if it behaves more like a mirror it will have high $k_s$.
+For the diffuse BRDF has been choosen the Lambert's BRDF that is equal to:
+
+$$f_{lambert} = \frac{c}{\pi}$$
+
+where c is the surface colour. The specular Cook-Torrance BRDF is defined as:
+
+$$f_{cook-torrance} = \frac{DFG}{(4 \omega_o \cdot n)(\omega_i \cdot n)}$$
+
+Where D is the distribution function, F is the fresnel function and G is the geometry function.
+These terms exist, as the Cook-Torrance model falls into the category of the \textbf{Microfacet Models} which revolves around the idea
+that rough surfaces can be modelled as a collection of small microfacets, each of them is assumed to be a very small perfect mirror,
+and their distribution and orientation define how the light is reflected at a large scale.

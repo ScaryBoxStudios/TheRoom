@@ -10,14 +10,14 @@ Naturally there are various utilities that help with those two tasks and they wi
 explained in the following sections.
 
 \subsection{Window}
-Another decoupled yet important part of the engine is the Window. All the window creating logic
+Another core part of the engine is the Window. All the window creating logic
 is separated from everything else, hence it is easy to implement window utilities (e.g.\ change
 title, subscribe to events) or even replace the whole context creation backend if needed.
 
-\subsection{State Management}
+\subsection{Screen Management}
 Each scene, is considered a different state\footnote{A scene can be anything that appears on
 screen. It can be a main menu screen or credits or a game scene etc\dots}The state management
-system allows selecting the next state of each screen and defining each scene's resources
+system can define the next state of each screen and defining each scene's resources
 so they can be loaded independently. When the screen changes, a loading screen appears which loads
 all assets the scene is going to need.
 
@@ -26,8 +26,8 @@ The result of rendering is the outcome of the combined efforts of quite a few Re
 with his own purpose. Namely, so far there are Renderers for:
 
 \begin{itemize}
-\item Management of defferred rendering and all the other Renderers. This is the main Renderer.
-\item AABBs
+\item Scene
+\item AABB Debug Renderer
 \item Debug view\footnote{Debug view is a mode where the visual output includes separate steps
       of the deferred rendering. For example a view with only the normals or a view with the
       shadow maps}

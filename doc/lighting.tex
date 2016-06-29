@@ -14,29 +14,23 @@ and looks like this:
 
 \begin{equation}
 \label{eq:rendeq}
-L_o(p,\omega_o)} = L_e(p, \omega_o) + \int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i
+L_o(p,\omega_o) = L_e(p, \omega_o) + \int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i
 \end{equation}
 
 Breaking down the equation we get:
 
-$$
-\underbrace{L_o(p,\omega_o)}_\text{Outgoing Light}
-= \underbrace{L_e(p, \omega_o)}_\text{Emitted Light}
-+ \underbrace{\int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i}_\text{Integral}
-$$
+\begin{equation}
+\underbrace{L_o(p,\omega_o)}_\text{Outgoing Light} = \underbrace{L_e(p, \omega_o)}_\text{Emitted Light} + \underbrace{\int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i}_\text{Integral}
+\end{equation}
 
 According to the equation the \textit{outgoing light} in a particular direction from a point on a surface is the sum of the
 sum of the \textit{emitted light} from that point and the sum of all the incoming light from all directions in a hemisphere
 above the point p (the orientation of the hemisphere is determined by the normal n).
 
 Breaking down the integral we get:
-$$
-\int_\Omega
-\underbrace{f_r(p,\omega_i,\omega_o)}_\text{BRDF}\
-\underbrace{L_i(p,\omega_i)}_\text{Incoming Light}\
-\underbrace{n\cdot\omega_i}_\text{Normal Attenuation}
-\ d\omega_i
-$$
+\begin{equation}
+\int_\Omega \underbrace{f_r(p,\omega_i,\omega_o)}_\text{BRDF}\underbrace{L_i(p,\omega_i)}_\text{Incoming Light}\underbrace{n\cdot\omega_i}_\text{Normal Attenuation}\ d\omega_i
+\end{equation}
 
 Where BRDF is a function returning the ratio of the amount of light reflected in a particular direction $\omega_o$, to the
 amount received from another direction $\omega_i$ (more details later), incoming light is the light arriving at the point p

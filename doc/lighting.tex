@@ -64,3 +64,39 @@ Where D is the distribution function, F is the fresnel function and G is the geo
 These terms exist, as the Cook-Torrance model falls into the category of the \textbf{Microfacet Models} which revolves around the idea
 that rough surfaces can be modelled as a collection of small microfacets, each of them is assumed to be a very small perfect mirror,
 and their distribution and orientation define how the light is reflected at a large scale.
+
+\subsection{Material properties}
+Materials are defined by the following properties:
+
+\begin{enumerate}
+    \item Base Color (Albedo), defines the color of diffused light
+    \item Roughness, defines how rough is a surface. Rougher surfaces will show wider but dimmer specular reflections, while smoother
+        surfaces will show brighter but sharper specular reflections.
+    \item Metallic, defines if a material behaves like a dielectric or metal.
+    \item Reflectivity, defines the percentage of light a surface reflects. Specifically defines how reflective a surface is when viewed
+        head on.
+    \item Emissive Color, defines emission light color for emissive materials.
+\end{enumerate}
+
+The separation between metallics and dielectrics, also affects the perspective material colors on each light reflection type.
+Metallics are assumed to be fully specular materials with base color acting as their specular color and no diffuse color (black).
+In the dielectrics category from the other the base color acts as their diffuse color and white as their specular color.
+The above choice can be explained as the subsurface scatter effect is deeper on dielectric materials due to their substantially
+lower density comparing to metals.
+
+In the following figures we can see the effects of roughness and reflectivity values for each type of material with
+roughness increasing from left to right and increasing from bottom to top:
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.4,clip=true]{./image/pbr_dielectrics.png}
+    \caption{Dielectrics}
+\label{fig:pbrdielectrics}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.4,clip=true]{./image/pbr_metals.png}
+    \caption{Metals}
+\label{fig:pbrmetals}
+\end{figure}

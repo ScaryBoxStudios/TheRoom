@@ -1,0 +1,34 @@
+\section{Architecture}
+Before moving on to the various algorithms used to improve the engine's visual output, a few
+words need to be said about its architecture.
+
+At its core, the engine operates on a loop, \textit{Updating} at least once per 5 frames 
+and \textit{Rendering} in the idle time between updates. The loop ends when it gets an exit
+signal. Note that the rendering is interpolated to improve quality and make it feel more natural.
+From an extremely distant point of view, that is all there is to it. Naturally there are various
+utilities that help with those two tasks and they will be briefly explained in the following
+sections.
+
+\subsection{Assets}
+One of the governing aspects of a game engine is the Assets loading and management. For the
+purpose of promoting modularization and eliminating code duplication a convention was made.
+
+\noindent Assets are divided on two categories (or even better, two states):
+
+\begin{itemize}
+\item Assets that are loaded from disk and stored to RAM
+\item Assets that are loaded to the GPU
+\end{itemize}
+
+\noindent Of course, an asset needs to be loaded from disk first, in order to load it to the GPU\@.
+
+Basically, assets are discriminated based on their state. When one starts thinking of them that
+way, it is easy to notice that many modules do not actually require the asset itself. For
+instance, the Rendering module only expects an identifier for the loaded asset; it has no use
+for the actual loaded data. Using that convention has proven a wise decision since it speeded
+up debugging and developing.
+
+Throughout the code there are many independent asset loaders, for images, models, scenefiles etc..
+and \textit{Asset Stores}, which get as input the loaded data, upload it to the GPU and save an
+identifier to access them. All asset stores are maps with strings as key. That string represents
+a unique way to reference an asset, like a name or a UUID\@.

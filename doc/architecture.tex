@@ -16,10 +16,10 @@ title, subscribe to events) or even replace the whole context creation backend i
 
 \subsection{Screen Management}
 Each scene, is considered a different state\footnote{A scene can be anything that appears on
-screen. It can be a main menu screen or credits or a game scene etc\dots}The state management
+screen. It can be a main menu screen or credits or a game scene etc\dots}. The state management
 system can define the next state of each screen and defining each scene's resources
 so they can be loaded independently. When the screen changes, a loading screen appears which loads
-all assets the scene is going to need.
+all assets the scene requires.
 
 \subsection{Renderers}
 The result of rendering is the outcome of the combined efforts of quite a few Renderers, each
@@ -103,8 +103,8 @@ default\footnote{Just like using include guards in C/C++}.
 
 \subsubsection{Shader Reloading}
 As stated earlier, many shaders needs to be reloaded many times during development. Restarting
-the program meant reloading all the assets which means waiting time. Shader Reloading feature
-comes to the rescue as it eliminates the need for program restarting for mere changes in shaders.
+the program results in reloading all the assets which means more waiting time. The Shader Reloading feature
+comes to the rescue as it eliminates the need for program restarting for mere alterations in shaders.
 They can be reloaded on the fly, and if there is an error, a message box appears without stopping
 the program.
 

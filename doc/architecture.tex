@@ -42,8 +42,38 @@ and \textit{Asset Stores}, which get as input the loaded data, upload it to the 
 identifier to access them. All asset stores are maps with strings as key. That string represents
 a unique way to reference an asset, like a name or a UUID\@.
 
-\subsection{Shader Reloading}
-Shader Reloading
+\subsection{Shader}
+One of the greatest and most annoying problems a graphics developer encounters is the hassle of
+having to restart the whole program for just a simple alteration to a shader. To address that
+problem the following convention was made:
+
+\noindent Shaders are divided to two categories:
+
+\begin{itemize}
+\item Static shaders, embedded in source code
+\item Normal shaders, in their own glsl files
+\end{itemize}
+
+\noindent Static shaders are needed for independent features that are not likely to change often,
+just like the shaders for Shadow Maps or Cubemaps. Normal shaders, on the other hand, are those
+that contain all lighting equations (among other thigns) and that usually means that they are a
+lot more likely to change.\\
+There were two features developed for that reason.
+
+\subsubsection{Shader Modularization}
+As the engine grows larger the features usually get more complex. GLSL is not an exception to that
+rule. The engine's GLSL is enchanced with a preprocessing mechanism that promotes code reusability
+and modularity. For the time being, the only preprocessor directives implemented are those of
+\textit{\#include} and \textit{\#module} which are respectively used to include a module to the
+current one and declare a file as a separate module. Note that multiple includes are ignored by
+default\footnote{Just like using include guards in C/C++}.
+
+\subsubsection{Shader Reloading}
+As stated earlier, many shaders needs to be reloaded many times during development. Restarting
+the program meant reloading all the assets which means waiting time. Shader Reloading feature
+comes to the rescue as it eliminates the need for program restarting for mere changes in shaders.
+They can be reloaded on the fly, and if there is an error, a message box appears without stopping
+the program.
 
 \subsection{Embedded Shell}
 Embedded Shell

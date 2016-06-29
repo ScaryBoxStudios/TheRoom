@@ -1,15 +1,15 @@
 \section{Lighting}
 \subsection{Preface}
 One of the most important factors that make a scene realistic is how the light interacts with the objects in it.
-Through the time rendering techniques progressed from various empirical models (e.g. Phong models), that required
-tweaking from the artists in order to make results seem more real under different lighting setups, to physical based
+Through time, rendering techniques progressed from various empirical models (e.g. Phong models), that required
+tweaking from the artists in order to make results seem more realistic under different lighting setups, to physical based
 algorithms (e.g. Microfacet models) that calculate the correct object lighting given the lighting environment and
-its material properties. The Physical Based models are based around the laws of physics on how light interacts with
+its material properties. The Physical Based models are based on the laws of physics on how light interacts with
 matter depending on a number of environmental variables.
 
 \subsection{Background}
 All the physical based rendering models try to solve a simplified version of the rendering equation~\cite{lighting:ref32}.
-This equation is a function which gives the outgoing light in a particular direction $\omega_o$ from a point $p$ on a surface
+This equation gives the outgoing light in a particular direction $\omega_o$ from a point $p$ on a surface
 and looks like this:
 
 \begin{equation}
@@ -17,7 +17,7 @@ and looks like this:
 L_o(p,\omega_o) = L_e(p, \omega_o) + \int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i
 \end{equation}
 
-Breaking down the equation we get:
+\noindent Breaking down the equation we get:
 
 \begin{equation}
 \underbrace{L_o(p,\omega_o)}_\text{Outgoing Light} = \underbrace{L_e(p, \omega_o)}_\text{Emitted Light} + \underbrace{\int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i}_\text{Integral}
@@ -27,16 +27,17 @@ According to the equation the \textit{outgoing light} in a particular direction 
 sum of the \textit{emitted light} from that point and the sum of all the incoming light from all directions in a hemisphere
 above the point p (the orientation of the hemisphere is determined by the normal n).
 
-Breaking down the integral we get:
+\noindent Breaking down the integral we get:
+
 \begin{equation}
 \int_\Omega \underbrace{f_r(p,\omega_i,\omega_o)}_\text{BRDF}\underbrace{L_i(p,\omega_i)}_\text{Incoming Light}\underbrace{n\cdot\omega_i}_\text{Normal Attenuation}\ d\omega_i
 \end{equation}
 
-Where BRDF is a function returning the ratio of the amount of light reflected in a particular direction $\omega_o$, to the
+Where BRDF is a function that returns the ratio of the amount of light reflected in a particular direction $\omega_o$, to the
 amount received from another direction $\omega_i$ (more details later), incoming light is the light arriving at the point p
 from the direction $\omega_i$, and the normal attenuation is an attenuation factor that makes the incoming light at $p$
 dependent on the cosine of the angle between the normal $n$ and the incoming light direction $\omega_i$. Note that the
-incoming light doesn't have to come from a light source (direct light), it may have been reflected or refracted from another
+incoming light does not have to come from a light source (direct light), it may have been reflected or refracted from another
 point int the scene (indirect light).
 
 \subsection{Diffuse and Specular lighting}
@@ -44,7 +45,7 @@ When light hits a surface there are three possible outcomes. Light may be \textb
 \textbf{transmitted} through to the other side or light may be \textbf{reflected} back.
 Reflected light can be divided into two sub-types, specular reflection and diffuse reflection. Specular reflection reflects
 all light near the same angle, whereas diffuse reflection reflects in a broad range of directions.
-The Cook-Torrance model that is also used in the current implementation also makes this separation by describing the BRDF
+The Cook-Torrance model, that is used in the current implementation, also makes this separation by describing the BRDF
 function as:
 
 $$f_r = k_d f_{lambert} + k_s f_{cook-torrance}$$

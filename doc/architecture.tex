@@ -21,6 +21,22 @@ system allows selecting the next state of each screen and defining each scene's 
 so they can be loaded independently. When the screen changes, a loading screen appears which loads
 all assets the scene is going to need.
 
+\subsection{Renderers}
+The result of rendering is the outcome of the combined efforts of quite a few Renderers, each
+with his own purpose. Namely, so far there are Renderers for:
+
+\begin{itemize}
+\item Management of defferred rendering and all the other Renderers. This is the main Renderer.
+\item AABBs
+\item Debug view\footnote{Debug view is a mode where the visual output includes separate steps
+      of the deferred rendering. For example a view with only the normals or a view with the
+      shadow maps}
+\item Runtime shell
+\item Shadow Maps
+\item Skysphere and Skybox
+\item Text
+\end{itemize}
+
 \subsection{Assets and Resources}
 One of the governing aspects of a game engine is the Assets loading and management. For the
 purpose of promoting modularization and eliminating code duplication a convention was made.

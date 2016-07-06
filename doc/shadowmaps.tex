@@ -24,16 +24,16 @@ resolution far away. This is achieved by splitting the camera view frustum and c
 for each partition (see Figures~\ref{fig:csmsplits},\ref{fig:csmbufs}). The algorithm is composed of two main parts:
 
 \begin{enumerate}
-\item For every frustum split render the scene depth from the light pov\footnote{pov: Point Of View}
-\item While rendering the scene from the camera pov, pick and use the matching shadow map for the current
+\item For every frustum split render the scene depth from the light point of view (POV)
+\item While rendering the scene from the camera POV, pick and use the matching shadow map for the current
     fragment's Z value
 \end{enumerate}
 
-For the creation of each depth map, firstly the split planes, view and projection matrices for each split
-must be calculated. The procedure for each split is:
+For the creation of each depth map, the split planes, view and projection matrices for each split
+must be first calculated. The procedure for each split is:
 
 \begin{enumerate}
-\item Calculate near and far splits
+\item Calculate near and far split distances
 \item Create the projection for the split using previously calculated near and far values
 \item Extract the split frustum points by multiplying the inverse projection-view matrix
     with each of the vertices of an NDC cube (note that the prespective division must

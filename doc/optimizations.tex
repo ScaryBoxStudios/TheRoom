@@ -16,7 +16,7 @@ possible till the next draw call} Therefore, redundant graphics API calls are av
 as much as possible.
 
 \subsection{Deferred Rendering}
-With the traditional Forward Rendering pipeline, each vertex passes through the Gpu processing pipeline regardless
+With the traditional Forward Rendering pipeline, each vertex passes through the GPU processing pipeline regardless
 if it is visible or not in the end. That means that lots of fragments reach the final shading stage without even
 being visible. In addition, this approach does not scale well with more lights because the more lights there are,
 the more unnecessary shading operations are required. This rendering overhead can be avoided by developing a way
@@ -62,13 +62,17 @@ is performed, while for point lights only fragments of the area they affect are 
 \subsection{Bounding Spheres Optimization}
 
 When making the point light passes it is desirable that we shade only the visible fragments that reside inside the light
-sphere's radius. The first attempt on this would be the rendering of a sphere around the point light position instead
-of a screen quad pass. The problems with this simplistic approach are imminent, first of no actual bounding is occuring
-as the projection of the rendered sphere is a circle and objects out of it (in front or behind it) are also lit.
-Secondly as soon as the viewer enters the bounding volume the point light disappears due to the back face culling
-being enabled. Disabling back face culling would not be a viable option as this leads to increased light when outside
-the sphere (because we render both faces) and inverse of the original effect if only front face culling is enabled (light
-only when inside the volume).
+source's volume of effect; light from emitters attenuates and contributes negligibly to distant
+surface points. Therefore, only points within a certain radius from the (point) light source
+center need to be evaluated for lighting, saving significant shading time.
+The first attempt on this would be the rendering of a sphere around the point light position instead
+of a screen quad pass. The problems with this simplistic approach are directly noticeable:
+First, the screen projection of a sphere is a two-dimensional (screen x, y) ellipsoid, preventing
+the culling of fragments beyond its z-extents.
+Second as soon as the camera center of projection enters the light volume the point light disappears
+due to the back face culling being enabled. Disabling back face culling would not be a viable option
+as this leads to increased light when outside the sphere (because we render both faces) and inverse
+of the original effect if only front face culling is enabled (light only when inside the volume).
 To bypass these problems a smart trick using the stencil buffer can be used. It can be separated in two main parts:
 \begin{enumerate}
     \item Mark affected fragments in the Stencil Buffer
@@ -77,9 +81,9 @@ To bypass these problems a smart trick using the stencil buffer can be used. It 
 In order to mark the affected fragments in the Stencil Buffer we rely on the fact that when we look on the bounding
 sphere from the camera point of view:
 \begin{enumerate}
-    \item Both bounding sphere's front and back face polygons are behind an object that is in front it
+    \item Both bounding sphere's front and back face polygons are behind an object that is in front of it
     \item Both bounding sphere's front and back face polygons are in front of an object that is behind it
-    \item The front face polygons are infront but the back face polygons are behind of an object that is inside the bounding sphere
+    \item The front face polygons are in front of but the back face polygons are behind an object that is inside the bounding sphere
 \end{enumerate}
 So in order to use this with the Stencil Buffer we take the following steps:
 \begin{enumerate}

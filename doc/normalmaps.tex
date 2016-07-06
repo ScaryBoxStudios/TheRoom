@@ -1,12 +1,12 @@
 \section{Normal Mapping}
 Normal Mapping provides an enormous boost in detail for a relatively low cost. To implement
-Normal Mapping, tangents of each vertex are required\footnote{Traditionally, bitangents are
-needed as well but not in this case, thanks to a workaround.}; tangents are computed in CPU
-when a model is loaded, saving important time.
+Normal Mapping, tangents and bitangents of each vertex are required. Tangents are computed in CPU
+when a model is loaded, saving important time. Bitangents are computed in shader code, as a cross
+product between re-orthogonalized Tangents and Normals.
 
 Normals and Tangents for each vertex are calculated when loading the model and are first processed
-on the Geometry pass where the TBN\footnote{Tangent, Bitangent, Normal} matrix is calculated and
-then written to a 2D texture, for light pass to use.
+on the Geometry pass where the TBN\footnote{TBN is a matrix that contains the Tangent, Bitangent
+and Normal vectors} matrix is calculated and then written to a 2D texture, for light pass to use.
 
 \noindent Normals used in light pass are calculated with the following equations:
 

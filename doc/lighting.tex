@@ -9,8 +9,7 @@ matter depending on a number of environmental variables.
 
 \subsection{Background}
 All the physical based rendering models try to solve a simplified version of the rendering equation~\cite{lighting:ref32}.
-This equation gives the outgoing light in a particular direction $\omega_o$ from a point $p$ on a surface
-and looks like this:
+This equation relates the outgoing light in a particular direction $\omega_o$ to the incident light at a point $p$ on a surface:
 
 \begin{equation}
 \label{eq:rendeq}
@@ -20,17 +19,17 @@ L_o(p,\omega_o) = L_e(p, \omega_o) + \int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\
 \noindent Breaking down the equation we get:
 
 \begin{equation}
-\underbrace{L_o(p,\omega_o)}_\text{Outgoing Light} = \underbrace{L_e(p, \omega_o)}_\text{Emitted Light} + \underbrace{\int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i}_\text{Integral}
+\underbrace{L_o(p,\omega_o)}_\text{Outgoing Light} = \underbrace{L_e(p, \omega_o)}_\text{Emitted Light} + \underbrace{\int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i}_\text{Reflected Irradiance}
 \end{equation}
 
 According to the equation the \textit{outgoing light} in a particular direction from a point on a surface is the sum of the
-sum of the \textit{emitted light} from that point and the sum of all the incoming light from all directions in a hemisphere
-above the point p (the orientation of the hemisphere is determined by the normal n).
+sum of the \textit{emitted light} from that point and the contribution of all the incoming light from all directions in a
+hemisphere above the point p (the orientation of the hemisphere is determined by the normal n).
 
 \noindent Breaking down the integral we get:
 
 \begin{equation}
-\int_\Omega \underbrace{f_r(p,\omega_i,\omega_o)}_\text{BRDF}\underbrace{L_i(p,\omega_i)}_\text{Incoming Light}\underbrace{n\cdot\omega_i}_\text{Normal Attenuation}\ d\omega_i
+\int_\Omega \underbrace{f_r(p,\omega_i,\omega_o)}_\text{BRDF}\underbrace{L_i(p,\omega_i)}_\text{Incoming Light}\underbrace{n\cdot\omega_i}_\text{Incident Flow}\ d\omega_i
 \end{equation}
 
 Where BRDF is a function that returns the ratio of the amount of light reflected in a particular direction $\omega_o$, to the
@@ -79,7 +78,7 @@ Materials are defined by the following properties:
     \item Emissive Color, defines emission light color for emissive materials.
 \end{enumerate}
 
-The separation between metallics and dielectrics, also affects the perspective material colors on each light reflection type.
+The separation between metals and dielectrics, also affects the perspective material colors on each light reflection type.
 Metallics are assumed to be fully specular materials with base color acting as their specular color and no diffuse color (black).
 In the dielectrics category from the other the base color acts as their diffuse color and white as their specular color.
 The above choice can be explained as the subsurface scatter effect is deeper on dielectric materials due to their substantially
@@ -103,20 +102,23 @@ roughness increasing from left to right and increasing from bottom to top:
 \end{figure}
 
 \subsection{Environmental lighting}
-As stated before, light arriving in a point may have been reflected or refracted from another point int the scene.
-Offline algorithms may be able to capture that effect but in realtime applications this computation is impossible.
+As stated before, light arriving at a point may have been reflected or refracted from another point in the scene.
+Offline algorithms may be able to capture that effect but in realtime applications this is computationally expensive.
 So in order to emulate indirect lighting there is an imminent need for some preprocessing of the surrounding
 environment of an object.
 
-A technique called Image Base Lighting (IBL) is one solution that addresses that problem. Firstly, the object's environment is
+A technique called Image Base Lighting (IBL) is one solution that addresses that problem. First, an object's environment is
 captured as images in a cubemap form and then the rendering equation integrals are precalculated, treating each pixel in the
-environment map as a light source. They result can also be stored in cubemaps that can be queried later and be used to calculate the
-environmental light contribution on a fragment.
+environment map as a point sample on the surrounding environment that contributes to the center of the cube map. The result
+can also be stored in cubemaps that can be queried later and be used to calculate the environmental light contribution on a
+fragment. This way, each texel of the new environment (pre-filterred radiance) map, corresponds to the pre-integrated radiance
+from a given lobe of directions centered at the direction of the cubemap texel. The integrant includes the weighting according
+to a BRDF matching the directional lobe, which corresponds to a particular roughness level.
 
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.18,clip=true]{./image/envl_ref.png}
-    \caption{Reference Environment}
+    \caption{Radiance Field}
 \label{fig:envlref}
 \end{figure}
 

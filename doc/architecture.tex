@@ -1,20 +1,23 @@
-\section{Architecture}
+\section{Rendering Engine Architecture}
 Before moving on to the various algorithms used to compose the engine's visual output, a few
 words need to be said about its architecture.
 
 At its core, the engine operates on a single threaded loop with constant update time and
-variable rendering. The loop ends when it gets an exit signal. Each set of render frames,
-executed between updates, are interpolated for the purpose of achieving more fluent interactions
+variable rendering\footnote{There is no pre-defined rate for Render calls. The frequency of
+rendering operations depends on how much time is left for render after updates}.
+Each set of render frames, executed between updates\footnote{These updates include both input
+updates and state updates.}, are interpolated for the purpose of achieving more fluent interactions
 on higher end hardware. From an extremely distant point of view, that is all there is to it.
 Naturally there are various utilities that help with those two tasks and they will be briefly
 explained in the following sections.
 
 \subsection{Window}
 Another core part of the engine is the Window. All the window creating logic
-is separated from everything else, hence it is easy to implement window utilities (e.g.\ change
-title, subscribe to events) or even replace the whole context creation backend if needed.
+is separated from everything else, hence it is easy to implement single management functionality
+(e.g.\ change title, subscribe to events) or even replace the whole context creation backend
+(windowing toolkit) if needed.
 
-\subsection{Screen Management}
+\subsection{State Management}
 Each scene, is considered a different state\footnote{A scene can be anything that appears on
 screen. It can be a main menu screen or credits or a game scene etc\dots}. The state management
 system can define the next state of each screen and defining each scene's resources
@@ -22,7 +25,7 @@ so they can be loaded independently. When the screen changes, a loading screen a
 all assets the scene requires.
 
 \subsection{Renderers}
-The result of rendering is the outcome of the combined efforts of quite a few Renderers, each
+The result of rendering is a composition of the outcomes of quite a few Renderers, each
 with his own purpose. Namely, so far there are Renderers for:
 
 \begin{itemize}

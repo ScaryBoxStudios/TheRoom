@@ -3,8 +3,8 @@ Before moving on to the various algorithms used to compose the engine's visual o
 words need to be said about its architecture.
 
 At its core, the engine operates on a single threaded loop with constant update time and
-variable rendering\footnote{There is no pre-defined rate for Render calls. The frequency of
-rendering operations depends on how much time is left for render after updates}.
+variable frame rates\footnote{There is no pre-defined rate for Render calls. The frequency of
+rendering operations depends on how much time is left between the fixed interval updates}.
 Each set of render frames, executed between updates\footnote{These updates include both input
 updates and state updates.}, are interpolated for the purpose of achieving more fluent interactions
 on higher end hardware. From an extremely distant point of view, that is all there is to it.

@@ -17,12 +17,12 @@ is separated from everything else, hence it is easy to implement single manageme
 (e.g.\ change title, subscribe to events) or even replace the whole context creation backend
 (windowing toolkit) if needed.
 
-\subsection{State Management}
-Each scene, is considered a different state\footnote{A scene can be anything that appears on
-screen. It can be a main menu screen or credits or a game scene etc\dots}. The state management
-system can define the next state of each screen and defining each scene's resources
-so they can be loaded independently. When the screen changes, a loading screen appears which loads
-all assets the scene requires.
+\subsection{Screen Management}
+Each screen, is considered a different state in the application. A screen has its logic separated
+from other screens. It can be a main menu screen or credits or a game screen etc. The screen management
+system defines the flow of the active screens and their lifetimes using a finite state machine. This
+way its easier to multiplex the screens that were created in order to effectively separate different
+application logic.
 
 \subsection{Renderers}
 The result of rendering is a composition of the outcomes of quite a few Renderers, each

@@ -62,7 +62,7 @@ $$f_{cook-torrance} = \frac{DFG}{(4 \omega_o \cdot n)(\omega_i \cdot n)}$$
 Where D is the distribution function, F is the fresnel function and G is the geometry function.
 The Cook-Torrance model falls into the category of the \textbf{Microfacet Models} which are based on the idea
 that rough surfaces can be modelled as a collection of small microfacets, where each microfacet is assumed to be a very small perfect mirror,
-and their distribution and orientation define how the light is reflected at a large scale.
+and their distribution and orientation define how the light is reflected at a large scale.\cite{lighting:ref33}
 
 \subsection{Material properties}
 Materials are defined by the following properties:
@@ -150,4 +150,4 @@ for a specific cubemap resolution.
 Note that still, this way only phong lobe shapes are possible to be matched, as the whole microfacet specular
 BRDF is not evaluated for the environment, although more advanced approximations also exist\footnote{Split sum approximation is a great
 example, where the part of the BRDF not included in the PMREM is calculated as a separate lookup table that can be used to make
-specular lobes for the environment lighting that match the direct lighting model}.
+specular lobes for the environment lighting that match the direct lighting model\cite{lighting:ref40}}.

@@ -22,7 +22,7 @@ L_o(p,\omega_o) = L_e(p, \omega_o) + \int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\
 \underbrace{L_o(p,\omega_o)}_\text{Outgoing Light} = \underbrace{L_e(p, \omega_o)}_\text{Emitted Light} + \underbrace{\int_\Omega f_r(p,\omega_i,\omega_o)L_i(p,\omega_i)n\cdot\omega_i \ d\omega_i}_\text{Reflected Irradiance}
 \end{equation}
 
-According to the equation the \textit{outgoing light} in a particular direction from a point on a surface is the sum of the
+According to the equation the \textit{outgoing light} in a particular direction from a point on a surface is the
 sum of the \textit{emitted light} from that point and the contribution of all the incoming light from all directions in a
 hemisphere above the point p (the orientation of the hemisphere is determined by the normal n).
 
@@ -34,18 +34,17 @@ hemisphere above the point p (the orientation of the hemisphere is determined by
 
 Where BRDF is a function that returns the ratio of the amount of light reflected in a particular direction $\omega_o$, to the
 amount received from another direction $\omega_i$ (more details later), incoming light is the light arriving at the point p
-from the direction $\omega_i$, and the normal attenuation is an attenuation factor that makes the incoming light at $p$
+from the direction $\omega_i$, and incident flow is an attenuation factor that makes the incoming light at $p$
 dependent on the cosine of the angle between the normal $n$ and the incoming light direction $\omega_i$. Note that the
 incoming light does not have to come from a light source (direct light), it may have been reflected or refracted from another
 point int the scene (indirect light).
 
 \subsection{Diffuse and Specular lighting}
 When light hits a surface there are three possible outcomes. Light may be \textbf{absorbed} by the material, light may be
-\textbf{transmitted} through to the other side or light may be \textbf{reflected} back.
-Reflected light can be divided into two sub-types, specular reflection and diffuse reflection. Specular reflection reflects
-all light near the same angle, whereas diffuse reflection reflects in a broad range of directions.
-The Cook-Torrance model, that is used in the current implementation, also makes this separation by describing the BRDF
-function as:
+\textbf{transmitted} through to the other side or light may be \textbf{reflected} back. For dense objects, light scattered
+back through the surface of incidence near the point of entry is said to be diffusely reflected (diffused). Moreover, surface
+reflection is also called specular reflection. The Cook-Torrance model, that is used in the current implementation,
+also makes this separation by describing the BRDF function as:
 
 $$f_r = k_d f_{lambert} + k_s f_{cook-torrance}$$
 
@@ -61,8 +60,8 @@ where c is the surface colour. The specular Cook-Torrance BRDF is defined as:
 $$f_{cook-torrance} = \frac{DFG}{(4 \omega_o \cdot n)(\omega_i \cdot n)}$$
 
 Where D is the distribution function, F is the fresnel function and G is the geometry function.
-These terms exist, as the Cook-Torrance model falls into the category of the \textbf{Microfacet Models} which revolves around the idea
-that rough surfaces can be modelled as a collection of small microfacets, each of them is assumed to be a very small perfect mirror,
+The Cook-Torrance model falls into the category of the \textbf{Microfacet Models} which are based on the idea
+that rough surfaces can be modelled as a collection of small microfacets, where each microfacet is assumed to be a very small perfect mirror,
 and their distribution and orientation define how the light is reflected at a large scale.
 
 \subsection{Material properties}
@@ -78,11 +77,10 @@ Materials are defined by the following properties:
     \item Emissive Color, defines emission light color for emissive materials.
 \end{enumerate}
 
-The separation between metals and dielectrics, also affects the perspective material colors on each light reflection type.
-Metallics are assumed to be fully specular materials with base color acting as their specular color and no diffuse color (black).
-In the dielectrics category from the other the base color acts as their diffuse color and white as their specular color.
-The above choice can be explained as the subsurface scatter effect is deeper on dielectric materials due to their substantially
-lower density comparing to metals.
+The separation between metals and dielectrics, also affects each light reflection type.
+Metals are assumed to be fully specular materials with base color acting as their specular color and no diffuse color (black)
+due to very quick absorption near the surface. In the dielectrics category on the other hand the base color acts as their diffuse
+color and white as their specular color.
 
 In the following figures we can see the effects of roughness and reflectivity values for each type of material with
 roughness increasing from left to right and increasing from bottom to top:
@@ -104,11 +102,13 @@ roughness increasing from left to right and increasing from bottom to top:
 \subsection{Environmental lighting}
 As stated before, light arriving at a point may have been reflected or refracted from another point in the scene.
 Offline algorithms may be able to capture that effect but in realtime applications this is computationally expensive.
-So in order to emulate indirect lighting there is an imminent need for some preprocessing of the surrounding
-environment of an object.
+So in order to emulate indirect lighting quite often many rendering systems resolve to approaches that take advantage of
+preprocessing the surrounding environment of an object.
 
 A technique called Image Base Lighting (IBL) is one solution that addresses that problem. First, an object's environment is
-captured as images in a cubemap form and then the rendering equation integrals are precalculated, treating each pixel in the
+captured as images in a cubemap form\footnote{Cube mapping is a method of environment mapping that uses the six faces of a cube
+as the map shape. The environment is projected onto the sides of a cube and stored as six square textures, or unfolded into six
+regions of a single texture.} and then the rendering equation integrals are precalculated, treating each pixel in the
 environment map as a point sample on the surrounding environment that contributes to the center of the cube map. The result
 can also be stored in cubemaps that can be queried later and be used to calculate the environmental light contribution on a
 fragment. This way, each texel of the new environment (pre-filterred radiance) map, corresponds to the pre-integrated radiance
@@ -122,20 +122,11 @@ to a BRDF matching the directional lobe, which corresponds to a particular rough
 \label{fig:envlref}
 \end{figure}
 
-The environmental diffuse light contribution can be captured on an Irradiance Map. The Irradiance map can be generated
-by precalculating Lambert Diffuse BRDF for all the points around an object, and giving the simplicity of the Lambert Diffuse BRDF
-function generating it is as simple as applying cosine filter to the reference environment.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[scale=0.18,clip=true]{./image/envl_irr.png}
-    \caption{Irradiance Map}
-\label{fig:envlirr}
-\end{figure}
-
-The environmental specular light contribution can be captured on the relevant Radiance Map, also known as Prefiltered mipmaped
-radiance environment map (PMREM). Unfortunately, solving the specular BRDF is more difficult than the diffuse BRDF, due to the number of
-contributing factors. Specifically, roughness is the main contributor on the tightness of the specular lobe, so with lower roughness
+The environmental diffuse and specular light contribution can be captured on an Irradiance Maps\footnote{The irradiance map that is
+adjusted for specular reflections is also known as Prefiltered mipmaped radiance environment map (PMREM)}. The diffuse Irradiance map
+can be generated by precalculating the BRDF for all the points in a hemisphere around an object according to the normal
+direction, and similary the specular environment map can be generated by precalculating the BRDF for an area near the ideal reflection
+vector. For the specular reflections, roughness is the main contributor on the tightness of the specular lobe, so with lower roughness
 values a less blurry lookup map is needed, while with the higher roughness values a more blurry map must be used in order to make
 the correct specular lobe. For this reason, multiple versions of increasing roughness radiance maps are created that are chosen
 for their relevant roughness value. These maps can be stored as different mipmaps of the radiance cubemap in order to sample uniformingly.
@@ -144,8 +135,15 @@ for a specific cubemap resolution.
 
 \begin{figure}[ht]
     \centering
+    \includegraphics[scale=0.18,clip=true]{./image/envl_irr.png}
+    \caption{Diffuse Irradiance Map}
+\label{fig:envlirr}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
     \includegraphics[scale=0.36,clip=true]{./image/envl_rad.png}
-    \caption{Radiance Map}
+    \caption{Specular Irradiance Map}
 \label{fig:envlrad}
 \end{figure}
 

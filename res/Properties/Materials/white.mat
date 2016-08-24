@@ -1,0 +1,13 @@
+{
+    "materials":
+    [
+        {
+            "id": "white",
+            "color": [255, 255, 255, 255],
+            "emissive": [255, 255, 255, 255],
+            "roughness": 0.3,
+            "reflectivity": 0.8,
+            "metallic": 0
+        }
+    ]
+}

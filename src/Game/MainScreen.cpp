@@ -8,6 +8,7 @@ WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
+#include "../Asset/Properties/Properties.hpp"
 #include "../Asset/Properties/PropertiesLoader.hpp"
 
 // Skybox, irrmap and Radmap names for cubemap store
@@ -83,12 +84,44 @@ void MainScreen::SetupWorld()
 {
     // Test new properties loader
     {
-        std::string testFile = "res/Test/testscene.json";
-        auto testData = FileLoad<BufferType>(testFile);
-        if (!testData)
-            throw std::runtime_error("Couldn't load file (" + testFile + ")");
+        // Util to load files
+        auto loadFile = [](const std::string& filename) -> auto {
+            auto rVal = FileLoad<BufferType>(filename);
+            if (!rVal)
+                throw std::runtime_error("Couldn't load file (" + filename + ")");
+            return rVal;
+        };
+
+        // Load test files
+        auto testData = loadFile("res/Test/testscene.json");
+        auto bronze   = loadFile("res/Properties/Materials/bronze.mat");
+        auto stone    = loadFile("res/Properties/Materials/stone.mat");
+
+        // Begin the loader
         PropertiesLoader propertiesLoader;
         auto test = propertiesLoader.Load<Properties::SceneFile>(*testData);
+
+        // Input
+        std::unordered_map<std::string, PropertiesLoader::LoadManyIn> input =
+        {
+            {   "scenes",
+                {
+                    { "scene1", *testData }
+                ,   { "scene2", *testData }}
+            },
+            {   "materials",
+                {
+                    { "bronze", *bronze}
+                ,   { "stone", *stone}}
+            }
+        };
+
+        // Output maps
+        PropertiesLoader::LoadManyOut<Properties::SceneFile> sceneMap;
+        PropertiesLoader::LoadManyOut<Properties::MaterialFile> materialMap;
+
+        // Load
+        propertiesLoader.LoadMany(input["scenes"], sceneMap, input["materials"], materialMap);
     }
 
     // Load sample scene file

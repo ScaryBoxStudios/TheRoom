@@ -1,0 +1,24 @@
+{
+    "textures":
+    [
+        {
+            "id": "mahogany_diffuse",
+            "url": "ext/Assets/Textures/Materials/Mahogany/mahogany_wood.jpg" 
+        },
+        {
+            "id": "mahogany_specular",
+            "url": "ext/Assets/Textures/Materials/Mahogany/mahogany_wood_spec.jpg" 
+        }
+    ],
+    "materials":
+    [
+        {
+            "id": "mahogany",
+            "dmap": "mahogany_diffuse",
+            "smap": "mahogany_specular",
+            "roughness": 0.8,
+            "reflectivity": 0.02,
+            "metallic": 0
+        }
+    ]
+}

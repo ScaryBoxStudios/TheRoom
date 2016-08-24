@@ -5,6 +5,8 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include "Properties.hpp"
+
 // Id Parse helper
 auto parseId = [](rapidjson::Value& v) -> Properties::Id { return Properties::Id { v.GetString(), true }; };
 

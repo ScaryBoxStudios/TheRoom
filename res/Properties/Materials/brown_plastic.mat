@@ -1,0 +1,33 @@
+{
+    "materials":
+    [
+        {
+            "id": "brown_plastic_rough_1",
+            "color": [255, 150, 90, 255],
+            "roughness": 0.1,
+            "reflectivity": 0.05,
+            "metallic": 0
+        },
+        {
+            "id": "brown_plastic_rough_3",
+            "color": [255, 150, 90, 255],
+            "roughness": 0.3,
+            "reflectivity": 0.05,
+            "metallic": 0
+        },
+        {
+            "id": "brown_plastic_rough_5",
+            "color": [255, 150, 90, 255],
+            "roughness": 0.5,
+            "reflectivity": 0.05,
+            "metallic": 0
+        },
+        {
+            "id": "brown_plastic_rough_8",
+            "color": [255, 150, 90, 255],
+            "roughness": 0.8,
+            "reflectivity": 0.05,
+            "metallic": 0
+        }
+    ]
+}

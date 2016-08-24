@@ -1,0 +1,24 @@
+{
+    "textures":
+    [
+        {
+            "id": "stone_diffuse",
+            "url": "ext/Assets/Textures/Materials/Stone/brickwall.jpg"
+        },
+        {
+            "id": "stone_normal",
+            "url": "ext/Assets/Textures/Materials/Stone/brickwall_NM.jpg"
+        }
+    ],
+    "materials":
+    [
+        {
+            "id": "stone",
+            "dmap": "stone_diffuse",
+            "nmap": "stone_normal",
+            "roughness": 0.3,
+            "reflectivity": 0.04,
+            "metallic": 0
+        }
+    ]
+}

@@ -31,9 +31,10 @@
 #ifndef _PROPERTIES_LOADER_HPP_
 #define _PROPERTIES_LOADER_HPP_
 
+#include <string>
+#include <unordered_map>
 #include <vector>
 #include <stdint.h>
-#include "Properties.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -46,6 +47,23 @@ class PropertiesLoader
 {
     public:
         using Buffer = std::vector<std::uint8_t>;
+
+        // Aliases for input and output data structures for LoadMany function
+        using LoadManyIn = std::unordered_map<std::string, const Buffer&>;
+        template <typename T>
+        using LoadManyOut = std::unordered_map<std::string, T>;
+
+        // Empty load function to terminate variadic recursion
+        void LoadMany() {}
+
+        // Loads n JSONs given by input maps, to their respective output maps
+        template <typename T, typename... Args>
+        void LoadMany(const LoadManyIn& input, LoadManyOut<T>& output, Args&&... args)
+        {
+            for (const auto& p : input)
+                output.insert({p.first, Load<T>(p.second)});
+            LoadMany(std::forward<Args>(args)...);
+        }
 
         template <typename T>
         T Load(const Buffer& buf)

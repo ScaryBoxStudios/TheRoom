@@ -132,6 +132,11 @@ namespace Properties
         ModelFile extraModels;       // "extraModels"
         Properties::Scene scene;     // "scene"
     };
+
+    template<typename T>
+    void print(const T& v);
+    template<typename T>
+    void print(const T& v, const std::string& str);
 }
 
 #endif // ! _PROPERTIES_HPP_

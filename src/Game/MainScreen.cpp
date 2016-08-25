@@ -11,6 +11,8 @@ WARN_GUARD_OFF
 #include "../Asset/Properties/Properties.hpp"
 #include "../Asset/Properties/PropertiesLoader.hpp"
 
+#include <iostream>
+
 // Skybox, irrmap and Radmap names for cubemap store
 const std::string skybox = "main_skybox";
 const std::string irrmap = "main_irr";
@@ -122,6 +124,18 @@ void MainScreen::SetupWorld()
 
         // Load
         propertiesLoader.LoadMany(input["scenes"], sceneMap, input["materials"], materialMap);
+
+        // Print output
+        for (auto p : materialMap)
+        {
+            std::cout << "-------------------------------------" << std::endl << p.first << std::endl;
+            Properties::print(p.second);
+        }
+        for (auto p : sceneMap)
+        {
+            std::cout << "-------------------------------------" << std::endl << p.first << std::endl;
+            Properties::print(p.second);
+        }
     }
 
     // Load sample scene file

@@ -53,14 +53,12 @@
                 "id": "model1",
                 "geometry": "geo1",
                 "name": "model1",
-                "transform": {},
                 "materials": ["testMaterial"]
             },
             {
                 "id": "model2",
                 "geometry": "geo2",
                 "name": "model2",
-                "transform": {},
                 "materials": ["testMaterial"]
             } 
 
@@ -68,8 +66,17 @@
     },
     "scene":
     {
-        "models": ["model1", "model2"],
-        "modelGroups": [],
-        "pointLights": []
+        "root": {
+            "model": "model1",
+            "type": "Model",
+            "transform": {},
+            "children": [
+                {
+                    "model": "model2",
+                    "type": "PointLight",
+                    "transform": {}
+                }
+            ]
+        }
     }
 }

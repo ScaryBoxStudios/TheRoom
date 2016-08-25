@@ -82,6 +82,19 @@ void MainScreen::onInit(ScreenContext& sc)
     mRenderformCreator = std::make_unique<RenderformCreator>(&(mEngine->GetModelStore()), &(mEngine->GetMaterialStore()));
 }
 
+// Printing debug utility for properties
+void PrintOutputMaps() {}
+template <typename T, typename... Args>
+void PrintOutputMaps(PropertiesLoader::LoadManyOut<T>& v, Args&&... args)
+{
+    for (const auto& p : v)
+    {
+        std::cout << "-------------------------------------" << std::endl << p.first << std::endl;
+        Properties::print(p.second);
+    }
+    PrintOutputMaps(std::forward<Args>(args)...);
+}
+
 void MainScreen::SetupWorld()
 {
     // Test new properties loader
@@ -98,6 +111,7 @@ void MainScreen::SetupWorld()
         auto testData = loadFile("res/Test/testscene.json");
         auto bronze   = loadFile("res/Properties/Materials/bronze.mat");
         auto stone    = loadFile("res/Properties/Materials/stone.mat");
+        auto house    = loadFile("res/Properties/Models/house.mod");
 
         // Begin the loader
         PropertiesLoader propertiesLoader;
@@ -109,33 +123,37 @@ void MainScreen::SetupWorld()
             {   "scenes",
                 {
                     { "scene1", *testData }
-                ,   { "scene2", *testData }}
+                ,   { "scene2", *testData }
+                }
             },
             {   "materials",
                 {
-                    { "bronze", *bronze}
-                ,   { "stone", *stone}}
+                    { "bronze", *bronze }
+                ,   { "stone",  *stone  }
+                }
+            },
+            {
+                "models",
+                {
+                    { "house", *house }
+                }
             }
         };
 
         // Output maps
         PropertiesLoader::LoadManyOut<Properties::SceneFile> sceneMap;
         PropertiesLoader::LoadManyOut<Properties::MaterialFile> materialMap;
+        PropertiesLoader::LoadManyOut<Properties::ModelFile> modelMap;
 
         // Load
-        propertiesLoader.LoadMany(input["scenes"], sceneMap, input["materials"], materialMap);
+        propertiesLoader.LoadMany(
+                input["scenes"],    sceneMap,
+                input["materials"], materialMap,
+                input["models"],    modelMap);
 
-        // Print output
-        for (auto p : materialMap)
-        {
-            std::cout << "-------------------------------------" << std::endl << p.first << std::endl;
-            Properties::print(p.second);
-        }
-        for (auto p : sceneMap)
-        {
-            std::cout << "-------------------------------------" << std::endl << p.first << std::endl;
-            Properties::print(p.second);
-        }
+
+        // Print results
+        PrintOutputMaps(materialMap, sceneMap, modelMap);
     }
 
     // Load sample scene file

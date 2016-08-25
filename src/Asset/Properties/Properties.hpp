@@ -94,22 +94,26 @@ namespace Properties
         Id id;                     // "id"
         Id geometry;               // "geometry"
         std::string name;          // "name"
-        Transform transform;       // "transform"
         std::vector<Id> materials; // "materials"
     };
 
-    struct ModelGroup
+    struct SceneNode
     {
-        Id id;                     // "id"
-        std::vector<Model> models; // "models"
-        Transform transform;       // "transform"
+        enum class Type
+        {
+            Model,
+            PointLight
+        };
+
+        Id model;                        // "model"
+        Type type;                       // "type"
+        Transform transform;             // "transform"
+        std::vector<SceneNode> children; // "children"
     };
 
     struct Scene
     {
-        std::vector<Id> models;      // "models"
-        std::vector<Id> modelGroups; // "modelGroups"
-        std::vector<Id> pointLights; // "pointLights"
+        SceneNode root; // "root"
     };
 
     // TODO: Remove them from Properties namespace during integration
@@ -121,7 +125,6 @@ namespace Properties
 
     struct ModelFile
     {
-        Id id;                                        // "groupId"
         std::vector<Properties::Geometry> geometries; // "geometries"
         std::vector<Properties::Model> models;        // "models"
     };

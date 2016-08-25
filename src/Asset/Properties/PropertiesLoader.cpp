@@ -1,6 +1,7 @@
 #include "PropertiesLoader.hpp"
 #include <assert.h>
 #include <cstring>
+#include <functional>
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
@@ -76,6 +77,42 @@ auto parseTransform = [](rapidjson::Value& t) -> Properties::Transform
         transform.rotation.z = static_cast<float>(rot[2].GetDouble());
     }
     return transform;
+};
+
+// Parse Scene Node
+std::function<Properties::SceneNode (rapidjson::Value&)> parseSceneNode =
+[](rapidjson::Value& sn) -> Properties::SceneNode
+{
+    using namespace rapidjson;
+    Properties::SceneNode sceneNode = {};
+    assert(sn.IsObject());
+
+    // Id
+    sceneNode.model = parseId(sn["model"]);
+
+    // Type
+    std::string type = sn["type"].GetString();
+    if (type == "Model")
+        sceneNode.type = Properties::SceneNode::Type::Model;
+    else if (type == "PointLight")
+        sceneNode.type = Properties::SceneNode::Type::PointLight;
+    else
+        assert(false);
+
+    // Transform
+    sceneNode.transform = parseTransform(sn["transform"]);
+
+    // Children
+    if (sn.HasMember("children"))
+    {
+        Value& children = sn["children"];
+        assert(children.IsArray());
+
+        for (SizeType i = 0; i < children.Size(); ++i)
+            sceneNode.children.push_back(parseSceneNode(children[i]));
+    }
+
+    return sceneNode;
 };
 
 template <>
@@ -183,10 +220,6 @@ Properties::ModelFile PropertiesLoader::Load<Properties::ModelFile>(rapidjson::D
     // Create the output model file struct
     Properties::ModelFile modelFile = {};
 
-    // Parse group id
-    if (doc.HasMember("groupId"))
-        modelFile.id = parseId(doc["groupId"]);
-
     // Parse geometries  
     if (doc.HasMember("geometries"))
     {
@@ -235,9 +268,6 @@ Properties::ModelFile PropertiesLoader::Load<Properties::ModelFile>(rapidjson::D
 
             // Name
             model.name = m["name"].GetString();
-
-            // Transform
-            model.transform = parseTransform(m["transform"]);
 
             // Material
             if (m.HasMember("materials"))
@@ -304,35 +334,9 @@ Properties::SceneFile PropertiesLoader::Load<Properties::SceneFile>(rapidjson::D
         Value& sceneVal = doc["scene"];
         assert(sceneVal.IsObject());
 
-        // Parse models
-        if (sceneVal.HasMember("models"))
-        {
-            Value& models = sceneVal["models"];
-            assert(models.IsArray());
-
-            for (SizeType i = 0; i < models.Size(); ++i)
-                sceneFile.scene.models.push_back(parseId(models[i]));
-        }
-
-        // Parse model groups
-        if (sceneVal.HasMember("modelGroups"))
-        {
-            Value& groups = sceneVal["modelGroups"];
-            assert(groups.IsArray());
-
-            for (SizeType i = 0; i < groups.Size(); ++i)
-                sceneFile.scene.models.push_back(parseId(groups[i]));
-        }
-
-        // Parse point lights
-        if (sceneVal.HasMember("pointLights"))
-        {
-            Value& lights = sceneVal["pointLights"];
-            assert(lights.IsArray());
-
-            for (SizeType i = 0; i < lights.Size(); ++i)
-                sceneFile.scene.models.push_back(parseId(lights[i]));
-        }
+        // Parse root scene node
+        Value& root = sceneVal["root"];
+        sceneFile.scene.root = parseSceneNode(root);
     }
 
     return sceneFile;

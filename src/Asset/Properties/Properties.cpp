@@ -68,6 +68,20 @@ namespace Properties
     }
 
     template<>
+    void print<Transform>(const Transform& t)
+    {
+        auto vec3ToStr = [](const glm::vec3& v) -> std::string
+        {
+            return "x: " + std::to_string(v.x) + ", y: " + std::to_string(v.y) + ", z: " + std::to_string(v.z);
+        };
+
+        printTitle("Printing Transform");
+        printStr("Position", vec3ToStr(t.position));
+        printStr("Rotation", vec3ToStr(t.rotation));
+        printStr("Scale",    vec3ToStr(t.scale));
+    }
+
+    template<>
     void print<Model>(const Model& m)
     {
         printTitle("Printing Model");
@@ -80,21 +94,19 @@ namespace Properties
     }
 
     template<>
-    void print<ModelGroup>(const ModelGroup& m)
+    void print<SceneNode>(const SceneNode& n)
     {
-        printTitle("Printing ModelGroup");
-        print(m.id, "Group");
-        for (const auto& i : m.models)
-            print(i);
+        printTitle("Printing node");
+        print(n.model);
+        print(n.transform);
+        for (const auto& c : n.children) print(c);
     }
 
     template<>
     void print<Scene>(const Scene& s)
     {
         printTitle("Printing Scene");
-        for (const auto& i : s.models) print(i);
-        for (const auto& i : s.modelGroups) print(i);
-        for (const auto& i : s.pointLights) print(i);
+        print(s.root);
     }
 
     template<>
@@ -109,7 +121,6 @@ namespace Properties
     void print<ModelFile>(const ModelFile& m)
     {
         printTitle("Printing Model File");
-        print(m.id);
         for (const auto& g : m.geometries) print(g);
         for (const auto& v : m.models) print(v);
     }

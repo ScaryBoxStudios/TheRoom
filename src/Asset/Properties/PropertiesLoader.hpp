@@ -41,36 +41,40 @@ WARN_GUARD_ON
 #include <rapidjson/document.h>
 WARN_GUARD_OFF
 
-void parseJson(const std::vector<std::uint8_t>& data, rapidjson::Document& doc);
+// Converts JSON data to a JSON Document object
+void ParseJson(const std::vector<std::uint8_t>& data, rapidjson::Document& doc);
 
 class PropertiesLoader
 {
     public:
         using Buffer = std::vector<std::uint8_t>;
 
-        // Aliases for input and output data structures for LoadMany function
-        using LoadManyIn = std::unordered_map<std::string, const Buffer&>;
+        // -----
+        // LoadBulk is a utility to load any number of files in one shot. LoadBulk expects
+        // pairs of input/ouput variables and loads every input to its respeective output
+        // -----
+        using InputContainer = std::unordered_map<std::string, const Buffer&>; // Alias for LoadBulk input
         template <typename T>
-        using LoadManyOut = std::unordered_map<std::string, T>;
+        using OutputContainer = std::unordered_map<std::string, T>;            // Alias for LoadBulk output
 
         // Empty load function to terminate variadic recursion
-        void LoadMany() {}
+        void LoadBulk() {}
 
-        // Loads n JSONs given by input maps, to their respective output maps
         template <typename T, typename... Args>
-        void LoadMany(const LoadManyIn& input, LoadManyOut<T>& output, Args&&... args)
+        void LoadBulk(const InputContainer& input, OutputContainer<T>& output, Args&&... args)
         {
             for (const auto& p : input)
                 output.insert({p.first, Load<T>(p.second)});
-            LoadMany(std::forward<Args>(args)...);
+            LoadBulk(std::forward<Args>(args)...);
         }
 
+        // Parses a JSON from Buffer and initiates the JSON Document loading
         template <typename T>
         T Load(const Buffer& buf)
         {
             // Parse JSON
             rapidjson::Document doc;
-            parseJson(buf, doc);
+            ParseJson(buf, doc);
             return Load<T>(doc);
         }
 

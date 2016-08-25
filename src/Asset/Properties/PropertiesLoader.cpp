@@ -1,119 +1,17 @@
 #include "PropertiesLoader.hpp"
 #include <assert.h>
 #include <cstring>
-#include <functional>
 
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
 #include "Properties.hpp"
 
-// Id Parse helper
-auto parseId = [](rapidjson::Value& v) -> Properties::Id { return Properties::Id { v.GetString(), true }; };
-
-// Color Parse helper
-auto parseColor = [](const rapidjson::Value& pos) -> Properties::Color
-{
-    Properties::Color col = {};
-    assert(pos.IsArray());
-    col.r = static_cast<std::uint8_t>(pos[0].GetInt());
-    col.g = static_cast<std::uint8_t>(pos[1].GetInt());
-    col.b = static_cast<std::uint8_t>(pos[2].GetInt());
-    col.a = static_cast<std::uint8_t>(pos[3].GetInt());
-    return col;
-};
-
-void parseJson(const PropertiesLoader::Buffer& data, rapidjson::Document& doc)
-{
-    // Less verbose usage
-    using namespace rapidjson;
-
-    // Convert it to std::string containter
-    std::string json(std::begin(data), std::end(data));
-
-    // The scene file object to be filled
-    Properties::SceneFile sc = {};
-
-    // Parse the json file
-    doc.Parse(json.c_str());
-
-    // Root
-    assert(doc.IsObject());
-}
-
-// Parse Transform 
-auto parseTransform = [](rapidjson::Value& t) -> Properties::Transform
-{
-    using namespace rapidjson;
-    Properties::Transform transform = {};
-    transform.scale = glm::vec3(1.0f);
-
-    // Position
-    if (t.HasMember("position"))
-    {
-        Value& pos = t["position"];
-        assert(pos.IsArray());
-        transform.position.x = static_cast<float>(pos[0].GetDouble());
-        transform.position.y = static_cast<float>(pos[1].GetDouble());
-        transform.position.z = static_cast<float>(pos[2].GetDouble());
-    }
-
-    // Scale
-    if (t.HasMember("scale"))
-    {
-        Value& sc = t["scale"];
-        assert(sc.IsArray());
-        transform.scale.x = static_cast<float>(sc[0].GetDouble());
-        transform.scale.y = static_cast<float>(sc[1].GetDouble());
-        transform.scale.z = static_cast<float>(sc[2].GetDouble());
-    }
-
-    // Rotation
-    if (t.HasMember("rotation"))
-    {
-        Value& rot = t["rotation"];
-        transform.rotation.x = static_cast<float>(rot[0].GetDouble());
-        transform.rotation.y = static_cast<float>(rot[1].GetDouble());
-        transform.rotation.z = static_cast<float>(rot[2].GetDouble());
-    }
-    return transform;
-};
-
-// Parse Scene Node
-std::function<Properties::SceneNode (rapidjson::Value&)> parseSceneNode =
-[](rapidjson::Value& sn) -> Properties::SceneNode
-{
-    using namespace rapidjson;
-    Properties::SceneNode sceneNode = {};
-    assert(sn.IsObject());
-
-    // Id
-    sceneNode.model = parseId(sn["model"]);
-
-    // Type
-    std::string type = sn["type"].GetString();
-    if (type == "Model")
-        sceneNode.type = Properties::SceneNode::Type::Model;
-    else if (type == "PointLight")
-        sceneNode.type = Properties::SceneNode::Type::PointLight;
-    else
-        assert(false);
-
-    // Transform
-    sceneNode.transform = parseTransform(sn["transform"]);
-
-    // Children
-    if (sn.HasMember("children"))
-    {
-        Value& children = sn["children"];
-        assert(children.IsArray());
-
-        for (SizeType i = 0; i < children.Size(); ++i)
-            sceneNode.children.push_back(parseSceneNode(children[i]));
-    }
-
-    return sceneNode;
-};
+// Parsing helper functions declarations
+Properties::Id ParseId(const rapidjson::Value& v);          // Id 
+Properties::Color ParseColor(const rapidjson::Value& v);    // Color
+Properties::Transform ParseTransform(rapidjson::Value& t);  // Transform
+Properties::SceneNode ParseSceneNode(rapidjson::Value& sn); // SceneNode
 
 template <>
 Properties::MaterialFile PropertiesLoader::Load<Properties::MaterialFile>(rapidjson::Document& doc)
@@ -137,7 +35,7 @@ Properties::MaterialFile PropertiesLoader::Load<Properties::MaterialFile>(rapidj
             Properties::Texture tex = {};
 
             // Id
-            tex.id = parseId(t["id"]);
+            tex.id = ParseId(t["id"]);
 
             // Url
             tex.url = t["url"].GetString();
@@ -160,7 +58,7 @@ Properties::MaterialFile PropertiesLoader::Load<Properties::MaterialFile>(rapidj
             Properties::Material mt = {};
 
             // Id
-            mt.id = parseId(m["id"]);
+            mt.id = ParseId(m["id"]);
 
             // Name
             if(m.HasMember("name"))
@@ -168,9 +66,9 @@ Properties::MaterialFile PropertiesLoader::Load<Properties::MaterialFile>(rapidj
 
             // Colors
             if(m.HasMember("color"))
-                mt.color = parseColor(m["color"]);
+                mt.color = ParseColor(m["color"]);
             if (m.HasMember("emissive"))
-                mt.emissive = parseColor(m["emissive"]);
+                mt.emissive = ParseColor(m["emissive"]);
 
             // Aspects
             if (m.HasMember("roughness"))
@@ -191,17 +89,17 @@ Properties::MaterialFile PropertiesLoader::Load<Properties::MaterialFile>(rapidj
             // Map
             mt.dmap.valid = false;
             if (m.HasMember("dmap"))
-                mt.dmap = parseId(m["dmap"]);
+                mt.dmap = ParseId(m["dmap"]);
 
             // SpecMap
             mt.smap.valid = false;
             if (m.HasMember("smap"))
-                mt.smap = parseId(m["smap"]);
+                mt.smap = ParseId(m["smap"]);
 
             // Nmap
             mt.nmap.valid = false;
             if(m.HasMember("nmap"))
-                mt.nmap = parseId(m["nmap"]);
+                mt.nmap = ParseId(m["nmap"]);
 
             // Add parsed material to the list
             matFile.materials.push_back(mt);
@@ -233,7 +131,7 @@ Properties::ModelFile PropertiesLoader::Load<Properties::ModelFile>(rapidjson::D
             Properties::Geometry gd = {};
 
             // Id
-            gd.id = parseId(g["id"]);
+            gd.id = ParseId(g["id"]);
 
             // Name 
             gd.name = g["name"].GetString();
@@ -260,11 +158,11 @@ Properties::ModelFile PropertiesLoader::Load<Properties::ModelFile>(rapidjson::D
 
             // Id
             model.id.valid = false;
-            model.id = parseId(m["id"]);
+            model.id = ParseId(m["id"]);
 
             // Geometry Id
             model.geometry.valid = false;
-            model.geometry = parseId(m["geometry"]);
+            model.geometry = ParseId(m["geometry"]);
 
             // Name
             model.name = m["name"].GetString();
@@ -279,7 +177,7 @@ Properties::ModelFile PropertiesLoader::Load<Properties::ModelFile>(rapidjson::D
                 for (SizeType j = 0; j < mats.Size(); ++j)
                 {
                     Value& mat = mats[j];
-                    model.materials[j] = parseId(mat);
+                    model.materials[j] = ParseId(mat);
                 }
             }
 
@@ -336,8 +234,117 @@ Properties::SceneFile PropertiesLoader::Load<Properties::SceneFile>(rapidjson::D
 
         // Parse root scene node
         Value& root = sceneVal["root"];
-        sceneFile.scene.root = parseSceneNode(root);
+        sceneFile.scene.root = ParseSceneNode(root);
     }
 
     return sceneFile;
+}
+
+// --------------------------------------------------
+// Parsing helper functions implementations
+// --------------------------------------------------
+// Id Parse helper
+Properties::Id ParseId(const rapidjson::Value& v) { return Properties::Id { v.GetString(), true }; }
+
+// Color Parse helper
+Properties::Color ParseColor(const rapidjson::Value& v)
+{
+    Properties::Color col = {};
+    assert(v.IsArray());
+    col.r = static_cast<std::uint8_t>(v[0].GetInt());
+    col.g = static_cast<std::uint8_t>(v[1].GetInt());
+    col.b = static_cast<std::uint8_t>(v[2].GetInt());
+    col.a = static_cast<std::uint8_t>(v[3].GetInt());
+    return col;
+};
+
+// Transform Parse helper
+Properties::Transform ParseTransform(rapidjson::Value& t)
+{
+    using namespace rapidjson;
+    Properties::Transform transform = {};
+    transform.scale = glm::vec3(1.0f);
+
+    // Position
+    if (t.HasMember("position"))
+    {
+        Value& pos = t["position"];
+        assert(pos.IsArray());
+        transform.position.x = static_cast<float>(pos[0].GetDouble());
+        transform.position.y = static_cast<float>(pos[1].GetDouble());
+        transform.position.z = static_cast<float>(pos[2].GetDouble());
+    }
+
+    // Scale
+    if (t.HasMember("scale"))
+    {
+        Value& sc = t["scale"];
+        assert(sc.IsArray());
+        transform.scale.x = static_cast<float>(sc[0].GetDouble());
+        transform.scale.y = static_cast<float>(sc[1].GetDouble());
+        transform.scale.z = static_cast<float>(sc[2].GetDouble());
+    }
+
+    // Rotation
+    if (t.HasMember("rotation"))
+    {
+        Value& rot = t["rotation"];
+        transform.rotation.x = static_cast<float>(rot[0].GetDouble());
+        transform.rotation.y = static_cast<float>(rot[1].GetDouble());
+        transform.rotation.z = static_cast<float>(rot[2].GetDouble());
+    }
+    return transform;
+};
+
+// Scene Node Parse helper
+Properties::SceneNode ParseSceneNode(rapidjson::Value& sn)
+{
+    using namespace rapidjson;
+    Properties::SceneNode sceneNode = {};
+    assert(sn.IsObject());
+
+    // Id
+    sceneNode.model = ParseId(sn["model"]);
+
+    // Type
+    std::string type = sn["type"].GetString();
+    if (type == "Model")
+        sceneNode.type = Properties::SceneNode::Type::Model;
+    else if (type == "PointLight")
+        sceneNode.type = Properties::SceneNode::Type::PointLight;
+    else
+        assert(false);
+
+    // Transform
+    sceneNode.transform = ParseTransform(sn["transform"]);
+
+    // Children
+    if (sn.HasMember("children"))
+    {
+        Value& children = sn["children"];
+        assert(children.IsArray());
+
+        for (SizeType i = 0; i < children.Size(); ++i)
+            sceneNode.children.push_back(ParseSceneNode(children[i]));
+    }
+
+    return sceneNode;
+};
+
+void ParseJson(const PropertiesLoader::Buffer& data, rapidjson::Document& doc)
+{
+    // Less verbose usage
+    using namespace rapidjson;
+
+    // Convert it to std::string containter
+    std::string json(std::begin(data), std::end(data));
+
+    // The scene file object to be filled
+    Properties::SceneFile sc = {};
+
+    // Parse the json file
+    doc.Parse(json.c_str());
+
+    // Root
+    assert(doc.IsObject());
 }

@@ -85,7 +85,7 @@ void MainScreen::onInit(ScreenContext& sc)
 // Printing debug utility for properties
 void PrintOutputMaps() {}
 template <typename T, typename... Args>
-void PrintOutputMaps(PropertiesLoader::LoadManyOut<T>& v, Args&&... args)
+void PrintOutputMaps(PropertiesLoader::OutputContainer<T>& v, Args&&... args)
 {
     for (const auto& p : v)
     {
@@ -118,7 +118,7 @@ void MainScreen::SetupWorld()
         auto test = propertiesLoader.Load<Properties::SceneFile>(*testData);
 
         // Input
-        std::unordered_map<std::string, PropertiesLoader::LoadManyIn> input =
+        std::unordered_map<std::string, PropertiesLoader::InputContainer> input =
         {
             {   "scenes",
                 {
@@ -141,16 +141,15 @@ void MainScreen::SetupWorld()
         };
 
         // Output maps
-        PropertiesLoader::LoadManyOut<Properties::SceneFile> sceneMap;
-        PropertiesLoader::LoadManyOut<Properties::MaterialFile> materialMap;
-        PropertiesLoader::LoadManyOut<Properties::ModelFile> modelMap;
+        PropertiesLoader::OutputContainer<Properties::SceneFile> sceneMap;
+        PropertiesLoader::OutputContainer<Properties::MaterialFile> materialMap;
+        PropertiesLoader::OutputContainer<Properties::ModelFile> modelMap;
 
         // Load
-        propertiesLoader.LoadMany(
+        propertiesLoader.LoadBulk(
                 input["scenes"],    sceneMap,
                 input["materials"], materialMap,
                 input["models"],    modelMap);
-
 
         // Print results
         PrintOutputMaps(materialMap, sceneMap, modelMap);

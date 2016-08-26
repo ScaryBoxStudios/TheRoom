@@ -10,6 +10,7 @@ WARN_GUARD_OFF
 #include "../Graphics/Scene/SceneFactory.hpp"
 #include "../Asset/Properties/Properties.hpp"
 #include "../Asset/Properties/PropertiesLoader.hpp"
+#include "../Asset/Properties/PropertiesValidator.hpp"
 
 #include <iostream>
 
@@ -113,9 +114,8 @@ void MainScreen::SetupWorld()
         auto stone    = loadFile("res/Properties/Materials/stone.mat");
         auto house    = loadFile("res/Properties/Models/house.mod");
 
-        // Begin the loader
+        // Create the loader
         PropertiesLoader propertiesLoader;
-        auto test = propertiesLoader.Load<Properties::SceneFile>(*testData);
 
         // Input
         std::unordered_map<std::string, PropertiesLoader::InputContainer> input =
@@ -151,8 +151,20 @@ void MainScreen::SetupWorld()
                 input["materials"], materialMap,
                 input["models"],    modelMap);
 
+        // Validation
+        PropertiesValidator validator;
+        PropertiesValidator::Result r = validator.ValidateBulk(materialMap, modelMap);
+
         // Print results
-        PrintOutputMaps(materialMap, sceneMap, modelMap);
+        //PrintOutputMaps(materialMap, sceneMap, modelMap);
+
+        std::cout << "Errors: " << std::endl;
+        for (const auto& e : r.errors)
+            std::cout << PropertiesValidator::ErrorToString(e) << std::endl;
+        std::cout << "Warnings: " << std::endl;
+        for (const auto& e : r.warnings)
+            std::cout << PropertiesValidator::WarnToString(e) << std::endl;
+
     }
 
     // Load sample scene file

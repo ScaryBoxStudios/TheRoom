@@ -1,5 +1,4 @@
 PRJTYPE = Executable
-LIBS = glfw glad
 DEFINES = _SCL_SECURE_NO_WARNINGS
 LIBS = assetloader vorbis ogg freetype openal tiff png glfw glad assimp jpeg
 ifeq ($(OS), Windows_NT)

@@ -10,6 +10,7 @@ WARN_GUARD_OFF
 #include "../Graphics/Scene/SceneFactory.hpp"
 #include "../Asset/Properties/Properties.hpp"
 #include "../Asset/Properties/PropertiesLoader.hpp"
+#include "../Asset/Properties/PropertiesManager.hpp"
 #include "../Asset/Properties/PropertiesValidator.hpp"
 
 #include <iostream>
@@ -100,71 +101,16 @@ void MainScreen::SetupWorld()
 {
     // Test new properties loader
     {
-        // Util to load files
-        auto loadFile = [](const std::string& filename) -> auto {
-            auto rVal = FileLoad<BufferType>(filename);
-            if (!rVal)
-                throw std::runtime_error("Couldn't load file (" + filename + ")");
-            return rVal;
-        };
-
-        // Load test files
-        auto testData = loadFile("res/Test/testscene.json");
-        auto bronze   = loadFile("res/Properties/Materials/bronze.mat");
-        auto stone    = loadFile("res/Properties/Materials/stone.mat");
-        auto house    = loadFile("res/Properties/Models/house.mod");
-
-        // Create the loader
-        PropertiesLoader propertiesLoader;
-
-        // Input
-        std::unordered_map<std::string, PropertiesLoader::InputContainer> input =
-        {
-            {   "scenes",
-                {
-                    { "scene1", *testData }
-                ,   { "scene2", *testData }
-                }
-            },
-            {   "materials",
-                {
-                    { "bronze", *bronze }
-                ,   { "stone",  *stone  }
-                }
-            },
-            {
-                "models",
-                {
-                    { "house", *house }
-                }
-            }
-        };
-
-        // Output maps
-        PropertiesLoader::OutputContainer<Properties::SceneFile> sceneMap;
-        PropertiesLoader::OutputContainer<Properties::MaterialFile> materialMap;
-        PropertiesLoader::OutputContainer<Properties::ModelFile> modelMap;
-
-        // Load
-        propertiesLoader.LoadBulk(
-                input["scenes"],    sceneMap,
-                input["materials"], materialMap,
-                input["models"],    modelMap);
-
-        // Validation
-        PropertiesValidator validator;
-        PropertiesValidator::Result r = validator.ValidateBulk(materialMap, modelMap);
-
-        // Print results
-        //PrintOutputMaps(materialMap, sceneMap, modelMap);
-
-        std::cout << "Errors: " << std::endl;
-        for (const auto& e : r.errors)
-            std::cout << PropertiesValidator::ErrorToString(e) << std::endl;
-        std::cout << "Warnings: " << std::endl;
-        for (const auto& e : r.warnings)
-            std::cout << PropertiesValidator::WarnToString(e) << std::endl;
-
+        PropertiesManager propMgr;
+        propMgr.Load
+            // Scenes
+            ( {{ "testscene", "res/Test/testscene.json" }}
+            // Materials
+            , {{ "bronze",    "res/Properties/Materials/bronze.mat" }
+              ,{ "stone",     "res/Properties/Materials/stone.mat" }}
+            // Models
+            , {{ "house",     "res/Properties/Models/house.mod" }}
+            );
     }
 
     // Load sample scene file

@@ -42,11 +42,18 @@ class PropertiesValidator
         using ErrorCode = int;
         using WarningCode = int;
 
+        template <typename T>
+        struct ResultItem
+        {
+            T code;         // Error/Warning code
+            std::string id; // Property id of said code
+        };
+
         class Result
         {
             public:
-                std::vector<ErrorCode> errors;
-                std::vector<WarningCode> warnings;
+                std::vector<ResultItem<ErrorCode>> errors;
+                std::vector<ResultItem<WarningCode>> warnings;
 
                 Result& operator+=(const Result& b);
                 Result& operator+=(const Result&& b);
@@ -72,7 +79,10 @@ class PropertiesValidator
 
             // Validate input
             for (const auto& p : input)
+            {
+                mCurrentId = p.first;
                 r += Validate(p.second);
+            }
 
             return r += ValidateBulk(std::forward<Args>(args)...);
         }
@@ -84,6 +94,8 @@ class PropertiesValidator
     private:
         const static std::unordered_map<ErrorCode, std::string> mErrMap;
         const static std::unordered_map<WarningCode, std::string> mWarnMap;
+
+        std::string mCurrentId;
 
 };
 

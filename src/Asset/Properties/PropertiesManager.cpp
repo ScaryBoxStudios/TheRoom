@@ -64,9 +64,9 @@ void PropertiesManager::Load(
 
     std::cout << "Errors: " << std::endl;
     for (const auto& e : r.errors)
-        std::cout << "\t" << PropertiesValidator::ErrorToString(e) << std::endl;
+        std::cout << "\t" << e.id + ": " << PropertiesValidator::ErrorToString(e.code) << std::endl;
     std::cout << "Warnings: " << std::endl;
-    for (const auto& e : r.warnings)
-        std::cout << "\t" << PropertiesValidator::WarnToString(e) << std::endl;
+    for (const auto& w : r.warnings)
+        std::cout << "\t" << w.id + ": " << PropertiesValidator::WarnToString(w.code) << std::endl;
 
 }

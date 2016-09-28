@@ -38,9 +38,9 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::Id>
 {
     Result r = {};
     if (!input.valid)
-        r.warnings.push_back(1);
+        r.warnings.push_back({1, mCurrentId});
     else if(input.data == "")
-        r.errors.push_back(3);
+        r.errors.push_back({3, mCurrentId});
     return r;
 }
 
@@ -90,13 +90,13 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::Material>
     for (float a : { input.roughness, input.reflectivity, input.transparency })
     {
         if (a < 0)
-            r.errors.push_back(1);
+            r.errors.push_back({1, mCurrentId});
         else if (a > 1)
-            r.errors.push_back(2);
+            r.errors.push_back({2, mCurrentId});
     }
 
     if (input.metallic != 0 && input.metallic != 1)
-        r.errors.push_back(4);
+        r.errors.push_back({4, mCurrentId});
 
     return r;
 }

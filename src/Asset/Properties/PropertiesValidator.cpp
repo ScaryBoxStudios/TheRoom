@@ -152,7 +152,12 @@ template<>
 PropertiesValidator::Result PropertiesValidator::Validate<Properties::Scene>
 (const Properties::Scene& input)
 {
-    return Validate(input.root);
+    Result r = {};
+
+    for (const auto& n : input.nodes)
+        r += Validate(n);
+
+    return r;
 }
 
 // Material File

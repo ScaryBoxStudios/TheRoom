@@ -232,9 +232,12 @@ Properties::SceneFile PropertiesLoader::Load<Properties::SceneFile>(rapidjson::D
         Value& sceneVal = doc["scene"];
         assert(sceneVal.IsObject());
 
-        // Parse root scene node
-        Value& root = sceneVal["root"];
-        sceneFile.scene.root = ParseSceneNode(root);
+        // Parse scene nodes
+        Value& nodes = sceneVal["nodes"];
+        assert(nodes.IsArray());
+
+        for (SizeType i = 0; i < nodes.Size(); ++i)
+            sceneFile.scene.nodes.push_back(ParseSceneNode(nodes[i]));
     }
 
     return sceneFile;

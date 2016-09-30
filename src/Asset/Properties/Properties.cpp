@@ -106,7 +106,8 @@ namespace Properties
     void print<Scene>(const Scene& s)
     {
         printTitle("Printing Scene");
-        print(s.root);
+        for (const auto& n : s.nodes)
+            print(n);
     }
 
     template<>

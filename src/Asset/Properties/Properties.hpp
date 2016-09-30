@@ -113,7 +113,7 @@ namespace Properties
 
     struct Scene
     {
-        SceneNode root; // "root"
+        std::vector<SceneNode> nodes; // "nodes"
     };
 
     // TODO: Remove them from Properties namespace during integration

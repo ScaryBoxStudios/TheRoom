@@ -60,7 +60,7 @@ void PropertiesManager::Load(
 
     // Validation
     PropertiesValidator validator;
-        PropertiesValidator::Result r = validator.ValidateBulk(materialOut, modelOut);
+        PropertiesValidator::Result r = validator.ValidateBulk(sceneOut, materialOut, modelOut);
 
     std::cout << "Errors: " << std::endl;
     for (const auto& e : r.errors)

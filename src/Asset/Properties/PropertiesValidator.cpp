@@ -101,6 +101,16 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::Material>
     return r;
 }
 
+// Transform
+template<>
+PropertiesValidator::Result PropertiesValidator::Validate<Properties::Transform>
+(const Properties::Transform& input)
+{
+    (void)input;
+    Result r = {};
+    return r;
+}
+
 // Model
 template<>
 PropertiesValidator::Result PropertiesValidator::Validate<Properties::Model>
@@ -115,6 +125,34 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::Model>
         r += Validate(id);
 
     return r;
+}
+
+// Scene Node
+template<>
+PropertiesValidator::Result PropertiesValidator::Validate<Properties::SceneNode>
+(const Properties::SceneNode& input)
+{
+    Result r = {};
+
+    // Id
+    r += Validate(input.model);
+
+    // Transform
+    r += Validate(input.transform);
+
+    // Children
+    for (const auto& child : input.children)
+        r += Validate(child);
+
+    return r;
+}
+
+// Scene
+template<>
+PropertiesValidator::Result PropertiesValidator::Validate<Properties::Scene>
+(const Properties::Scene& input)
+{
+    return Validate(input.root);
 }
 
 // Material File
@@ -149,6 +187,25 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::ModelFile>
     // Validate models
     for (const auto& m : input.models)
         r += Validate(m);
+
+    return r;
+}
+
+// Scene File
+template <>
+PropertiesValidator::Result PropertiesValidator::Validate<Properties::SceneFile>
+(const Properties::SceneFile& input)
+{
+    PropertiesValidator::Result r = {};
+
+    // Validate extra materials
+    r += Validate(input.extraMaterials);
+
+    // Validate extra models
+    r += Validate(input.extraModels);
+
+    // Validate scene
+    r += Validate(input.scene);
 
     return r;
 }

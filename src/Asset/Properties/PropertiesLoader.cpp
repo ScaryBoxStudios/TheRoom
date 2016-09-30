@@ -307,6 +307,9 @@ Properties::SceneNode ParseSceneNode(rapidjson::Value& sn)
     assert(sn.IsObject());
 
     // Id
+    sceneNode.id = ParseId(sn["id"]);
+
+    // Model Id
     sceneNode.model = ParseId(sn["model"]);
 
     // Type

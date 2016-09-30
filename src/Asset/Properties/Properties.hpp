@@ -105,6 +105,7 @@ namespace Properties
             PointLight
         };
 
+        Id id;                           // "id"
         Id model;                        // "model"
         Type type;                       // "type"
         Transform transform;             // "transform"

@@ -135,6 +135,9 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::SceneNode>
     Result r = {};
 
     // Id
+    r += Validate(input.id);
+
+    // Model Id
     r += Validate(input.model);
 
     // Transform

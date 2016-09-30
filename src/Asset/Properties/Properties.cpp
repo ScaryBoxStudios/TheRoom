@@ -97,6 +97,7 @@ namespace Properties
     void print<SceneNode>(const SceneNode& n)
     {
         printTitle("Printing node");
+        print(n.id);
         print(n.model);
         print(n.transform);
         for (const auto& c : n.children) print(c);

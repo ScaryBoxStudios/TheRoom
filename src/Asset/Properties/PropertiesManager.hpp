@@ -33,20 +33,50 @@
 
 #include <vector>
 #include <string>
+#include <memory>
+
+#include "Properties.hpp"
+#include "PropertiesLoader.hpp"
 
 class PropertiesManager
 {
     public:
+        using SceneFileContainer    = PropertiesLoader::OutputContainer<Properties::SceneFile>;
+        using MaterialFileContainer = PropertiesLoader::OutputContainer<Properties::MaterialFile>;
+        using ModelFileContainer    = PropertiesLoader::OutputContainer<Properties::ModelFile>;
+
         struct LoadInput
         {
             std::string id;
             std::string filename;
         };
 
-        void Load(
+        Properties::SceneFile Load(
             const std::vector<LoadInput>& scenes,
             const std::vector<LoadInput>& materials,
             const std::vector<LoadInput>& models);
+
+    private:
+        PropertiesManager& ParseProperties(
+            const std::vector<LoadInput>& scenes,
+            const std::vector<LoadInput>& materials,
+            const std::vector<LoadInput>& models,
+            SceneFileContainer& sceneBuf,
+            MaterialFileContainer& materialBuf,
+            ModelFileContainer& modelBuf);
+
+        PropertiesManager& ValidateProperties(
+                const SceneFileContainer& scenes,
+                const MaterialFileContainer& materials,
+                const ModelFileContainer& models);
+
+        PropertiesManager& MergeProperties(
+                Properties::SceneFile& mergedPropsBuffer,
+                const SceneFileContainer& scenes,
+                const MaterialFileContainer& materials,
+                const ModelFileContainer& models);
+
+        void ValidateMergedProperties(Properties::SceneFile& mergedProps);
 };
 
 #endif // ! _PROPERTIES_MANAGER_HPP_

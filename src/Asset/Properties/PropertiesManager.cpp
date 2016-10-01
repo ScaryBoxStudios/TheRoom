@@ -1,11 +1,8 @@
 #include "PropertiesManager.hpp"
 
 #include <iostream>
-#include <memory>
 #include <unordered_map>
 
-#include "Properties.hpp"
-#include "PropertiesLoader.hpp"
 #include "PropertiesValidator.hpp"
 #include "../../Util/FileLoad.hpp"
 
@@ -29,14 +26,39 @@ static void PrintResult(const PropertiesValidator::Result& r);
 // --------------------------------------------------
 // Header function implementation
 // --------------------------------------------------
-void PropertiesManager::Load(
+Properties::SceneFile PropertiesManager::Load(
      const std::vector<PropertiesManager::LoadInput>& scenes,
      const std::vector<PropertiesManager::LoadInput>& materials,
      const std::vector<PropertiesManager::LoadInput>& models)
 {
-    // Create input containers
-    PropertiesLoader::InputContainer sceneIn, materialIn, modelIn;
+    // Output buffers
+    SceneFileContainer sceneBuf;
+    MaterialFileContainer materialBuf;
+    ModelFileContainer modelBuf;
+
+    // Merged properties buffer
+    Properties::SceneFile merged = {};
+
+    // Load Properties Pipeline
+    ParseProperties(scenes, materials, models, sceneBuf, materialBuf, modelBuf)
+    .ValidateProperties(sceneBuf, materialBuf, modelBuf)
+    .MergeProperties(merged, sceneBuf, materialBuf, modelBuf)
+    .ValidateMergedProperties(merged);
+
+    return merged;
+}
+
+PropertiesManager& PropertiesManager::ParseProperties(
+    const std::vector<LoadInput>& scenes,
+    const std::vector<LoadInput>& materials,
+    const std::vector<LoadInput>& models,
+    SceneFileContainer& sceneBuf,
+    MaterialFileContainer& materialBuf,
+    ModelFileContainer& modelBuf)
+{
+    // Create containers
     std::vector<std::unique_ptr<BufferType>> filedata;
+    PropertiesLoader::InputContainer sceneIn, materialIn, modelIn;
 
     // Load filedata
     LoadFiledata(
@@ -47,23 +69,46 @@ void PropertiesManager::Load(
     // Create the loader
     PropertiesLoader loader;
 
-    // Output maps
-    PropertiesLoader::OutputContainer<Properties::SceneFile> sceneOut;
-    PropertiesLoader::OutputContainer<Properties::MaterialFile> materialOut;
-    PropertiesLoader::OutputContainer<Properties::ModelFile> modelOut;
-
     // Parse properties
     loader.LoadBulk(
-        sceneIn,    sceneOut,
-        materialIn, materialOut,
-        modelIn,    modelOut);
+        sceneIn,    sceneBuf,
+        materialIn, materialBuf,
+        modelIn,    modelBuf);
 
+    return *this;
+}
+
+PropertiesManager& PropertiesManager::ValidateProperties(
+    const PropertiesManager::SceneFileContainer& scenes,
+    const PropertiesManager::MaterialFileContainer& materials,
+    const PropertiesManager::ModelFileContainer& models)
+{
     // Validate properties
     PropertiesValidator validator;
-    PropertiesValidator::Result r = validator.ValidateBulk(sceneOut, materialOut, modelOut);
+    PropertiesValidator::Result r = validator.ValidateBulk(scenes, materials, models);
 
     // Print results
     PrintResult(r);
+
+    return *this;
+}
+
+PropertiesManager& PropertiesManager::MergeProperties(
+    Properties::SceneFile& mergedPropsBuffer,
+    const SceneFileContainer& scenes,
+    const MaterialFileContainer& materials,
+    const ModelFileContainer& models)
+{
+    (void)mergedPropsBuffer;
+    (void)scenes;
+    (void)materials;
+    (void)models;
+    return *this;
+}
+
+void PropertiesManager::ValidateMergedProperties(Properties::SceneFile& mergedProps)
+{
+    (void)mergedProps;
 }
 
 // --------------------------------------------------

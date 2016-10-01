@@ -1,5 +1,6 @@
 #include "PropertiesManager.hpp"
 
+#include <cstdlib>
 #include <iostream>
 #include <unordered_map>
 
@@ -99,10 +100,67 @@ PropertiesManager& PropertiesManager::MergeProperties(
     const MaterialFileContainer& materials,
     const ModelFileContainer& models)
 {
-    (void)mergedPropsBuffer;
-    (void)scenes;
-    (void)materials;
-    (void)models;
+    // Use std members for verbosity
+    using std::move;
+    using std::begin;
+    using std::end;
+    using std::back_inserter;
+    using std::vector;
+
+    // Create buffers to store properties in other files
+    vector<Properties::Texture> texturesBuf;
+    vector<Properties::Material> materialsBuf;
+    vector<Properties::Geometry> geometriesBuf;
+    vector<Properties::Model> modelsBuf;
+    vector<Properties::SceneNode> sceneNodeBuf;
+
+    auto addMaterialToBuf = [&texturesBuf, &materialsBuf](const Properties::MaterialFile& mf) -> void
+    {
+        texturesBuf.insert(end(texturesBuf), begin(mf.textures), end(mf.textures));
+        materialsBuf.insert(end(materialsBuf), begin(mf.materials), end(mf.materials));
+    };
+
+    auto addModelToBuf = [&geometriesBuf, &modelsBuf](const Properties::ModelFile& mf) -> void
+    {
+        geometriesBuf.insert(end(geometriesBuf), begin(mf.geometries), end(mf.geometries));
+        modelsBuf.insert(end(modelsBuf), begin(mf.models), end(mf.models));
+    };
+
+    // Scan material files
+    for (const auto& p : materials)
+        addMaterialToBuf(p.second);
+
+    // Scan model files
+    for (const auto& p : models)
+        addModelToBuf(p.second);
+
+    // Scan scene files
+    for (const auto& p : scenes)
+    {
+        addMaterialToBuf(p.second.extraMaterials);
+        addModelToBuf(p.second.extraModels);
+        sceneNodeBuf.insert(
+            end(sceneNodeBuf), begin(p.second.scene.nodes), end(p.second.scene.nodes));
+    }
+
+    // Merge everything into a single scene file
+    Properties::MaterialFile& mergedMat = mergedPropsBuffer.extraMaterials;
+    Properties::ModelFile& mergedMod = mergedPropsBuffer.extraModels;
+
+    // Reserve space to move contents
+    mergedMat.textures.reserve(texturesBuf.size() + mergedMat.textures.size());
+    mergedMat.materials.reserve(materialsBuf.size() + mergedMat.materials.size());
+    mergedMod.geometries.reserve(geometriesBuf.size() + mergedMod.geometries.size());
+    mergedMod.models.reserve(modelsBuf.size() + mergedMod.models.size());
+    mergedPropsBuffer.scene.nodes.reserve(sceneNodeBuf.size() + mergedPropsBuffer.scene.nodes.size());
+
+    // Move contents
+    move(begin(texturesBuf),   end(texturesBuf),   back_inserter(mergedMat.textures));
+    move(begin(materialsBuf),  end(materialsBuf),  back_inserter(mergedMat.materials));
+    move(begin(geometriesBuf), end(geometriesBuf), back_inserter(mergedMod.geometries));
+    move(begin(modelsBuf),     end(modelsBuf),     back_inserter(mergedMod.models));
+    move(begin(sceneNodeBuf),  end(sceneNodeBuf),  back_inserter(mergedPropsBuffer.scene.nodes));
+
     return *this;
 }
 

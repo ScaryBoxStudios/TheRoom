@@ -60,47 +60,56 @@
             {
                 "id": "cube1",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube2",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube3",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube4",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube5",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube6",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube7",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube8",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "cube9",
                 "model": "wooden_cube",
-                "type": "Model"
+                "type": "Model",
+                "transform": {}
             },
             {
                 "id": "teapot_1",

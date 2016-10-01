@@ -49,7 +49,7 @@ struct enum_class_hash
     }
 };
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && (__GNUC__ < 6)
 namespace std
 {
     template <typename T>

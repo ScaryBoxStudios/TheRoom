@@ -1,0 +1,125 @@
+{
+    "scene":
+    {
+        "nodes":
+        [
+            {
+                "id": "cube0",
+                "type": "Model",
+                "model": "wooden_cube",
+                "name": "Cube 0",
+                "transform": {
+                    "position": [0, 0, 0],
+                    "scale": [2.0, 2.0, 2.0]
+                }
+            },
+            {
+                "id": "wall",
+                "type": "Model",
+                "model": "stone_cube",
+                "name": "wall",
+                "transform": {
+                    "position": [8, 0, 0.0],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
+                "id": "Teapot",
+                "type": "Model",
+                "model": "mirror_teapot",
+                "name": "mirror teapot",
+                "transform": {
+                    "position": [4, 0, 0],
+                    "scale": [1.5, 1.5, 1.5]
+                }
+            },
+            {
+                "id": "shaderBall",
+                "type": "Model",
+                "model": "wooden_shaderball",
+                "name": "stone shaderBall",
+                "transform": {
+                    "position": [-8, 0, 0]
+                }
+            },
+            {
+                "id": "shaderBall2",
+                "type": "Model",
+                "model": "white_mirror_shaderball",
+                "name": "White Mirror ShaderBall",
+                "transform": {
+                    "position": [-4, 0, 0]
+                }
+            },
+            {
+                "id": "room",
+                "type": "Model",
+                "model": "room",
+                "name": "room",
+                "transform": {
+                    "position": [0, -2, 0],
+                    "scale": [1, 1, 1]
+                }
+            }
+        ] 
+    },
+    "extraMaterials":
+    {
+        "textures":
+        [
+            {
+                "id": "room_diffuse",
+                "url": "ext/Assets/Textures/Models/Room/FloorDiff.png"
+            },
+            {
+                "id": "room_normals",
+                "url": "ext/Assets/Textures/Models/Room/FloorNrm.png"
+            },
+            {
+                "id": "marble_tex",
+                "url": "ext/Assets/Textures/Models/Room/MarbleTex.png"
+            }
+        ],
+        "materials":
+        [
+            {
+                "id": "room",
+                "name": "floor",
+                "map": "room_diffuse",
+                "nmap": "room_normals",
+                "roughness": 0.5,
+                "reflectivity": 0.04,
+                "metallic": 0
+            },
+            {
+                "id": 6,
+                "name": "marble",
+                "map": "marble_tex",
+                "roughness": 0.5,
+                "reflectivity": 0.04,
+                "metallic": 0
+            }
+
+        ]
+    },
+    "extraModels":
+    {
+        "geometries":
+        [
+            {
+                "id": "room",
+                "type": "room",
+                "url" : "ext/Assets/Models/Room.fbx"
+            }
+        ],
+        "models":
+        [
+            {
+                "id": "room",
+                "geometry": "room",
+                "name": "Room",
+                "materials": ["room"]
+            }
+        ]
+    }
+}

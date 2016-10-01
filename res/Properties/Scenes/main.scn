@@ -1,0 +1,230 @@
+{
+    "scene":
+    {
+        "nodes":
+        [
+            {
+                "id": "house",
+                "model": "house",
+                "type": "Model",
+                "transform": {
+                    "position": [0, -10, -40],
+                    "scale": [0.3, 0.3, 0.3]
+                }
+            },
+            {
+                "id": "character",
+                "model": "armor",
+                "type": "Model",
+                "transform": {
+                    "position": [0, -4.3, -6.6],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
+                "id": "plane",
+                "model": "wooden_cube",
+                "type": "Model",
+                "transform": {
+                    "position": [0, -11, -40],
+                    "scale": [75, 0.1, 75]
+                }
+            },
+            {
+                "id": "wall",
+                "model": "stone_cube",
+                "type": "Model",
+                "transform": {
+                    "position": [10, 0, 2.0],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
+                "id": "well",
+                "model": "well",
+                "type": "Model",
+                "transform": {
+                    "position": [0, -5, -10],
+                    "scale":    [2, 2, 2]
+                }
+            },
+            {
+                "id": "barell",
+                "model": "barell",
+                "type": "Model",
+                "transform": {
+                    "position": [-5, -3, 0],
+                    "scale": [0.5, 0.5, 0.5]
+                }
+            },
+            {
+                "id": "cube1",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube2",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube3",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube4",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube5",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube6",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube7",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube8",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "cube9",
+                "model": "wooden_cube",
+                "type": "Model"
+            },
+            {
+                "id": "teapot_1",
+                "model": "white_teapot",
+                "type": "PointLight",
+                "transform": {
+                    "position": [4, 0, 0]
+                }
+            },
+            {
+                "id": "teapot_2",
+                "model": "white_teapot",
+                "type": "PointLight",
+                "transform": {
+                    "position": [-2, 2, -1]
+                }
+            }
+        ] 
+    },
+    "extraMaterials":
+    {
+        "textures":
+        [
+            {
+                "id": "house_diffuse",
+                "url": "ext/Assets/Textures/Models/WoodCabinDif.jpg"
+            },
+            {
+                "id": "house_specular",
+                "url": "ext/Assets/Textures/Models/WoodCabinSM.jpg"
+            },
+            {
+                "id": "house_normals",
+                "url": "ext/Assets/Textures/Models/WoodCabinNM.jpg"
+            },
+            {
+                "id": "well_diffuse",
+                "url": "ext/Assets/Textures/Models/Well1_T.tga"
+            },
+            {
+                "id": "well_specular",
+                "url": "ext/Assets/Textures/Models/Well1_B.tga"
+            },
+            {
+                "id": "barell_diffuse",
+                "url": "ext/Assets/Textures/Models/Barell/Barell2.tif"
+            },
+            {
+                "id": "barell_normals",
+                "url": "ext/Assets/Textures/Models/Barel/Barell2_nmap.tif"
+            }
+        ],
+        "materials":
+        [
+            {
+                "id": "house",
+                "name": "house",
+                "dmap": "house_diffuse",
+                "smap": "house_specular",
+                "nmap": "house_normals",
+                "roughness": 0.7,
+                "reflectivity": 0.01,
+                "metallic": 0
+            },
+            {
+                "id": "well",
+                "name": "well",
+                "dmap": "well_diffuse",
+                "smap": "well_specular",
+                "roughness": 0.4,
+                "reflectivity": 0.02,
+                "metallic": 0
+            },
+            {
+                "id": "barell",
+                "name": "barell",
+                "dmap": "barell_diffuse",
+                "nmap": "barell_normals",
+                "roughness": 0.3,
+                "reflectivity": 0.02,
+                "metallic": 0
+            }
+        ]
+    },
+    "extraModels":
+    {
+        "geometries":
+        [
+            {
+                "id": "house",
+                "name": "Wooden Cabin",
+                "url": "ext/Assets/Models/WoodenCabin.dae"
+            },
+            {
+                "id": "well",
+                "name": "Well",
+                "url": "ext/Assets/Models/Well.obj"
+            },
+            {
+                "id": "barell",
+                "name": "Barell",
+                "url": "ext/Assets/Models/Barell2.fbx"
+            }
+        ],
+        "models":
+        [
+            {
+                "id": "house",
+                "geometry": "house",
+                "name": "house",
+                "materials": ["house"]
+            },
+            {
+                "id": "well",
+                "geometry": "well",
+                "name": "Well",
+                "materials": ["well"]
+            },
+            {
+                "id": "barell",
+                "geometry": "barell",
+                "name": "Barell",
+                "materials": ["barell"]
+            }
+        ]
+    }
+}

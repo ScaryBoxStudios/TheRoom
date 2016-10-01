@@ -1,0 +1,12 @@
+{
+    "materials":
+    [
+        {
+            "id": "mirror",
+            "color": [255, 255, 255, 255],
+            "roughness": 0.2,
+            "reflectivity": 0.9,
+            "metallic": 1
+        }
+    ]
+}

@@ -6,7 +6,7 @@
             "color": [255, 150, 90, 255],
             "roughness": 0.1,
             "reflectivity": 0.4,
-            "metallic": 2
+            "metallic": 1
         },
         {
             "id": "bronze_rough_3",

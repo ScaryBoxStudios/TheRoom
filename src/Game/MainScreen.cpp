@@ -104,12 +104,18 @@ void MainScreen::SetupWorld()
         PropertiesManager propMgr;
         propMgr.Load
             // Scenes
-            ( {{ "testscene", "res/Test/testscene.json" }}
+            ( {{ "mainscene", "res/Properties/Scenes/main.scn" }}
             // Materials
-            , {{ "bronze",    "res/Properties/Materials/bronze.mat" }
-              ,{ "stone",     "res/Properties/Materials/stone.mat" }}
+            , {{ "armor",         "res/Properties/Materials/armor.mat"         }
+              ,{ "bronze",        "res/Properties/Materials/bronze.mat"        }
+              ,{ "brown_plastic", "res/Properties/Materials/brown_plastic.mat" }
+              ,{ "mahogany",      "res/Properties/Materials/mahogany.mat"      }
+              ,{ "stone",         "res/Properties/Materials/stone.mat"         }
+              ,{ "white",         "res/Properties/Materials/white.mat"         }}
             // Models
-            , {{ "house",     "res/Properties/Models/house.mod" }}
+            , {{ "armor",      "res/Properties/Models/armor.mod"      }
+              ,{ "cube",       "res/Properties/Models/cube.mod"       }
+              ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
             );
     }
 

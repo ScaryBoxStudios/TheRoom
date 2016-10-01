@@ -1,0 +1,24 @@
+{
+    "textures":
+    [
+        {
+            "id": "concrete_diffuse",
+            "url": "ext/Assets/Textures/Materials/Room/ConcreteDiff.png"
+        },
+        {
+            "id": "concrete_normal",
+            "url": "ext/Assets/Textures/Materials/Room/ConcreteNrm.png"
+        }
+    ],
+    "materials":
+    [
+        {
+            "id": "concrete",
+            "dmap": "concrete_diffuse",
+            "nmap": "concrete_normal",
+            "roughness": 0.5,
+            "reflectivity": 0.04,
+            "metallic": 0
+        }
+    ]
+}

@@ -34,6 +34,7 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
+#include "Properties.hpp"
 #include "PropertiesLoader.hpp"
 
 class PropertiesValidator
@@ -86,6 +87,9 @@ class PropertiesValidator
 
             return r += ValidateBulk(std::forward<Args>(args)...);
         }
+
+        // Check a scene file for duplicate IDs and undefined references
+        Result ValidateGlobal(const Properties::SceneFile& scene) const;
 
         // Convert codes to strings
         static std::string ErrorToString(ErrorCode err);

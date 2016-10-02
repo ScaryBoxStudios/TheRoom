@@ -1,7 +1,7 @@
 #include "PropertiesValidator.hpp"
+#include <algorithm>
+#include <functional>
 #include <unordered_set>
-
-#include "Properties.hpp"
 
 #include "../../Util/WarnGuard.hpp"
 WARN_GUARD_ON
@@ -227,12 +227,14 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::SceneFile>
     // Validate scene
     r += Validate(input.scene);
 
-    // Validate scene globally
-    r += GlobalValidateScene(input);
-
     return r;
 }
 
+// Global SceneFile Validation
+PropertiesValidator::Result PropertiesValidator::ValidateGlobal(const Properties::SceneFile& scene) const
+{
+    return GlobalValidateScene(scene);
+}
 
 std::string PropertiesValidator::ErrorToString(ErrorCode err)
 {
@@ -247,7 +249,7 @@ std::string PropertiesValidator::WarnToString(WarningCode warn)
 }
 
 // --------------------------------------------------
-//  Static helpers
+//  Global Validation helpers
 // --------------------------------------------------
 
 //
@@ -276,7 +278,9 @@ struct ModComp {bool operator()(const P::Model& a,     const P::Model& b)     co
 struct NodComp {bool operator()(const P::SceneNode& a, const P::SceneNode& b) const {return  a.id.data == b.id.data;}};
 
 template <typename T, typename H, typename C>
-static PropertiesValidator::Result DuplicateIdCheck(std::unordered_set<T, H, C>& set, const std::vector<T>& input)
+static PropertiesValidator::Result DuplicateIdCheck(
+    std::unordered_set<T, H, C>& set,
+    const std::vector<T>& input)
 {
     PropertiesValidator::Result r = {};
 
@@ -286,6 +290,24 @@ static PropertiesValidator::Result DuplicateIdCheck(std::unordered_set<T, H, C>&
         if (!result.second)
            r.errors.push_back({5, v.id.data});
     }
+
+    return r;
+}
+
+template <typename T, typename H, typename C>
+static PropertiesValidator::Result UndefinedRefCheck(
+    const std::unordered_set<T, H, C>& valueSet,
+    const Properties::Id& id)
+{
+    PropertiesValidator::Result r = {};
+
+    const auto it = std::find_if(
+        std::begin(valueSet),
+        std::end(valueSet),
+        [&id](const T& v) -> bool { return id.data == v.id.data || id.data == ""; });
+
+    if (it == std::end(valueSet))
+        r.errors.push_back({6, id.data});
 
     return r;
 }
@@ -312,12 +334,63 @@ static PropertiesValidator::Result GlobalValidateScene(const Properties::SceneFi
     std::unordered_set<Model, ModHash, ModComp>     models;
     std::unordered_set<SceneNode, NodHash, NodComp> sceneNodes;
 
+    //
+    // Multiple Definitions check
+    //
     // Add values to set and take note of errors
     r += DuplicateIdCheck(textures,   scene.extraMaterials.textures);
     r += DuplicateIdCheck(materials,  scene.extraMaterials.materials);
     r += DuplicateIdCheck(geometries, scene.extraModels.geometries);
     r += DuplicateIdCheck(models,     scene.extraModels.models);
-    r += DuplicateIdCheck(sceneNodes, scene.scene.nodes);
+
+    // Check scene nodes and their children
+    std::function<void(const std::vector<SceneNode>&)> checkNodeHelper =
+        [&checkNodeHelper, &sceneNodes, &r](const std::vector<SceneNode>& nodes) -> void
+        {
+            // Check this node
+            r += DuplicateIdCheck(sceneNodes, nodes);
+
+            // Check children
+            for (const auto& n : nodes)
+                checkNodeHelper(n.children);
+        };
+
+    checkNodeHelper(scene.scene.nodes);
+
+    //
+    // Undefined ID Reference Check
+    //
+    // Check materials for undefined texture IDs
+    for (const auto& m : materials)
+    {
+        r += UndefinedRefCheck(textures, m.dmap);
+        r += UndefinedRefCheck(textures, m.smap);
+        r += UndefinedRefCheck(textures, m.nmap);
+    }
+
+    // Check models for undefined materials and geometries
+    for (const auto& m : models)
+    {
+        r += UndefinedRefCheck(geometries, m.geometry);
+        for (const auto& mat : m.materials)
+            r += UndefinedRefCheck(materials, mat);
+    }
+
+    // Check nodes for undefined models
+    std::function<void(const std::vector<SceneNode>&)> undefRefNodeHelper =
+        [&undefRefNodeHelper, &models, &r](const std::vector<SceneNode>& nodes) -> void
+        {
+            for (const auto& n : nodes)
+            {
+                // Check this node
+                r += UndefinedRefCheck(models, n.model);
+
+                // Check children
+                undefRefNodeHelper(n.children);
+            }
+        };
+
+    undefRefNodeHelper(scene.scene.nodes);
 
     return r;
 }

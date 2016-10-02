@@ -19,7 +19,19 @@
                 "transform": {
                     "position": [0, -4.3, -6.6],
                     "scale": [3, 3, 3]
-                }
+                },
+                "children":
+                [
+                    {
+                        "id": "character",
+                        "model": "armor",
+                        "type": "Model",
+                        "transform": {
+                            "position": [0, -4.3, -6.6],
+                            "scale": [3, 3, 3]
+                        }
+                    }
+                ]
             },
             {
                 "id": "plane",

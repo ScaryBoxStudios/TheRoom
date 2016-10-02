@@ -2,12 +2,40 @@
     "textures":
     [
         {
-            "id": "mahogany_diffuse",
-            "url": "ext/Assets/Textures/Materials/Mahogany/mahogany_wood.jpg" 
+            "id": "armor_chest_diffuse",
+            "url": "ext/Assets/Textures/Models/Warrior/cuirassplate_T.tga"
         },
         {
-            "id": "mahogany_specular",
-            "url": "ext/Assets/Textures/Materials/Mahogany/mahogany_wood_spec.jpg" 
+            "id": "armor_chest_specular",
+            "url": "ext/Assets/Textures/Models/Warrior/cuirassplate_B.tga"
+        },
+        {
+            "id": "armor_chest_normals",
+            "url": "ext/Assets/Textures/Models/Warrior/cuirassplate_N.tga"
+        },
+        {
+            "id": "armor_head_diffuse",
+            "url": "ext/Assets/Textures/Models/Warrior/helmetplate01_T.tga"
+        },
+        {
+            "id": "armor_head_specular",
+            "url": "ext/Assets/Textures/Models/Warrior/helmetplate01_B.tga"
+        },
+        {
+            "id": "armor_head_normals",
+            "url": "ext/Assets/Textures/Models/Warrior/helmetplate01_N.tga"
+        },
+        {
+            "id": "armor_hands_diffuse",
+            "url": "ext/Assets/Textures/Models/Warrior/gauntletsplate_T.tga"
+        },
+        {
+            "id": "armor_hands_specular",
+            "url": "ext/Assets/Textures/Models/Warrior/gauntletsplate_B.tga"
+        },
+        {
+            "id": "armor_hands_normals",
+            "url": "ext/Assets/Textures/Models/Warrior/gauntletsplate_N.tga"
         }
     ],
     "materials":
@@ -15,9 +43,9 @@
         {
             "id": "armor_chest",
             "color": [255, 150, 90, 255],
-            "dmap": "ext/Assets/Textures/Models/Warrior/cuirassplate_T.tga",
-            "smap": "ext/Assets/Textures/Models/Warrior/cuirassplate_B.tga",
-            "nmap": "ext/Assets/Textures/Models/Warrior/cuirassplate_N.tga",
+            "dmap": "armor_chest_diffuse",
+            "smap": "armor_chest_specular",
+            "nmap": "armor_chest_normals",
             "roughness": 0.5,
             "reflectivity": 0.2,
             "metallic": 1
@@ -25,9 +53,9 @@
         {
             "id": "armor_head",
             "color": [255, 150, 90, 255],
-            "dmap": "ext/Assets/Textures/Models/Warrior/helmetplate01_T.tga",
-            "smap": "ext/Assets/Textures/Models/Warrior/helmetplate01_B.tga",
-            "nmap": "ext/Assets/Textures/Models/Warrior/helmetplate01_N.tga",
+            "dmap": "armor_head_diffuse",
+            "smap": "armor_head_specular",
+            "nmap": "armor_head_normals",
             "roughness": 0.5,
             "reflectivity": 0.02,
             "metallic": 0
@@ -35,9 +63,9 @@
         {
             "id": "armor_hands",
             "color": [255, 150, 90, 255],
-            "dmap": "ext/Assets/Textures/Models/Warrior/gauntletsplate_T.tga",
-            "smap": "ext/Assets/Textures/Models/Warrior/gauntletsplate_B.tga",
-            "nmap": "ext/Assets/Textures/Models/Warrior/gauntletsplate_N.tga",
+            "dmap": "armor_hands_diffuse",
+            "smap": "armor_hands_specular",
+            "nmap": "armor_hands_normals",
             "roughness": 0.3,
             "reflectivity": 0.02,
             "metallic": 0

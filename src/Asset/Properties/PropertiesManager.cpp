@@ -166,7 +166,12 @@ PropertiesManager& PropertiesManager::MergeProperties(
 
 void PropertiesManager::ValidateMergedProperties(Properties::SceneFile& mergedProps)
 {
-    (void)mergedProps;
+    // Validate properties
+    PropertiesValidator validator;
+    PropertiesValidator::Result r = validator.Validate(mergedProps);
+
+    // Print results
+    PrintResult(r);
 }
 
 // --------------------------------------------------

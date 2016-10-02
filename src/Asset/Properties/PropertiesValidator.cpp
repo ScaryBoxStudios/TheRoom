@@ -1,4 +1,6 @@
 #include "PropertiesValidator.hpp"
+#include <unordered_set>
+
 #include "Properties.hpp"
 
 #include "../../Util/WarnGuard.hpp"
@@ -8,7 +10,9 @@ const std::unordered_map<PropertiesValidator::ErrorCode, std::string> Properties
     { 1, "Float argument is smaller than zero" },
     { 2, "Float argument is greater than 1.0"  },
     { 3, "Id is empty string"                  },
-    { 4, "Metallic argument is not 0 or 1"     }
+    { 4, "Metallic argument is not 0 or 1"     },
+    { 5, "Duplicate id"                        },
+    { 6, "Undefined reference"                 }
 };
 
 const std::unordered_map<PropertiesValidator::WarningCode, std::string> PropertiesValidator::mWarnMap =
@@ -17,6 +21,14 @@ const std::unordered_map<PropertiesValidator::WarningCode, std::string> Properti
 };
 WARN_GUARD_OFF
 
+// --------------------------------------------------
+// Forward declarations
+// --------------------------------------------------
+static PropertiesValidator::Result GlobalValidateScene(const Properties::SceneFile& scene);
+
+// --------------------------------------------------
+// Header function implementations
+// --------------------------------------------------
 PropertiesValidator::Result& PropertiesValidator::Result::operator+=(const PropertiesValidator::Result& b)
 {
     this->errors.insert(std::end(this->errors), std::begin(b.errors), std::end(b.errors));
@@ -215,8 +227,12 @@ PropertiesValidator::Result PropertiesValidator::Validate<Properties::SceneFile>
     // Validate scene
     r += Validate(input.scene);
 
+    // Validate scene globally
+    r += GlobalValidateScene(input);
+
     return r;
 }
+
 
 std::string PropertiesValidator::ErrorToString(ErrorCode err)
 {
@@ -228,4 +244,80 @@ std::string PropertiesValidator::WarnToString(WarningCode warn)
 {
     const auto it = mWarnMap.find(warn);
     return it != std::end(mWarnMap) ? it->second : "";
+}
+
+// --------------------------------------------------
+//  Static helpers
+// --------------------------------------------------
+
+//
+// Helpers for unordered_set
+//
+static std::size_t CustomHash(const std::string& s1, const std::string& s2)
+{
+        std::size_t h1 = std::hash<std::string>{}(s1);
+        std::size_t h2 = std::hash<std::string>{}(s2);
+        return h1 ^ (h2 << 1);
+}
+
+namespace P = Properties;
+// Hash structs
+struct TexHash {std::size_t operator()(const P::Texture& t)   const {return CustomHash(t.id.data, t.url);}};
+struct MatHash {std::size_t operator()(const P::Material& m)  const {return CustomHash(m.id.data, m.name);}};
+struct GeoHash {std::size_t operator()(const P::Geometry& g)  const {return CustomHash(g.id.data, g.url);}};
+struct ModHash {std::size_t operator()(const P::Model& m)     const {return CustomHash(m.id.data, m.name);}};
+struct NodHash {std::size_t operator()(const P::SceneNode& n) const {return CustomHash(n.id.data, n.model.data);}};
+
+// Compare structs
+struct TexComp {bool operator()(const P::Texture& a,   const P::Texture& b)   const {return  a.id.data == b.id.data;}};
+struct MatComp {bool operator()(const P::Material& a,  const P::Material& b)  const {return  a.id.data == b.id.data;}};
+struct GeoComp {bool operator()(const P::Geometry& a,  const P::Geometry& b)  const {return  a.id.data == b.id.data;}};
+struct ModComp {bool operator()(const P::Model& a,     const P::Model& b)     const {return  a.id.data == b.id.data;}};
+struct NodComp {bool operator()(const P::SceneNode& a, const P::SceneNode& b) const {return  a.id.data == b.id.data;}};
+
+template <typename T, typename H, typename C>
+static PropertiesValidator::Result DuplicateIdCheck(std::unordered_set<T, H, C>& set, const std::vector<T>& input)
+{
+    PropertiesValidator::Result r = {};
+
+    for (const auto& v : input)
+    {
+        auto result = set.insert(v);
+        if (!result.second)
+           r.errors.push_back({5, v.id.data});
+    }
+
+    return r;
+}
+
+static PropertiesValidator::Result GlobalValidateScene(const Properties::SceneFile& scene)
+{
+    // Avoid unecessary use of namespace for verbosity
+    using Properties::Texture;
+    using Properties::Material;
+    using Properties::Geometry;
+    using Properties::Model;
+    using Properties::SceneNode;
+    using Properties::Scene;
+    using Properties::MaterialFile;
+    using Properties::ModelFile;
+    using Properties::SceneFile;
+
+    PropertiesValidator::Result r = {};
+
+    // Gather all IDs
+    std::unordered_set<Texture, TexHash, TexComp>   textures;
+    std::unordered_set<Material, MatHash, MatComp>  materials;
+    std::unordered_set<Geometry, GeoHash, GeoComp>  geometries;
+    std::unordered_set<Model, ModHash, ModComp>     models;
+    std::unordered_set<SceneNode, NodHash, NodComp> sceneNodes;
+
+    // Add values to set and take note of errors
+    r += DuplicateIdCheck(textures,   scene.extraMaterials.textures);
+    r += DuplicateIdCheck(materials,  scene.extraMaterials.materials);
+    r += DuplicateIdCheck(geometries, scene.extraModels.geometries);
+    r += DuplicateIdCheck(models,     scene.extraModels.models);
+    r += DuplicateIdCheck(sceneNodes, scene.scene.nodes);
+
+    return r;
 }

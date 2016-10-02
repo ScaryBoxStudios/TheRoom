@@ -109,12 +109,15 @@ void MainScreen::SetupWorld()
             , {{ "armor",         "res/Properties/Materials/armor.mat"         }
               ,{ "bronze",        "res/Properties/Materials/bronze.mat"        }
               ,{ "brown_plastic", "res/Properties/Materials/brown_plastic.mat" }
+              ,{ "concrete",      "res/Properties/Materials/concrete.mat"      }
               ,{ "mahogany",      "res/Properties/Materials/mahogany.mat"      }
+              ,{ "mirror",        "res/Properties/Materials/mirror.mat"        }
               ,{ "stone",         "res/Properties/Materials/stone.mat"         }
               ,{ "white",         "res/Properties/Materials/white.mat"         }}
             // Models
             , {{ "armor",      "res/Properties/Models/armor.mod"      }
               ,{ "cube",       "res/Properties/Models/cube.mod"       }
+              ,{ "teapot",     "res/Properties/Models/teapot.mod"     }
               ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
             );
     }

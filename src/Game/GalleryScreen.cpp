@@ -3,10 +3,11 @@
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Asset/Scene/SceneLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"
+#include "../Asset/Properties/Properties.hpp"
+#include "../Asset/Properties/PropertiesManager.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
 
 // Skybox, Irrmap and Radmap names for cubemap store
@@ -25,20 +26,30 @@ void GalleryScreen::onInit(ScreenContext& sc)
     // Store file data cache ref
     mFileDataCache = sc.GetFileDataCache();
 
-    // Load scene file
-    std::string sceneFile = "res/Scenes/gallery_scene.json";
-    auto sceneFileData = FileLoad<BufferType>(sceneFile);
-    if(!sceneFileData)
-        throw std::runtime_error("Couldn't load file (" + sceneFile + ")");
-    SceneLoader sceneLoader;
-    SceneFile sf = sceneLoader.Load(*sceneFileData);
+    PropertiesManager propMgr;
+    Properties::SceneFile scene = propMgr.Load
+        // Scenes
+        ( {{ "galleryscene",  "res/Properties/Scenes/gallery.scn" }}
+        // Materials
+        , {{ "bronze",        "res/Properties/Materials/bronze.mat"        }
+          ,{ "brown_plastic", "res/Properties/Materials/brown_plastic.mat" }
+          ,{ "concrete",      "res/Properties/Materials/concrete.mat"      }
+          ,{ "mahogany",      "res/Properties/Materials/mahogany.mat"      }
+          ,{ "mirror",        "res/Properties/Materials/mirror.mat"        }
+          ,{ "stone",         "res/Properties/Materials/stone.mat"         }
+          ,{ "white",         "res/Properties/Materials/white.mat"         }}
+        // Models
+        , {{ "cube",       "res/Properties/Models/cube.mod"       }
+          ,{ "teapot",     "res/Properties/Models/teapot.mod"     }
+          ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
+        );
 
     SceneFactory factory(
         &mEngine->GetTextureStore(),
         &mEngine->GetModelStore(),
         &mEngine->GetMaterialStore(),
         mFileDataCache);
-    mScene = std::move(factory.CreateFromSceneFile(sf));
+    mScene = factory.CreateFromSceneFile(scene);
 
     // Setup scene lights
     Lights& lights = mEngine->GetRenderer().GetLights();

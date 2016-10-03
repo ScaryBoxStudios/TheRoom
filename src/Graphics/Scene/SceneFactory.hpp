@@ -33,7 +33,7 @@
 
 #include <memory>
 #include "Scene.hpp"
-#include "../../Asset/Scene/SceneLoader.hpp"
+#include "../../Asset/Properties/Properties.hpp"
 #include "../Resource/TextureStore.hpp"
 #include "../Resource/ModelStore.hpp"
 #include "../Resource/MaterialStore.hpp"
@@ -46,7 +46,7 @@ class SceneFactory
         SceneFactory(TextureStore* tStore, ModelStore* mdlStore, MaterialStore* matStore, ScreenContext::FileDataCache* fdc);
 
         // Creates a scene from a given SceneFile struct
-        std::unique_ptr<Scene> CreateFromSceneFile(const SceneFile& sceneFile);
+        std::unique_ptr<Scene> CreateFromSceneFile(const Properties::SceneFile& sceneFile);
 
     private:
         // The stores that will be needed by the factory
@@ -56,16 +56,24 @@ class SceneFactory
         ScreenContext::FileDataCache* mFileDataCache;
 
         // Loads the textures
-        void LoadTextures(const std::vector<SceneFile::Texture>& textures, const std::vector<SceneFile::Image>& images);
+        void LoadTextures(const std::vector<Properties::Texture>& textures);
 
         // Loads the materials
-        void LoadMaterials(const std::vector<SceneFile::Material>& materials);
+        void LoadMaterials(const std::vector<Properties::Material>& materials);
 
         // Load geometries
-        void LoadGeometries(const std::vector<SceneFile::Geometry>& geometries);
+        void LoadGeometries(const std::vector<Properties::Geometry>& geometries);
 
-        // Create scene
-        void BakeScene(Scene* const sceneToBake, const std::vector<SceneFile::Object::Child>& children);
+        // Load a scene node and its children recursively
+        void LoadSceneNode(
+            Scene* const sceneToBake,
+            const Properties::SceneNode& node,
+            const std::vector<Properties::Model>& models);
+
+        // Create Scene
+        std::unique_ptr<Scene> CreateScene(
+            const Properties::Scene& scene,
+            const std::vector<Properties::Model>& models);
 };
 
 #endif // ! _SCENEFACTORY_HPP_

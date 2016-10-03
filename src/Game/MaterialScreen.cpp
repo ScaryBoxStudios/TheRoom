@@ -3,7 +3,6 @@
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Asset/Scene/SceneLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"

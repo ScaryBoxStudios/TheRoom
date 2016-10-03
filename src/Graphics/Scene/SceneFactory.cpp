@@ -14,86 +14,67 @@ SceneFactory::SceneFactory(TextureStore* tStore, ModelStore* mdlStore, MaterialS
 {
 }
 
-std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const SceneFile& sceneFile)
+std::unique_ptr<Scene> SceneFactory::CreateFromSceneFile(const Properties::SceneFile& sceneFile)
 {
-    std::unique_ptr<Scene> scene(std::make_unique<Scene>());
+    LoadTextures(sceneFile.extraMaterials.textures);
+    LoadMaterials(sceneFile.extraMaterials.materials);
+    LoadGeometries(sceneFile.extraModels.geometries);
 
-    LoadTextures(sceneFile.textures, sceneFile.images);
-    LoadMaterials(sceneFile.materials);
-    LoadGeometries(sceneFile.geometries);
-
-    BakeScene(scene.get(), sceneFile.object.children);
-
-    return scene;
+    return CreateScene(sceneFile.scene, sceneFile.extraModels.models);
 }
 
-void SceneFactory::LoadTextures(const std::vector<SceneFile::Texture>& textures, const std::vector<SceneFile::Image>& images)
+void SceneFactory::LoadTextures(const std::vector<Properties::Texture>& textures)
 {
     // The ImageLoader object
     ImageLoader imageLoader;
 
-    for(auto& texture : textures)
+    for(const auto& t : textures)
     {
         // Ignore that texture if it has already been loaded
-        if((*mTextureStore)[std::to_string(texture.id)] != nullptr)
+        if((*mTextureStore)[t.id.data] != nullptr)
             continue;
 
-        // Find the coresponding image
-        auto img = std::find_if(std::begin(images), std::end(images),
-            [&texture](const SceneFile::Image& image)->bool
-            {
-                return texture.image == image.id;
-            }
-        );
-
-        // Assert if no image with the given UUID exists in scene file
-        assert(img != std::end(images));
-
-        std::string ext = img->url.substr(img->url.find_last_of(".") + 1);
-        RawImage pb = imageLoader.Load(*(*mFileDataCache)[img->url], ext);
-        mTextureStore->Load(std::to_string(texture.id), std::move(pb));
+        std::string ext = t.url.substr(t.url.find_last_of(".") + 1);
+        RawImage pb = imageLoader.Load(*(*mFileDataCache)[t.url], ext);
+        mTextureStore->Load(t.id.data, std::move(pb));
     }
 }
 
-void SceneFactory::LoadMaterials(const std::vector<SceneFile::Material>& materials)
+void SceneFactory::LoadMaterials(const std::vector<Properties::Material>& materials)
 {
-    for(auto& material : materials)
+    for(auto& m : materials)
     {
         // Ignore that material if it has already been loaded
-        if((*mMaterialStore)[std::to_string(material.id)] != nullptr)
+        if((*mMaterialStore)[m.id.data] != nullptr)
             continue;
 
         Material newMat;
 
-        const std::string& diffId      = std::to_string(material.map);
-        const std::string& specId      = std::to_string(material.specMap);
-        const std::string& normalMapId = std::to_string(material.nmap);
-
-        if(diffId.compare("") != 0)
-            newMat.SetDiffuseTexture((*mTextureStore)[diffId]->texId);
+        if(m.dmap.data.compare("") != 0)
+            newMat.SetDiffuseTexture((*mTextureStore)[m.dmap.data]->texId);
 
         // Add specular
-        if(specId.compare("") != 0)
-            newMat.SetSpecularTexture((*mTextureStore)[specId]->texId);
+        if(m.smap.data.compare("") != 0)
+            newMat.SetSpecularTexture((*mTextureStore)[m.smap.data]->texId);
 
         // Add normal map
-        if(normalMapId.compare("") != 0)
-            newMat.SetNormalMapTexture((*mTextureStore)[normalMapId]->texId);
+        if(m.nmap.data.compare("") != 0)
+            newMat.SetNormalMapTexture((*mTextureStore)[m.nmap.data]->texId);
 
         // Add color
-        newMat.SetDiffuseColor(glm::vec3(material.color.r, material.color.g, material.color.b));
-        newMat.SetSpecularColor(glm::vec3(material.specular.r, material.specular.g, material.specular.b));
-        newMat.SetEmissiveColor(glm::vec3(material.emissive.r, material.emissive.g, material.emissive.b));
-        newMat.SetRoughness(material.roughness);
-        newMat.SetFresnel(material.fresnel);
-        newMat.SetMetallic(material.metallic);
-        newMat.SetTransparency(material.transparency);
+        newMat.SetDiffuseColor(glm::vec3(m.color.r, m.color.g, m.color.b));
+        //newMat.SetSpecularColor(glm::vec3(m.specular.r, m.specular.g, m.specular.b));
+        newMat.SetEmissiveColor(glm::vec3(m.emissive.r, m.emissive.g, m.emissive.b));
+        newMat.SetRoughness(m.roughness);
+        newMat.SetFresnel(m.reflectivity);
+        newMat.SetMetallic(m.metallic);
+        newMat.SetTransparency(m.transparency);
 
-        mMaterialStore->Load(std::to_string(material.id), newMat);
+        mMaterialStore->Load(m.id.data, newMat);
     }
 }
 
-void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geometries)
+void SceneFactory::LoadGeometries(const std::vector<Properties::Geometry>& geometries)
 {
     // Model loader instance
     ModelLoader modelLoader;
@@ -101,7 +82,7 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
     for(auto& geometry : geometries)
     {
         // Ignore that geometry if it has alredy been loaded
-        if((*mModelStore)[std::to_string(geometry.id)] != nullptr)
+        if((*mModelStore)[geometry.id.data] != nullptr)
             continue;
 
         // Check if path not empty
@@ -127,36 +108,60 @@ void SceneFactory::LoadGeometries(const std::vector<SceneFile::Geometry>& geomet
         if(model.meshes.size() == 0)
             throw std::runtime_error("Couldn't load model (" + geometry.url + ")");
 
-        mModelStore->Load(std::to_string(geometry.id), std::move(model));
+        mModelStore->Load(geometry.id.data, std::move(model));
 
         //(*mModelStore)[geometry.uuid.ToString()]->material = *(*mMaterialStore)[m.material];
     }
 }
 
-void SceneFactory::BakeScene(Scene* const sceneToBake, const std::vector<SceneFile::Object::Child>& children)
+void SceneFactory::LoadSceneNode(
+    Scene* const scene,
+    const Properties::SceneNode& node,
+    const std::vector<Properties::Model>& models)
 {
-    // Add objects to scene
-    for(auto& child : children)
-    {
-        // Find the right geometry
-        ModelDescription* model = (*mModelStore)[std::to_string(child.geometry)];
+    // Find the right model
+    const auto modelIt = std::find_if(
+        std::begin(models),
+        std::end(models),
+        [&node](const Properties::Model& model) -> bool { return node.model == model.id; });
 
-        // Find the right category
-        Category category = (child.type.compare("Mesh") == 0) ? Category::Normal : Category::Light;
+    // Assert if model not found (unlikely because of Properties Validation stage)
+    assert(modelIt != std::end(models));
 
-        // Create Scene Node
-        const auto& initAABB = model->localAABB;
-        std::vector<std::string> materials;
-        for (const auto& mat : child.materials)
-            materials.push_back(std::to_string(mat));
-        sceneToBake->CreateNode(std::to_string(child.geometry), materials, child.name, category, initAABB);
+    // Find the right geometry
+    ModelDescription* model = (*mModelStore)[modelIt->geometry.data];
 
-        // Set initial transformation
-        SceneNode* node = sceneToBake->FindNodeByUuid(child.name);
-        node->Move(child.transform.position);
-        node->Scale(child.transform.scale);
-        node->Rotate(RotationAxis::X, child.transform.rotation.x);
-        node->Rotate(RotationAxis::Y, child.transform.rotation.y);
-        node->Rotate(RotationAxis::Z, child.transform.rotation.z);
-    }
+    // Find the right category
+    Category category = (node.type == Properties::SceneNode::Type::Model) ? Category::Normal : Category::Light;
+
+    // Create Scene Node
+    const auto& initAABB = model->localAABB;
+    std::vector<std::string> materials;
+    for (const auto& m : modelIt->materials)
+        materials.push_back(m.data);
+    scene->CreateNode(modelIt->geometry.data, materials, node.id.data, category, initAABB);
+
+    // Set initial transformation
+    SceneNode* sceneNode = scene->FindNodeByUuid(node.id.data);
+    sceneNode->Move(node.transform.position);
+    sceneNode->Scale(node.transform.scale);
+    sceneNode->Rotate(RotationAxis::X, node.transform.rotation.x);
+    sceneNode->Rotate(RotationAxis::Y, node.transform.rotation.y);
+    sceneNode->Rotate(RotationAxis::Z, node.transform.rotation.z);
+
+    // Load children
+    for (const auto& c : node.children)
+        LoadSceneNode(scene, c, models);
+}
+
+std::unique_ptr<Scene> SceneFactory::CreateScene(
+    const Properties::Scene& scene,
+    const std::vector<Properties::Model>& models)
+{
+    std::unique_ptr<Scene> sceneOut(std::make_unique<Scene>());
+
+    for (const auto& n : scene.nodes)
+        LoadSceneNode(sceneOut.get(), n, models);
+
+    return sceneOut;
 }

@@ -3,15 +3,12 @@
 WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Asset/Scene/SceneLoader.hpp"
 WARN_GUARD_OFF
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
 #include "../Asset/Properties/Properties.hpp"
-#include "../Asset/Properties/PropertiesLoader.hpp"
 #include "../Asset/Properties/PropertiesManager.hpp"
-#include "../Asset/Properties/PropertiesValidator.hpp"
 
 #include <iostream>
 
@@ -99,43 +96,33 @@ void PrintOutputMaps(PropertiesLoader::OutputContainer<T>& v, Args&&... args)
 
 void MainScreen::SetupWorld()
 {
-    // Test new properties loader
-    {
-        PropertiesManager propMgr;
-        propMgr.Load
-            // Scenes
-            ( {{ "mainscene", "res/Properties/Scenes/main.scn" }}
-            // Materials
-            , {{ "armor",         "res/Properties/Materials/armor.mat"         }
-              ,{ "bronze",        "res/Properties/Materials/bronze.mat"        }
-              ,{ "brown_plastic", "res/Properties/Materials/brown_plastic.mat" }
-              ,{ "concrete",      "res/Properties/Materials/concrete.mat"      }
-              ,{ "mahogany",      "res/Properties/Materials/mahogany.mat"      }
-              ,{ "mirror",        "res/Properties/Materials/mirror.mat"        }
-              ,{ "stone",         "res/Properties/Materials/stone.mat"         }
-              ,{ "white",         "res/Properties/Materials/white.mat"         }}
-            // Models
-            , {{ "armor",      "res/Properties/Models/armor.mod"      }
-              ,{ "cube",       "res/Properties/Models/cube.mod"       }
-              ,{ "teapot",     "res/Properties/Models/teapot.mod"     }
-              ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
-            );
-    }
+    PropertiesManager propMgr;
+    Properties::SceneFile scene = propMgr.Load
+        // Scenes
+        ( {{ "mainscene", "res/Properties/Scenes/main.scn" }}
+        // Materials
+        , {{ "armor",         "res/Properties/Materials/armor.mat"         }
+          ,{ "bronze",        "res/Properties/Materials/bronze.mat"        }
+          ,{ "brown_plastic", "res/Properties/Materials/brown_plastic.mat" }
+          ,{ "mahogany",      "res/Properties/Materials/mahogany.mat"      }
+          ,{ "mirror",        "res/Properties/Materials/mirror.mat"        }
+          ,{ "stone",         "res/Properties/Materials/stone.mat"         }
+          ,{ "white",         "res/Properties/Materials/white.mat"         }}
+        // Models
+        , {{ "armor",      "res/Properties/Models/armor.mod"      }
+          ,{ "cube",       "res/Properties/Models/cube.mod"       }
+          ,{ "teapot",     "res/Properties/Models/teapot.mod"     }
+          ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
+        );
 
-    // Load sample scene file
-    std::string sceneFile = "res/Scenes/main_scene.json";
-    auto sceneFileData = FileLoad<BufferType>(sceneFile);
-    if(!sceneFileData)
-        throw std::runtime_error("Couldn't load file (" + sceneFile + ")");
-    SceneLoader sceneLoader;
-    SceneFile sf = sceneLoader.Load(*sceneFileData);
+    //Properties::print(scene);
 
     SceneFactory factory(
         &mEngine->GetTextureStore(),
         &mEngine->GetModelStore(),
         &mEngine->GetMaterialStore(),
         mFileDataCache);
-    mScene = std::move(factory.CreateFromSceneFile(sf));
+    mScene = factory.CreateFromSceneFile(scene);
 
     // Set positions for cubes
     SceneNode* node;
@@ -358,7 +345,7 @@ void MainScreen::UpdatePhysics(float dt)
     (void) dt;
 
     auto& scene = mScene;
-    SceneNode* teapot = mScene->FindNodeByUuid("teapot");
+    SceneNode* teapot = mScene->FindNodeByUuid("teapot_1");
     for(auto& p : scene->GetNodes())
     {
         SceneNode* cur = p.second.get();

@@ -112,6 +112,8 @@ std::tuple<float, float> GalleryScreen::CameraLookOffset()
 
 void GalleryScreen::onKey(Key k, KeyAction ka)
 {
+    (void)k;
+    (void)ka;
 }
 
 void GalleryScreen::onUpdate(float dt)

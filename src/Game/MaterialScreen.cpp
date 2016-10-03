@@ -45,7 +45,7 @@ void MaterialScreen::onInit(ScreenContext& sc)
                 materialName += "r" + std::to_string(roughness);
                 materialName += "f" + std::to_string(reflectivity);
                 Material m;
-                m.SetMetallic(metallic);
+                m.SetMetallic(static_cast<float>(metallic));
                 m.SetRoughness(roughness);
                 m.SetFresnel(reflectivity);
                 m.SetDiffuseColor(glm::vec3(255.0f, 0.0f, 0.0f));
@@ -126,6 +126,8 @@ std::tuple<float, float> MaterialScreen::CameraLookOffset()
 
 void MaterialScreen::onKey(Key k, KeyAction ka)
 {
+    (void)k;
+    (void)ka;
 }
 
 void MaterialScreen::onUpdate(float dt)

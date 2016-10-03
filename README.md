@@ -3,17 +3,33 @@ TheRoom
 
 Introduction
 ------------
-A sample OpenGL App to learn in depth Graphics development
+An OpenGL Real-Time Rendering Engine written in C++. TheRoom features various advanced rendering techniques
+such as Physical Based Rendering, Cascaded Shadow Maps, Deferred Shading and others.
+
+You can read more about the CG part of the engine if you build and read the report in docs directory.
 
 Building
 --------
- 1. Clone the project and cd to the directory of the sample you want to build.
- 2. Run:  
-    ```
-    runhaskell Shakefile.hs --toolchain=<TOOLCHAIN> --variant=<VARIANT>
-    ```
-    where <VARIANT> can be either Release|Debug and <TOOLCHAIN> can be either MSVC|GCC|LLVM.
- 3. Built binaries will reside in the `bin\<ARCH>\<VARIANT>` directory.
+Currently we have two build systems. The first and the one we use in production is a Makefile while the second
+(legacy build system) is written in Haskell using Shake.
+
+### Make
+Run the commands below. The binaries will be in the `bin/<Deubg|Release>` directory.
+
+```
+set TOOLCHAIN=<MSVC|GCC>
+set VARIANT=<Debug|Release>
+make -j 4 --no-print-directory deps
+make -j 4 --no-print-directory
+```
+
+### Shake
+Run the commands below. Built binaries will reside in the `bin/<ARCH>/<VARIANT>` directory.
+
+```
+runhaskell Shakefile.hs --toolchain=<TOOLCHAIN> --variant=<VARIANT>
+```
+where <VARIANT> can be either Release|Debug and <TOOLCHAIN> can be either MSVC|GCC|LLVM.
 
 ChangeLog
 ---------
@@ -33,6 +49,6 @@ Licensing
 ---------
 Read [LICENSE](LICENSE.md)  
 
-Copyright (C) 2015 Agorgianitis Loukas <agorglouk@gmail.com>, Vlachakis Dimitris <dimitrisvlh@gmail.com>
+Copyright (C) 2016 Agorgianitis Loukas <agorglouk@gmail.com>, Vlachakis Dimitris <dimitrisvlh@gmail.com>
 All rights reserved.
 

@@ -38,6 +38,28 @@
 #include "Properties.hpp"
 #include "PropertiesLoader.hpp"
 
+/*
+ * Properties manager is responsible to manage the property system pipeline and succefully load and validate
+ * properties.
+ *
+ * PROPERTIES SYSTEM
+ *   Each physical Json file has its struct counterpart (SceneFile, MaterialFile, ModelFile). Each struct
+ *   contains elements that represent objects in Json. Properties can be scattered in various files but
+ *   before usage they MUST be merged into a single SceneFile.
+ *
+ *   In other words, you actually have ONE SceneFile which you may (or may not) divide into separate files
+ *   for better organization. It's Validator's responsibility to do the error checking and ensure that all
+ *   those files do not have overlapping properties (eg. multiple IDs).
+ *
+ * PIPELINE
+ *   PropertiesManager offers a fixed pipeline to load and validate properties:
+ *
+ *     Parse -> Validate (File Scope) -> Merge into a single SceneFile -> Validate (Global Scope)
+ *
+ *   where "File Scope" means that each file is checked for errors such as incorrect types while the
+ *   "Global Scope" means that the merged SceneFile is checked for errors such as multiple defined IDs
+ *   or undefined ID references.
+ */
 class PropertiesManager
 {
     public:

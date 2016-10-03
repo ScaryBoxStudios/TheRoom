@@ -23,11 +23,11 @@
                 "children":
                 [
                     {
-                        "id": "character",
+                        "id": "character2",
                         "model": "armor",
                         "type": "Model",
                         "transform": {
-                            "position": [0, -4.3, -6.6],
+                            "position": [10, -4.3, -6.6],
                             "scale": [3, 3, 3]
                         }
                     }
@@ -124,6 +124,74 @@
                 "transform": {}
             },
             {
+                "id": "bronze_shaderball_1",
+                "model": "bronze_rough_1_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [-20, -7, -32],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
+                "id": "bronze_shaderball_2",
+                "model": "bronze_rough_3_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [-20, -7, -40],
+                    "scale": [3, 3, 3]
+                }
+            },            {
+                "id": "bronze_shaderball_3",
+                "model": "bronze_rough_5_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [-20, -7, -48],
+                    "scale": [3, 3, 3]
+                }
+            },            {
+                "id": "bronze_shaderball_4",
+                "model": "bronze_rough_8_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [-20, -7, -56],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
+                "id": "brown_shaderball_1",
+                "model": "brown_dielectric_rough_1_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [20, -7, -32],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
+                "id": "brown_shaderball_2",
+                "model": "brown_dielectric_rough_3_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [20, -7, -40],
+                    "scale": [3, 3, 3]
+                }
+            },            {
+                "id": "brown_shaderball_3",
+                "model": "brown_dielectric_rough_5_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [20, -7, -48],
+                    "scale": [3, 3, 3]
+                }
+            },            {
+                "id": "brown_shaderball_4",
+                "model": "brown_dielectric_rough_8_shaderball",
+                "type": "Model",
+                "transform": {
+                    "position": [20, -7, -56],
+                    "scale": [3, 3, 3]
+                }
+            },
+            {
                 "id": "teapot_1",
                 "model": "white_teapot",
                 "type": "PointLight",
@@ -147,31 +215,31 @@
         [
             {
                 "id": "house_diffuse",
-                "url": "ext/Assets/Textures/Models/WoodCabinDif.jpg"
+                "url": "ext/Assets/Textures/Models/WoodenCabin/WoodCabinDif.jpg"
             },
             {
                 "id": "house_specular",
-                "url": "ext/Assets/Textures/Models/WoodCabinSM.jpg"
+                "url": "ext/Assets/Textures/Models/WoodenCabin/WoodCabinSM.jpg"
             },
             {
                 "id": "house_normals",
-                "url": "ext/Assets/Textures/Models/WoodCabinNM.jpg"
+                "url": "ext/Assets/Textures/Models/WoodenCabin/WoodCabinNM.jpg"
             },
             {
                 "id": "well_diffuse",
-                "url": "ext/Assets/Textures/Models/Well1_T.tga"
+                "url": "ext/Assets/Textures/Models/Well/Wall1_T.tga"
             },
             {
                 "id": "well_specular",
-                "url": "ext/Assets/Textures/Models/Well1_B.tga"
+                "url": "ext/Assets/Textures/Models/Well/Wall1_B.tga"
             },
             {
                 "id": "barell_diffuse",
-                "url": "ext/Assets/Textures/Models/Barell/Barell2.tif"
+                "url": "ext/Assets/Textures/Models/Barrel/barrel2.tif"
             },
             {
                 "id": "barell_normals",
-                "url": "ext/Assets/Textures/Models/Barel/Barell2_nmap.tif"
+                "url": "ext/Assets/Textures/Models/Barrel/barrel2_nmp.tif"
             }
         ],
         "materials":
@@ -223,7 +291,7 @@
             {
                 "id": "barell",
                 "name": "Barell",
-                "url": "ext/Assets/Models/Barell2.fbx"
+                "url": "ext/Assets/Models/Barrel2.fbx"
             }
         ],
         "models":

@@ -42,7 +42,6 @@
     [
         {
             "id": "armor_chest",
-            "color": [255, 150, 90, 255],
             "dmap": "armor_chest_diffuse",
             "smap": "armor_chest_specular",
             "nmap": "armor_chest_normals",
@@ -52,7 +51,6 @@
         },
         {
             "id": "armor_head",
-            "color": [255, 150, 90, 255],
             "dmap": "armor_head_diffuse",
             "smap": "armor_head_specular",
             "nmap": "armor_head_normals",
@@ -62,7 +60,6 @@
         },
         {
             "id": "armor_hands",
-            "color": [255, 150, 90, 255],
             "dmap": "armor_hands_diffuse",
             "smap": "armor_hands_specular",
             "nmap": "armor_hands_normals",

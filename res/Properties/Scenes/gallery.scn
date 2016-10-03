@@ -92,14 +92,13 @@
                 "metallic": 0
             },
             {
-                "id": 6,
+                "id": "marble",
                 "name": "marble",
                 "map": "marble_tex",
                 "roughness": 0.5,
                 "reflectivity": 0.04,
                 "metallic": 0
             }
-
         ]
     },
     "extraModels":
@@ -108,6 +107,7 @@
         [
             {
                 "id": "room",
+                "name": "Room",
                 "type": "room",
                 "url" : "ext/Assets/Models/Room.fbx"
             }
@@ -118,7 +118,7 @@
                 "id": "room",
                 "geometry": "room",
                 "name": "Room",
-                "materials": ["room"]
+                "materials": ["concrete", "concrete", "room", "marble", "mahogany", "room", "concrete", "room", "concrete", "concrete"]
             }
         ]
     }

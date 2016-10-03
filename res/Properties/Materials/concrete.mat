@@ -3,11 +3,11 @@
     [
         {
             "id": "concrete_diffuse",
-            "url": "ext/Assets/Textures/Materials/Room/ConcreteDiff.png"
+            "url": "ext/Assets/Textures/Models/Room/ConcreteDiff.png"
         },
         {
             "id": "concrete_normal",
-            "url": "ext/Assets/Textures/Materials/Room/ConcreteNrm.png"
+            "url": "ext/Assets/Textures/Models/Room/ConcreteNrm.png"
         }
     ],
     "materials":

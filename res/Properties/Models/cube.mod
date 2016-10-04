@@ -21,6 +21,5 @@
             "name": "Stone (Brick) Cube",
             "materials": ["stone"]
         }
-
     ]
 }

@@ -31,20 +31,24 @@
 #ifndef _TIMER_HPP_
 #define _TIMER_HPP_
 
-/* Timer state */
-struct timer_data;
+class Timer
+{
+    public:
+        // Constructor
+        Timer();
 
-/* Init/Destroy */
-struct timer_data* timer_create();
-void timer_destroy(struct timer_data* data);
+        // Start the timer
+        void Start();
 
-/* Starts the timer with the given id */
-void timer_start(struct timer_data* data);
+        // Retrieve time in usec since Start() called
+        long long Now();
 
-/* Retrieves the time passed since timer has started wihout stoping it */
-long long timer_now(struct timer_data* data);
+        // Retrieve time in usec since Start() called and stop the timer
+        long long Stop();
 
-/* Stops the timer and returns the time passed since it started */
-long long timer_stop(struct timer_data* data);
+    private:
+        long long mStartTime;
+        bool mStarted;
+};
 
 #endif // ! _TIMER_HPP_

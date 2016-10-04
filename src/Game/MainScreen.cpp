@@ -4,14 +4,11 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
-#include "../Util/Timer.hpp"
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
 #include "../Asset/Properties/Properties.hpp"
 #include "../Asset/Properties/PropertiesManager.hpp"
-
-#include <iostream>
 
 // Skybox, irrmap and Radmap names for cubemap store
 const std::string skybox = "main_skybox";
@@ -97,10 +94,6 @@ void PrintOutputMaps(PropertiesLoader::OutputContainer<T>& v, Args&&... args)
 
 void MainScreen::SetupWorld()
 {
-    // Create timer
-    timer_data* timer = timer_create();
-    timer_start(timer);
-
     PropertiesManager propMgr;
     Properties::SceneFile scene = propMgr.Load
         // Scenes
@@ -120,18 +113,12 @@ void MainScreen::SetupWorld()
           ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
         );
 
-    std::cout << "Main Screen Properties Parsing: " << timer_stop(timer) << " usec" << std::endl;
-    timer_start(timer);
-
     SceneFactory factory(
         &mEngine->GetTextureStore(),
         &mEngine->GetModelStore(),
         &mEngine->GetMaterialStore(),
         mFileDataCache);
     mScene = factory.CreateFromSceneFile(scene);
-
-    std::cout << "Main Screen Scene Creation: " << timer_stop(timer) << " usec" << std::endl;
-    timer_destroy(timer);
 
     // Set positions for cubes
     SceneNode* node;

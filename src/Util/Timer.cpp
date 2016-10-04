@@ -1,64 +1,68 @@
 #include "Timer.hpp"
-#include <stdlib.h>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #else
 #endif
 
-/* -------------------------------------------------- */
-/* Helpers                                            */
-/* -------------------------------------------------- */
+// --------------------------------------------------
+// Helpers
+// --------------------------------------------------
+// Retrieves current time with high resolution
+static long long GetTimeNow();
+
+// OS specific implementations of GetTimeNow()
 #if defined(_WIN32) || defined(_WIN64)
-static long long win_get_time_now();
+static long long WinGetTimeNow();
 #else
-static long long unix_get_time_now();
+static long long UnixGetTimeNow();
 #endif
 
-static long long get_time_now();
-
-/* -------------------------------------------------- */
-/* Header implementations                             */
-/* -------------------------------------------------- */
-struct timer_data
+// --------------------------------------------------
+// Header implementations
+// --------------------------------------------------
+Timer::Timer() : mStartTime(0), mStarted(false)
 {
-    long long start_time = 0;
-    int started = 0;
-};
-
-struct timer_data* timer_create()
-{
-    return (struct timer_data*) malloc(sizeof(struct timer_data));
 }
 
-void timer_start(struct timer_data* data)
+void Timer::Start()
 {
-    data->start_time = get_time_now();
-    data->started = 1;
+    mStartTime = GetTimeNow();
+    mStarted = true;
 }
 
-long long timer_now(struct timer_data* data)
+long long Timer::Now()
 {
-    return (data->started) ? (long long) (get_time_now() - data->start_time) : 0;
+    return (mStarted) ? static_cast<long long>(GetTimeNow() - mStartTime) : 0;
 }
 
-long long timer_stop(struct timer_data* data)
+long long Timer::Stop()
 {
-    long long value = timer_now(data);
-    data->started = 0;
-    return value;
+    // Get timer value right now
+    long long timeNow = Now();
+
+    // Reset state
+    mStarted = false;
+    mStartTime = 0;
+
+    // Return time right now
+    return timeNow;
 }
 
-void timer_destroy(struct timer_data* data)
+// --------------------------------------------------
+// Helpers
+// --------------------------------------------------
+static long long GetTimeNow()
 {
-    free(data);
-}
-
-/* -------------------------------------------------- */
-/* Helpers                                            */
-/* -------------------------------------------------- */
 #if defined(_WIN32) || defined(_WIN64)
-static long long win_get_time_now()
+    return WinGetTimeNow();
+#else
+    return UnixGetTimeNow();
+#endif
+}
+
+#if defined(_WIN32) || defined(_WIN64)
+static long long WinGetTimeNow()
 {
     LARGE_INTEGER time, frequency;
     QueryPerformanceFrequency(&frequency);
@@ -69,18 +73,9 @@ static long long win_get_time_now()
     return usec;
 }
 #else
-static long long unix_get_time_now()
+static long long UnixGetTimeNow()
 {
-    /* TODO: Implement unix function to retrieve high resolution time */
+    // TODO: Implement unix function to retrieve high resolution time
     return 0;
 }
 #endif
-
-static long long get_time_now()
-{
-#if defined(_WIN32) || defined(_WIN64)
-    return win_get_time_now();
-#else
-    return unix_get_time_now();
-#endif
-}

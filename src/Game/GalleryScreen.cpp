@@ -4,11 +4,14 @@ WARN_GUARD_ON
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 WARN_GUARD_OFF
+#include "../Util/Timer.hpp"
 #include "../Util/FileLoad.hpp"
 #include "../Asset/Image/ImageLoader.hpp"
 #include "../Asset/Properties/Properties.hpp"
 #include "../Asset/Properties/PropertiesManager.hpp"
 #include "../Graphics/Scene/SceneFactory.hpp"
+
+#include <iostream>
 
 // Skybox, Irrmap and Radmap names for cubemap store
 const std::string skybox = "gallery_skybox";
@@ -20,6 +23,10 @@ using BufferType = std::vector<std::uint8_t>;
 
 void GalleryScreen::onInit(ScreenContext& sc)
 {
+    // Create timer
+    timer_data* timer = timer_create();
+    timer_start(timer);
+
     // Store engine ref
     mEngine = sc.GetEngine();
 
@@ -44,12 +51,18 @@ void GalleryScreen::onInit(ScreenContext& sc)
           ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
         );
 
+    std::cout << "Gallery Screen Properties Parsing: " << timer_stop(timer) << " usec" << std::endl;
+    timer_start(timer);
+
     SceneFactory factory(
         &mEngine->GetTextureStore(),
         &mEngine->GetModelStore(),
         &mEngine->GetMaterialStore(),
         mFileDataCache);
     mScene = factory.CreateFromSceneFile(scene);
+
+    std::cout << "Gallery Screen Scene Creation: " << timer_stop(timer) << " usec" << std::endl;
+    timer_destroy(timer);
 
     // Setup scene lights
     Lights& lights = mEngine->GetRenderer().GetLights();

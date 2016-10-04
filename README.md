@@ -51,6 +51,6 @@ Licensing
 ---------
 Read [LICENSE](LICENSE.md)  
 
-Copyright (C) 2016 Agorgianitis Loukas <agorglouk@gmail.com>, Vlachakis Dimitris <dimitrisvlh@gmail.com>
+Copyright (C) 2015-2016 Agorgianitis Loukas <agorglouk@gmail.com>, Vlachakis Dimitris <dimitrisvlh@gmail.com>
 All rights reserved.
 

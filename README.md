@@ -19,9 +19,11 @@ Run the commands below. The binaries will be in the `bin/<Deubg|Release>` direct
 ```
 set TOOLCHAIN=<MSVC|GCC>
 set VARIANT=<Debug|Release>
-make -j 4 --no-print-directory deps
-make -j 4 --no-print-directory
+make deps
+make
 ```
+Note: You can use the `-j 4` make flag to speed up the process and the `--no-print-directory` flag
+to get rid of make's messages when changing directories.
 
 ### Shake
 Run the commands below. Built binaries will reside in the `bin/<ARCH>/<VARIANT>` directory.

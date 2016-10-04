@@ -79,19 +79,6 @@ void MainScreen::onInit(ScreenContext& sc)
     mRenderformCreator = std::make_unique<RenderformCreator>(&(mEngine->GetModelStore()), &(mEngine->GetMaterialStore()));
 }
 
-// Printing debug utility for properties
-void PrintOutputMaps() {}
-template <typename T, typename... Args>
-void PrintOutputMaps(PropertiesLoader::OutputContainer<T>& v, Args&&... args)
-{
-    for (const auto& p : v)
-    {
-        std::cout << "-------------------------------------" << std::endl << p.first << std::endl;
-        Properties::print(p.second);
-    }
-    PrintOutputMaps(std::forward<Args>(args)...);
-}
-
 void MainScreen::SetupWorld()
 {
     PropertiesManager propMgr;

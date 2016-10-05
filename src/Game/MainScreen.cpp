@@ -84,20 +84,20 @@ void MainScreen::SetupWorld()
     PropertiesManager propMgr;
     Properties::SceneFile scene = propMgr.Load
         // Scenes
-        ( {{ "mainscene", "res/Properties/Scenes/main.scn" }}
+        ( {{ "mainscene", "ext/Assets/Properties/Scenes/main.scn" }}
         // Materials
-        , {{ "armor",         "res/Properties/Materials/armor.mat"         }
-          ,{ "bronze",        "res/Properties/Materials/bronze.mat"        }
-          ,{ "brown_plastic", "res/Properties/Materials/brown_plastic.mat" }
-          ,{ "mahogany",      "res/Properties/Materials/mahogany.mat"      }
-          ,{ "mirror",        "res/Properties/Materials/mirror.mat"        }
-          ,{ "stone",         "res/Properties/Materials/stone.mat"         }
-          ,{ "white",         "res/Properties/Materials/white.mat"         }}
+        , {{ "armor",         "ext/Assets/Properties/Materials/armor.mat"         }
+          ,{ "bronze",        "ext/Assets/Properties/Materials/bronze.mat"        }
+          ,{ "brown_plastic", "ext/Assets/Properties/Materials/brown_plastic.mat" }
+          ,{ "mahogany",      "ext/Assets/Properties/Materials/mahogany.mat"      }
+          ,{ "mirror",        "ext/Assets/Properties/Materials/mirror.mat"        }
+          ,{ "stone",         "ext/Assets/Properties/Materials/stone.mat"         }
+          ,{ "white",         "ext/Assets/Properties/Materials/white.mat"         }}
         // Models
-        , {{ "armor",      "res/Properties/Models/armor.mod"      }
-          ,{ "cube",       "res/Properties/Models/cube.mod"       }
-          ,{ "teapot",     "res/Properties/Models/teapot.mod"     }
-          ,{ "shaderball", "res/Properties/Models/shaderball.mod" }}
+        , {{ "armor",      "ext/Assets/Properties/Models/armor.mod"      }
+          ,{ "cube",       "ext/Assets/Properties/Models/cube.mod"       }
+          ,{ "teapot",     "ext/Assets/Properties/Models/teapot.mod"     }
+          ,{ "shaderball", "ext/Assets/Properties/Models/shaderball.mod" }}
         );
 
     SceneFactory factory(

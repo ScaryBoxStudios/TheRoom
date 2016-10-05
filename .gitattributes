@@ -1,2 +1,5 @@
 ext\ filter=lfs diff=lfs merge=lfs -text
 ext/** filter=lfs diff=lfs merge=lfs -text
+ext/Assets/Properties/**/*.mat !filter !diff !merge
+ext/Assets/Properties/**/*.mod !filter !diff !merge
+ext/Assets/Properties/**/*.scn !filter !diff !merge
